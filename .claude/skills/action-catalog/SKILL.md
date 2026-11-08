@@ -56,6 +56,10 @@ exists in the CSV (`grep -rhoE '"(inbox|docs|transcripts|crm|email)\.[a-z_]+"'` 
 
 ## Upload (sends data to Unbox; confirm with the user first)
 
+Prefer the sync script, which validates, guards the 2 slots, and records the result in
+`catalog/unbox.json`: `uv run python scripts/catalog_sync.py push --keywords` (`status` shows what's on
+the portal). The raw SDK calls it wraps:
+
 ```python
 from dotenv import load_dotenv
 

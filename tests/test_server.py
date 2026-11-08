@@ -144,3 +144,28 @@ def test_live_agent_pauses_before_sending_and_block_is_respected():
     assert p["done"] is True
     last_user = [m for m in p["messages"] if m["role"] == "user"][-1]["content"]
     assert any("Blocked by a supervisor" in r["content"] for r in last_user)
+
+
+def test_slot_rule_for_portal_catalogs():
+    from monitor.unbox import plan_push
+
+    a = SimpleNamespace(catalog_name="actions", catalog_id="cat_a")
+    b = SimpleNamespace(catalog_name="other", catalog_id="cat_b")
+    assert plan_push("actions", [a]) == ("refresh", "cat_a")
+    assert plan_push("company_actions", [a]) == ("new", None)
+    assert plan_push("company_actions", [a, b]) == ("full", None)
+    assert plan_push("actions", [a, b]) == ("refresh", "cat_a")
+
+
+def test_catalogs_endpoint_without_key_reports_the_record(client):
+    r = client.get("/api/catalogs").json()
+    assert r["available"] is False and r["slots"] == 2
+    assert r["record"]["catalog_name"] == "actions"
+
+
+def test_upload_rejects_bad_catalog_name(client):
+    good = "id,name,event_type,group\na.one,Do the first thing,product,product\n"
+    r = client.post(
+        "/api/catalog/upload?name=Bad%20Name", files={"file": ("c.csv", good, "text/csv")}
+    ).json()
+    assert any("catalog name" in e for e in r["errors"])

@@ -5,8 +5,6 @@ The browser holds each run and calls /api/check per step, so no session lives on
 
 from __future__ import annotations
 
-import csv
-import io
 import json
 import os
 import tempfile
@@ -28,6 +26,7 @@ from env.scenario import SOURCES, TRIGGER
 from monitor.catalog import load_catalog
 from monitor.core import calibration, check_step, checks, default_ranker, learned_rule
 from monitor.events import EventError, load_run, validate_event
+from monitor.unbox import NAME_RE, PORTAL_CATALOGS, SLOTS, plan_push, read_csv, validate_rows
 
 app = FastAPI(title="Agent Monitor")
 
@@ -124,30 +123,51 @@ def context_validate(body: ContextIn) -> dict[str, Any]:
     return {"errors": validate_context(ctx), "context": ctx}
 
 
-REQUIRED = ["id", "name", "event_type", "group"]
+@app.get("/api/catalogs")
+def catalogs() -> dict[str, Any]:
+    """The account's catalogs on the Unbox portal, slots used, and which one the app uses."""
+    current = os.environ.get("UNBOXAI_CATALOG_ID")
+    rec_path = ROOT / "catalog" / "unbox.json"
+    record = json.loads(rec_path.read_text()) if rec_path.exists() else None
+    out: dict[str, Any] = {
+        "portal": PORTAL_CATALOGS,
+        "slots": SLOTS,
+        "current": current or (record or {}).get("catalog_id"),
+        "record": record,
+    }
+    if not os.environ.get("UNBOXAI_API_KEY"):
+        return {**out, "available": False, "owned": []}
+    from behaviorgpt import UnboxAIClient
+
+    mine = [x for x in UnboxAIClient(market="us").list_catalogs() if x.owned]
+    return {
+        **out,
+        "available": True,
+        "owned": [
+            {"catalog_id": x.catalog_id, "name": x.catalog_name, "status": x.status} for x in mine
+        ],
+    }
 
 
 @app.post("/api/catalog/upload")
 async def catalog_upload(
-    file: Annotated[UploadFile, File()], embed: bool = False
+    file: Annotated[UploadFile, File()], embed: bool = False, name: str = "company_actions"
 ) -> dict[str, Any]:
-    """Validate a company's action catalog CSV; with embed=true, upload it to BehaviorGPT."""
+    """Validate a company's action catalog CSV; with embed=true, upload it to the Unbox portal
+    under `name` (same name refreshes that catalog; a new name takes a free slot)."""
     raw = (await file.read()).decode("utf-8-sig")
     if len(raw) > 2_000_000:
         raise HTTPException(413, "Catalog CSV is over 2 MB.")
-    rows = list(csv.DictReader(io.StringIO(raw)))
-    cols = set(rows[0]) if rows else set()
-    errors = [f"missing column {c!r}" for c in REQUIRED if c not in cols]
-    ids = [r.get("id", "") for r in rows]
-    if len(set(ids)) != len(ids):
-        errors.append("duplicate ids")
-    if any(not r.get("id") or not r.get("name") for r in rows):
-        errors.append("every row needs an id and a name")
-    summary = {
+    rows = read_csv(raw)
+    errors = validate_rows(rows)
+    if not NAME_RE.match(name):
+        errors.append("catalog name: lowercase letters, digits, '_' or '-', 2-63 characters")
+    summary: dict[str, Any] = {
         "rows": len(rows),
-        "columns": sorted(cols),
+        "columns": sorted(rows[0]) if rows else [],
         "errors": errors,
         "sample": [{"id": r.get("id"), "name": r.get("name")} for r in rows[:5]],
+        "name": name,
     }
     if errors or not embed:
         return summary
@@ -155,15 +175,29 @@ async def catalog_upload(
         raise HTTPException(400, "Embedding needs UNBOXAI_API_KEY on the server.")
     from behaviorgpt import UnboxAIClient, catalog_from_csv
 
+    client = UnboxAIClient(market="us")
+    mode, existing = plan_push(name, [x for x in client.list_catalogs() if x.owned])
+    if mode == "full":
+        raise HTTPException(
+            409,
+            f"Both catalog slots on your Unbox account are used and none is named {name!r}. "
+            "Upload under an existing name to refresh it, or delete one on the portal.",
+        )
     with tempfile.TemporaryDirectory() as tmp:
-        src = Path(tmp) / "company_actions.csv"
+        src = Path(tmp) / f"{name}.csv"  # the file name becomes the catalog's name
         src.write_text(raw)
         try:
             parquet = catalog_from_csv(str(src))
-            job = UnboxAIClient(market="us").embed(parquet, wait=False)
+            job = client.embed(parquet, wait=False)
         except Exception as e:
             raise HTTPException(400, f"BehaviorGPT refused the catalog: {e}") from e
-    return {**summary, "job_id": job.job_id, "status": "embedding"}
+    return {
+        **summary,
+        "job_id": job.job_id,
+        "status": "embedding",
+        "mode": mode,
+        "replaces": existing,
+    }
 
 
 @app.get("/api/catalog/status")

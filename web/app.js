@@ -461,9 +461,15 @@ function openSetup() {
       <div class="row-actions"><button class="ghost" id="u-add">Add rule</button></div></section>
     <section><h3>Rules you taught it</h3><ul class="rules" id="learned">${ruleList(c.learned_rules, "learned_rules")}</ul></section>
     <section>
-      <h3>Action catalog</h3>
-      <p class="note">A CSV of the actions your agents can take, one per row: id, name, event_type and group (product). BehaviorGPT reads each action's name.</p>
+      <h3>Your catalogs on the Unbox portal</h3>
+      <p class="note">Catalogs uploaded with your API key are the ones on the <a href="https://portal.unboxai.com/catalogs/" target="_blank" rel="noopener">portal's Catalogs page</a>. Each key holds 2.</p>
+      <ul class="rules" id="portal-cats"><li class="note">Loading…</li></ul>
+    </section>
+    <section>
+      <h3>Upload an action catalog</h3>
+      <p class="note">A CSV of the actions your agents can take, one per row: id, name, event_type and group (product). BehaviorGPT reads each action's name. Uploading under an existing name refreshes that catalog.</p>
       <input type="file" id="cat-file" accept=".csv,text/csv" aria-label="Catalog CSV">
+      <label for="cat-name">Catalog name on the portal</label><input type="text" id="cat-name" value="company_actions" pattern="[a-z0-9][a-z0-9_\\-]{1,62}">
       <div class="row-actions"><button class="ghost" id="cat-check">Check file</button><button class="primary" id="cat-embed" disabled>Embed with BehaviorGPT</button><span class="status" id="cat-status" role="status"></span></div>
       <div id="cat-out"></div>
     </section>`);
@@ -498,7 +504,8 @@ function openSetup() {
     st.className = "status";
     st.textContent = embed ? "Uploading to BehaviorGPT…" : "Checking…";
     try {
-      const r = await fetch(`/api/catalog/upload?embed=${embed}`, { method: "POST", body: fd });
+      const name = encodeURIComponent($("#cat-name").value.trim());
+      const r = await fetch(`/api/catalog/upload?embed=${embed}&name=${name}`, { method: "POST", body: fd });
       const j = await r.json();
       if (!r.ok) throw new Error(j.detail || r.statusText);
       $("#cat-out").innerHTML = `<p>${j.rows} actions${j.errors.length ? `. Fix first: ${esc(j.errors.join("; "))}` : ", ready to embed"}.</p><ul class="rules">${j.sample.map((x) => `<li><span class="who">${esc(x.id)}</span>${esc(x.name)}</li>`).join("")}</ul>`;
@@ -507,8 +514,24 @@ function openSetup() {
       if (j.job_id) pollEmbed(j.job_id, j.sample);
     } catch (e) { st.textContent = e.message; st.className = "status err"; }
   };
+  loadPortalCatalogs();
   $("#cat-check").onclick = () => upload(false);
   $("#cat-embed").onclick = () => upload(true);
+}
+
+async function loadPortalCatalogs() {
+  const ul = $("#portal-cats");
+  try {
+    const c = await api("/api/catalogs");
+    if (!c.available) {
+      ul.innerHTML = `<li class="note">Add UNBOXAI_API_KEY on the server to see them here.${c.record ? ` This app uses <strong>${esc(c.record.catalog_name)}</strong> (${esc(c.record.catalog_id)}).` : ""}</li>`;
+      return;
+    }
+    ul.innerHTML = c.owned.map((x) => `<li><span class="who">${esc(x.status)}${x.catalog_id === c.current ? ", used by this app" : ""}</span><strong>${esc(x.name)}</strong> <span class="note">${esc(x.catalog_id)}</span></li>`).join("") +
+      `<li class="note">${c.owned.length} of ${c.slots} slots used.</li>`;
+  } catch (e) {
+    ul.innerHTML = `<li class="status err">${esc(e.message)}</li>`;
+  }
 }
 
 async function pollEmbed(jobId, sample) {
@@ -518,7 +541,8 @@ async function pollEmbed(jobId, sample) {
     if (j.error) { st.textContent = j.error; st.className = "status err"; return; }
     st.textContent = `Embedding: ${j.status || "queued"}…`;
     if (j.catalog_id && /ready|done|succeeded|complete/i.test(j.status || "")) {
-      st.textContent = `Embedded as ${j.catalog_id}.`;
+      st.textContent = `Embedded as ${j.catalog_id}. It's on your Unbox portal now.`;
+      loadPortalCatalogs();
       const first = sample[0]?.id;
       if (first) {
         const p = await api("/api/catalog/preview", { catalog_id: j.catalog_id, after: [first] }).catch(() => null);

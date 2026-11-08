@@ -1,0 +1,9 @@
+{
+  "catalog_id": "cat_7c9916ba8e6b222d1084c033",
+  "catalog_name": "actions",
+  "source": "catalog/actions.csv",
+  "rows": 60,
+  "keywords": true,
+  "embedded_at": "2026-11-08",
+  "portal": "https://portal.unboxai.com/catalogs/"
+}

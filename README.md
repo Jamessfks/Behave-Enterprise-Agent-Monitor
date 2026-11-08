@@ -24,10 +24,10 @@ uv sync
 ```
 
 ```bash
-uv run uvicorn server:app --port 8765
+uv run uvicorn server:app --port 8780
 ```
 
-Open <http://localhost:8765>, pick **Careful agent** or **Faulty agent**, and press **Play**. No
+Open <http://localhost:8780>, pick **Careful agent** or **Faulty agent**, and press **Play**. No
 API keys are needed for the recorded runs: BehaviorGPT's rankings for them are cached in
 `runs/rankings_cache.json`.
 
@@ -55,7 +55,8 @@ uv run ruff check . && uv run ruff format --check .
 - `uv run python -m monitor.go_no_go`: BehaviorGPT transfer test → `results/go_no_go.json`
 - `uv run python -m monitor.calibrate`: fit and evaluate the step models →
   `monitor/calibration.json`
-- `uv run python scripts/embed_catalog.py`: (re)embed `catalog/actions.csv` with BehaviorGPT
+- `uv run python scripts/catalog_sync.py status|push|keywords|smoke`: the catalog on the
+  [Unbox portal](https://portal.unboxai.com/catalogs/); see [docs/plans/unbox-portal-catalogs.md](docs/plans/unbox-portal-catalogs.md)
 
 Why the default step model isn't BehaviorGPT alone, and the other design decisions:
 [docs/decisions.md](docs/decisions.md).

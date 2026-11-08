@@ -24,9 +24,10 @@ cache · `catalog/actions.csv` the 60 actions.
 ## Commands
 
 - `uv sync`: install (Python 3.12, `behaviorgpt` 0.10.0)
-- `uv run uvicorn server:app --port 8765`: run the app
+- `uv run uvicorn server:app --port 8780`: run the app
 - `uv run pytest -q`, `uv run ruff check .`, `uv run ruff format --check .`: run before committing
 - `uv run python scripts/make_scripted_runs.py`: regenerate `runs/*.jsonl` from the workflow
+- `uv run python scripts/catalog_sync.py status`: the catalogs on the Unbox portal (push/keywords/smoke too)
 
 ## Project skills (`.claude/skills/`)
 
