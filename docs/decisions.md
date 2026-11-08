@@ -1,5 +1,9 @@
 # Decisions
 
+> **Since the sales-env merge (2026-11-08), decisions are recorded as ADRs in [adr/](adr/README.md).**
+> The entries below are the pre-merge history (NovaDesk world), kept for context; where they
+> conflict with an ADR, the ADR wins.
+
 Each entry says what was chosen and why. Newest first.
 
 ## 2026-11-08: BehaviorGPT stays as evidence
