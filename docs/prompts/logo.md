@@ -47,3 +47,9 @@ very dark moss background #161C14.
 - **Size in the header:** the mark shows at 28×28 px. Check that it still reads at that size.
 - **Where it goes:** save it as `web/logo.svg` (and `web/logo-dark.svg` if you made one). Then it
   replaces the inline mark in the header and the favicon (`web/favicon.svg`).
+
+## Status (2026-11-08)
+
+Generated, then redrawn as vectors from the generated image: `web/logo.svg` (light),
+`web/logo-dark.svg` (dark), and `web/favicon.svg`. The header uses an inline copy with heavier
+strokes for small sizes, coloured by the theme tokens so it switches with dark mode.

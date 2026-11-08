@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="356 88 312 850" role="img" aria-label="Agent Monitor">
+  <title>Agent Monitor</title>
+  <g fill="none" stroke="#BAC8B1" stroke-width="36" stroke-linecap="round">
+    <path d="M512 115V483"/>
+    <path d="M512 757V910"/>
+    <rect x="390" y="499" width="244" height="242" rx="52"/>
+  </g>
+  <path d="M444 321H580" stroke="#94B382" stroke-width="32" stroke-linecap="round"/>
+  <circle cx="512" cy="621" r="57" fill="#94B382"/>
+</svg>

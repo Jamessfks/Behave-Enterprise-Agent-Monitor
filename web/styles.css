@@ -63,7 +63,10 @@ button, select, textarea, input { font: inherit; color: inherit; }
 .brand { display: flex; align-items: center; gap: 10px; }
 .brand h1 { font-size: 17px; }
 .brand .sub { margin: 0; font-size: 13px; color: var(--muted); }
-.mark { width: 28px; height: 28px; color: var(--moss); }
+.mark { height: 42px; width: auto; flex: none; }
+.mark-line { stroke: var(--moss); }
+.mark-spark { stroke: var(--jade); }
+.mark-dot { fill: var(--jade); }
 .controls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
 .seg { display: inline-flex; background: var(--fill); border-radius: var(--r-md); padding: 3px; }
 .seg button {
