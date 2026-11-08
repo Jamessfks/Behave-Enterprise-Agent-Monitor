@@ -7,7 +7,7 @@
   <div class="text-sm text-gray-500 mb-1">
     {% for c in crumbs %}{% if not loop.first %} &rsaquo; {% endif %}<a href="/drive?folder={{ c.id }}" class="hover:underline">{{ c.name }}</a>{% endfor %}
   </div>
-  <h1 class="text-2xl font-normal text-gray-900 flex items-center gap-3">{{ doc.name }} {{ badge(doc.sensitivity) }}</h1>
+  <h1 class="text-2xl font-normal text-gray-900 flex items-center gap-3" data-field="name">{{ doc.name }} {{ badge(doc.sensitivity) }}</h1>
   <div class="text-xs text-gray-500 mt-1">Owner: {{ user_name(doc.owner) }} · Last modified {{ fmt_dt(doc.updated_at, false) }} · Type: {{ doc.kind }}
     {% if doc.copied_from %} · Copied from <a class="underline" href="/drive/doc/{{ doc.copied_from }}">{{ doc.copied_from }}</a>{% endif %}
     {% if doc.shared_with %} · Shared with {{ doc.shared_with|length }}{% endif %}</div>

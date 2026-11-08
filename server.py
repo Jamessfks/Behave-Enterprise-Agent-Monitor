@@ -99,6 +99,7 @@ def bootstrap() -> dict[str, Any]:
                 "mistakes": len(runner.steps_for(sc, True)),
             },
         },
+        "scenarios": runner.scenarios(),
         "apps": {"mail": "/mail", "drive": "/drive", "crm": "/crm/deals", "calendar": "/calendar"},
         "catalog": {
             a.id: {"name": a.name, "app": a.app, "irreversible": a.irreversible, "role": a.role}

@@ -14,7 +14,7 @@
     {% endif %}
     <ul class="divide-y divide-gray-100 overflow-y-auto" aria-label="Conversations">
       {% for t in threads %}
-      <li>
+      <li data-thread-id="{{ t.id }}">
         <a href="/mail/thread/{{ t.id }}?label={{ label|urlencode }}" class="flex items-center gap-3 px-4 py-2 text-sm hover:shadow-[inset_1px_0_0_#dadce0,inset_-1px_0_0_#dadce0,0_1px_2px_rgba(60,64,67,.3)] {{ 'bg-white' if t.unread else 'bg-gray-50' }}">
           <span class="w-4 text-yellow-500" aria-label="{{ 'Starred' if t.starred else '' }}">{{ '★' if t.starred else '' }}</span>
           <span class="w-48 shrink-0 truncate {{ 'font-bold text-gray-900' if t.unread else 'text-gray-700' }}">{{ t.senders }}{% if t.messages > 1 %} <span class="text-gray-500 font-normal">{{ t.messages }}</span>{% endif %}</span>
