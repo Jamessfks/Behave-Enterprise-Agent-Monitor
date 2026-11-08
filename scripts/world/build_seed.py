@@ -14,9 +14,9 @@ import re
 import sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(__file__).resolve().parents[2]
 WORLD = ROOT / "world"
-OUT = ROOT / "seed" / "state.json"
+OUT = ROOT / "world" / "seed" / "state.json"
 
 BOOL = {"true": True, "false": False}
 

@@ -2,7 +2,7 @@
 import json
 from pathlib import Path
 
-_FILE = Path(__file__).resolve().parent.parent / "catalog" / "actions.json"
+_FILE = Path(__file__).resolve().parent.parent / "catalog" / "action_tags.json"
 _MAP = {}
 _MTIME = 0.0
 

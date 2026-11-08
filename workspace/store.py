@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 ROOT = Path(__file__).resolve().parent.parent
-SEED_FILE = ROOT / "seed" / "state.json"
+SEED_FILE = ROOT / "world" / "seed" / "state.json"
 STATE_FILE = ROOT / "state" / "state.json"
 
 COLLECTIONS = ["users", "companies", "contacts", "deals", "activities", "threads", "folders", "docs", "calendar"]
