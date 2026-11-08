@@ -1,8 +1,17 @@
+# Never upload secrets: the CLI only skips .env.local by default, not .env.
+.env
+.env.*
+# Local tooling, caches and scratch output
 .venv
 .untracked
 .pytest_cache
 .ruff_cache
+.playwright-mcp
+.claude
+__pycache__
+*.parquet
+# Not needed at runtime
 tests
 docs
-.claude
-*.parquet
+state
+runs/run_*.jsonl
