@@ -62,12 +62,18 @@ def ok(res: Optional[dict] = None, redirect: Optional[str] = None, **extra) -> d
 
 
 async def body(request: Request) -> dict:
-    """Accept JSON (scripts, app.js) or form posts."""
+    """Accept JSON (scripts, app.js) or form posts. Records the body so a paused write can be
+    replayed when a person approves it (events.CURRENT_REQUEST)."""
     ct = request.headers.get("content-type", "")
     if "application/json" in ct:
-        return await request.json()
-    form = await request.form()
-    return {k: v for k, v in form.items()}
+        b = await request.json()
+    else:
+        form = await request.form()
+        b = {k: v for k, v in form.items()}
+    req = events.CURRENT_REQUEST.get()
+    if req is not None:
+        req["body"] = b
+    return b
 
 
 def as_list(v: Any) -> list:

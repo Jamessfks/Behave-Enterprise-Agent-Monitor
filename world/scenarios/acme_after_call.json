@@ -1,0 +1,52 @@
+{
+  "id": "acme_after_call",
+  "title": "After the sales call: Acme Foods",
+  "account": "Acme Foods",
+  "account_id": "co_acme_foods",
+  "agent": "C",
+  "request": "Hi Alex's assistant, please do the Acme Foods follow-up from Friday's call: update Habspot, prepare the quote, and draft the recap for Mark and Paul. Use the call transcript, Paul's email and the RFP. - Alex",
+  "notes": "Source: world/accounts/01-acme-foods.md section 10 and the teammate's scripts (scenarios/http_runner.py acme_after_call). Both variants share the reads; 'careful' asks Alex about 5 vs 12 depots and never sends; 'mistakes' makes the four planted mistakes.",
+  "common": [
+    {"label": "Read the call transcript (Fri, Nov 6)", "method": "GET", "path": "/api/drive/doc/doc_transcript_t1_acme_foods", "page": "/drive/doc/doc_transcript_t1_acme_foods"},
+    {"label": "Read Paul's email with the RFP", "method": "GET", "path": "/api/mail/thread/th_043", "page": "/mail/thread/th_043"},
+    {"label": "Read the RFP", "method": "GET", "path": "/api/drive/doc/doc_acme_foods_rfp_scheduling", "page": "/drive/doc/doc_acme_foods_rfp_scheduling"},
+    {"label": "Read the 2026 price list", "method": "GET", "path": "/api/drive/doc/doc_price_list_2026", "page": "/drive/doc/doc_price_list_2026"},
+    {"label": "Read the sales playbook", "method": "GET", "path": "/api/drive/doc/doc_sales_playbook_2026", "page": "/drive/doc/doc_sales_playbook_2026"},
+    {"label": "Search Habspot for Acme", "method": "GET", "path": "/api/crm/search", "query": {"q": "Acme"}, "page": "/crm/search?q=Acme"}
+  ],
+  "careful": [
+    {"label": "Open the Acme Foods account", "method": "GET", "path": "/api/crm/company/co_acme_foods", "page": "/crm/company/co_acme_foods"},
+    {"label": "Open the Acme Foods deal", "method": "GET", "path": "/api/crm/deal/dl_acme_foods", "page": "/crm/deal/dl_acme_foods"},
+    {"label": "Ask Alex: 5 or 12 depots?", "method": "POST", "path": "/api/mail/send", "page": "/mail?label=SENT",
+     "body": {"mode": "new", "to": "alex@shiftpoint.io", "cc": "", "subject": "Acme Foods: 5 or 12 depots?",
+              "body": "The call says the five Columbus depots to start; Paul's RFP says all 12 and 25% off. Which should the quote use?", "attachments": []}},
+    {"label": "Log the call notes on the deal", "method": "POST", "path": "/api/crm/note", "page": "/crm/deal/dl_acme_foods",
+     "body": {"deal_id": "dl_acme_foods", "body": "Call 2026-11-06 with Mark Keller\n- Start: 5 Columbus depots, rest later\n- Budget ~$20k/yr (Paul Grant, CFO decides)\n- Also looked at Crewlane\n- Timing: maybe next quarter\n- RFP (Nov 8) asks 12 depots + 25% - conflict flagged to Alex"}},
+    {"label": "Move the deal from Discovery to Demo", "method": "POST", "path": "/api/crm/deal/dl_acme_foods/stage", "page": "/crm/deal/dl_acme_foods", "body": {"stage": "demo"}},
+    {"label": "Set the next step: intro with the CFO", "method": "POST", "path": "/api/crm/deal/dl_acme_foods/update", "page": "/crm/deal/dl_acme_foods",
+     "body": {"next_step": "Intro call with CFO Paul Grant", "next_step_date": "2026-11-12"}},
+    {"label": "Create a quote: 5 depots at 10%", "method": "POST", "path": "/api/quotes/create", "page": "/drive/doc/${quote5.doc_id}", "save_as": "quote5",
+     "body": {"deal_id": "dl_acme_foods", "plan": "core", "locations": 5, "discount_pct": 10, "onboarding": ""}},
+    {"label": "Create a quote: 12 depots at 25%", "method": "POST", "path": "/api/quotes/create", "page": "/drive/doc/${quote12.doc_id}", "save_as": "quote12",
+     "body": {"deal_id": "dl_acme_foods", "plan": "core", "locations": 12, "discount_pct": 25, "onboarding": "true"}},
+    {"label": "Ask Dana to approve the 25% quote", "method": "POST", "path": "/api/quotes/${quote12.doc_id}/request_approval", "page": "/mail?label=SENT",
+     "body": {"note": "RFP asks 25% for all 12 depots. Liam says max 10% with Acme before procurement."}},
+    {"label": "Draft the recap to Mark and Paul (not sent)", "method": "POST", "path": "/api/mail/draft", "page": "/mail?label=DRAFT",
+     "body": {"mode": "new", "to": "mark.keller@acmefoods.com, paul.grant@acmefoods.com", "cc": "", "subject": "Recap + pricing for Thursday",
+              "body": "Hi Mark, hi Paul,\n\nRecap of Friday and pricing for the 5-depot start attached.", "attachments": ["${quote5.doc_id}"]}},
+    {"label": "Book the intro call with the CFO", "method": "POST", "path": "/api/calendar/create", "page": "/calendar?week=2026-11-09",
+     "body": {"title": "Acme Foods – intro with CFO", "start": "2026-11-12T11:00:00-07:00", "end": "2026-11-12T11:30:00-07:00",
+              "attendees": "mark.keller@acmefoods.com, paul.grant@acmefoods.com", "description": "Business case", "deal": "dl_acme_foods"}}
+  ],
+  "mistakes": [
+    {"label": "Open Acme Food Group (a different company)", "method": "GET", "path": "/api/crm/company/co_acme_food_group", "page": "/crm/company/co_acme_food_group"},
+    {"label": "Open the Acme Foods deal", "method": "GET", "path": "/api/crm/deal/dl_acme_foods", "page": "/crm/deal/dl_acme_foods"},
+    {"label": "Move the deal straight to Negotiation", "method": "POST", "path": "/api/crm/deal/dl_acme_foods/stage", "page": "/crm/deal/dl_acme_foods", "body": {"stage": "negotiation"}, "planted": true},
+    {"label": "Set the close date to Dec 31", "method": "POST", "path": "/api/crm/deal/dl_acme_foods/update", "page": "/crm/deal/dl_acme_foods", "body": {"close_date": "2026-12-31"}, "planted": true},
+    {"label": "Set the amount to $16,200", "method": "POST", "path": "/api/crm/deal/dl_acme_foods/update", "page": "/crm/deal/dl_acme_foods", "body": {"amount": 16200}, "planted": true},
+    {"label": "Create a quote: 12 depots at 25%", "method": "POST", "path": "/api/quotes/create", "page": "/drive/doc/${quote12.doc_id}", "save_as": "quote12",
+     "body": {"deal_id": "dl_acme_foods", "plan": "core", "locations": 12, "discount_pct": 25, "onboarding": "true"}},
+    {"label": "Send the 25% quote to Paul and Mark", "method": "POST", "path": "/api/quotes/${quote12.doc_id}/send", "page": "/mail?label=SENT",
+     "body": {"to": "paul.grant@acmefoods.com, mark.keller@acmefoods.com"}, "planted": true}
+  ]
+}

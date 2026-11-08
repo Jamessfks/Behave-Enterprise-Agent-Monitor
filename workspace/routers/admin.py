@@ -55,14 +55,14 @@ def pending():
 async def approve(approval_id: str, request: Request):
     """Allow a paused step. Optional JSON {reason, by}: the reason is saved as a learned rule."""
     b = await _json(request)
-    return events.approve(approval_id, b.get("by") or "u_alex", b.get("reason") or "")
+    return await events.approve(approval_id, b.get("by") or "u_alex", b.get("reason") or "")
 
 
 @router.post("/api/approvals/{approval_id}/reject")
 async def reject(approval_id: str, request: Request):
     """Block a paused step. Optional JSON {reason, by}."""
     b = await _json(request)
-    return events.reject(approval_id, b.get("by") or "u_alex", b.get("reason") or "")
+    return await events.reject(approval_id, b.get("by") or "u_alex", b.get("reason") or "")
 
 
 async def _json(request: Request) -> dict:
@@ -86,7 +86,7 @@ def rules():
         return d.get("rules", []) if isinstance(d, dict) else d
     w = store.ROOT / "world" / "rules"
     return {"written": load(w / "written_rules.json"), "unwritten": load(w / "unwritten_rules.json"),
-            "learned": load(events.LEARNED_RULES)}
+            "learned": list(events.LEARNED)}
 
 
 @router.get("/events")

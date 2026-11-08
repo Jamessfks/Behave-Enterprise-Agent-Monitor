@@ -18,18 +18,22 @@ conflicts are in the design: two apps, two worlds, two event formats, two catalo
 
 - Merge with history (`git merge --no-ff origin/sales-env`) on `merge/sales-env` and land it
   through a pull request. The teammate's commits keep their authorship.
-- Restructure into **one** package layout and **one** FastAPI app (`server.py`):
-  - `workspace/`: the sales-env app (routers, templates, static, store, events, catalog)
-  - `world/`: the ShiftPoint data, plus `world/seed/state.json`
-  - `monitor/`: the three checks
-  - `agent/`: the live Claude agent
-  - `scenarios/`: scripted runs
-  - `web/`: the monitor UI
-- Files are moved with `git mv` so `git log --follow` keeps their history.
+- **One repository, one deploy, two FastAPI apps** (the owner's call, 2026-11-08: "a separate
+  FastAPI app with its own world"):
+  - **The workspace** (`workspace/main.py`, `create_app()`): its own FastAPI app (Jmail, Jdrive,
+    Habspot, Calendario, quotes, approvals, event log) over its own world (`world/`). It runs
+    alone with `uvicorn workspace.main:app`.
+  - **The monitor server** (`server.py`): the run APIs, the Unbox catalog tools, and the canvas
+    at `/monitor/`. It mounts the workspace app at `/`, so one Vercel deploy serves both.
+- Files moved with `git mv`, so `git log --follow` keeps their history:
+  `sales-env/app` → `workspace/`, `sales-env/world` → `world/`, seed → `world/seed/`, scripts →
+  `scripts/world/` and `scenarios/http_runner.py`.
 
 ## Consequences
 
-- One process, one deploy, one test suite, one dependency file (`pyproject.toml`).
+- One process, one deploy, one state store, one test suite, one dependency file (`pyproject.toml`).
+- The monitor checks every step in-process (ADR 0005), with no network hop, even though the
+  workspace is its own app.
 - sales-env's README run instructions (`cd sales-env && uvicorn app.main:app`) change to the
   root README's.
 - Later ADRs record each part that was replaced: the monitor stub (0005), the event format
@@ -37,6 +41,7 @@ conflicts are in the design: two apps, two worlds, two event formats, two catalo
 
 ## Alternatives considered
 
-- **Keep two apps connected over HTTP** (sales-env `MONITOR_MODE=remote` → main `/api/check`).
-  Less churn, but two deploys, a network hop in every write, and two state models. Rejected:
-  the owner asked for one MVP and allowed restructuring.
+- **Two apps, two deploys, connected over HTTP** (sales-env's original `MONITOR_MODE=remote`).
+  Rejected by the owner: two deploys, a network hop on every write, and shared state to wire up.
+- **One app with the workspace routers folded in.** Simpler routing, but the owner wants the
+  workspace to stay its own app with its own world.

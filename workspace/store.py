@@ -1,14 +1,16 @@
-"""In-memory app state, persisted to state/state.json. Reset copies seed/state.json over it."""
+"""In-memory app state. Reset copies world/seed/state.json into memory.
+
+Persistence between requests is the StateStore's job (workspace/state.py, ADR 0003): this module
+never writes to disk, so it runs on a read-only filesystem. `save()` only marks the state changed.
+"""
 import copy
 import json
-import shutil
 import uuid
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 ROOT = Path(__file__).resolve().parent.parent
 SEED_FILE = ROOT / "world" / "seed" / "state.json"
-STATE_FILE = ROOT / "state" / "state.json"
 
 COLLECTIONS = ["users", "companies", "contacts", "deals", "activities", "threads", "folders", "docs", "calendar"]
 
@@ -20,6 +22,7 @@ TYPE_TO_COLL = {
 }
 
 DATA: Dict[str, Any] = {}
+CHANGED = {"v": False}  # set by save()/events._log; the StateStore persists when True
 
 # In-world clock. Real event timestamps use wall time; displayed "today" is fixed.
 NOW = "2026-11-09T09:00:00-07:00"
@@ -30,29 +33,29 @@ POLICY = {"max_discount_rep": 15, "max_discount_manager": 25,
           "large_amount_change_pct": 20, "large_close_date_change_days": 30}
 
 
-def load() -> None:
+def load(data: Optional[Dict[str, Any]] = None) -> None:
+    """Use `data` (from a snapshot) or, if there is none, the seed."""
     global DATA
-    if not STATE_FILE.exists():
+    if data is None:
         reset()
         return
-    DATA = json.loads(STATE_FILE.read_text())
+    DATA = data
     for c in COLLECTIONS:
         DATA.setdefault(c, [])
 
 
 def save() -> None:
-    STATE_FILE.parent.mkdir(exist_ok=True)
-    tmp = STATE_FILE.with_suffix(".tmp")
-    tmp.write_text(json.dumps(DATA, indent=1))
-    tmp.replace(STATE_FILE)
+    CHANGED["v"] = True
 
 
 def reset() -> None:
+    global DATA
     if not SEED_FILE.exists():
-        raise RuntimeError("seed/state.json missing - run: python scripts/build_seed.py")
-    STATE_FILE.parent.mkdir(exist_ok=True)
-    shutil.copy(SEED_FILE, STATE_FILE)
-    load()
+        raise RuntimeError("world/seed/state.json missing - run: python scripts/world/build_seed.py")
+    DATA = json.loads(SEED_FILE.read_text())
+    for c in COLLECTIONS:
+        DATA.setdefault(c, [])
+    save()
 
 
 def items(coll: str) -> List[dict]:

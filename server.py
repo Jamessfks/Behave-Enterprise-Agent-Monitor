@@ -1,6 +1,13 @@
-"""Agent Monitor: one stateless FastAPI app (local: `uv run uvicorn server:app`; also Vercel).
+"""Agent Monitor server (ADR 0001). Local: `uv run uvicorn server:app --port 8780`.
 
-The browser holds each run and calls /api/check per step, so no session lives on the server.
+One deploy, two apps:
+- The ShiftPoint workspace (`workspace.main.create_app`): its own FastAPI app with its own world
+  (Jmail /mail, Jdrive /drive, Habspot /crm, Calendario /calendar, quotes), mounted at "/" last.
+  Every agent write passes its single gate, which runs the monitor in-process.
+- The monitor: run APIs for the canvas (scenarios/runner.py, agent/live.py), Unbox catalog
+  tools, and the canvas (`web/`) at /monitor/ ("/" redirects there).
+
+State lives in a StateStore (workspace/state.py): process memory locally, Upstash Redis on Vercel.
 """
 
 from __future__ import annotations
@@ -8,11 +15,13 @@ from __future__ import annotations
 import json
 import os
 import tempfile
+from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Annotated, Any
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, File, HTTPException, UploadFile
+from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
@@ -20,12 +29,7 @@ ROOT = Path(__file__).resolve().parent
 load_dotenv(ROOT / ".env")
 
 from agent import live
-from env.app import new_state
-from env.company import default_context, merged, validate_context
-from env.scenario import SOURCES, TRIGGER
 from monitor.catalog import load_catalog
-from monitor.core import calibration, check_step, checks, default_ranker, learned_rule
-from monitor.events import EventError, load_run, validate_event
 from monitor.unbox import (
     NAME_RE,
     PORTAL_CATALOGS,
@@ -35,28 +39,31 @@ from monitor.unbox import (
     read_csv,
     validate_rows,
 )
+from scenarios import runner
+from workspace import events, session
+from workspace.main import create_app
+from workspace.state import MemoryStore, make_store
 
-app = FastAPI(title="Agent Monitor")
-
-RUN_LABELS = {"careful_01": "Careful agent", "faulty": "Faulty agent"}
-
-
-class CheckIn(BaseModel):
-    history: list[dict[str, Any]]
-    event: dict[str, Any]
-    context: dict[str, Any] | None = None
-    cusum: float = 0.0
-    ranker: str | None = None
+STATE = make_store()
+DEFAULT_SCENARIO = "acme_after_call"
+WORKSPACE = create_app(standalone=False, state=STATE)
 
 
-class LearnIn(BaseModel):
-    event: dict[str, Any]
-    failed: list[str]
-    reason: str
+@asynccontextmanager
+async def lifespan(_app: FastAPI):
+    if isinstance(STATE, MemoryStore):
+        events.restore(None)  # seed the world in process memory
+    yield
 
 
-class ContextIn(BaseModel):
-    context: dict[str, Any]
+app = FastAPI(title="Agent Monitor", lifespan=lifespan)
+session.install(app, STATE)  # state load/save + actor, around the monitor APIs and the workspace
+
+
+class RunIn(BaseModel):
+    scenario: str | None = None
+    mistakes: bool = True
+    instruction: str | None = None
 
 
 class PreviewIn(BaseModel):
@@ -66,69 +73,73 @@ class PreviewIn(BaseModel):
 
 @app.get("/api/health")
 def health() -> dict[str, Any]:
-    return {"ok": True}
+    return {"ok": True, "state": STATE.name}
+
+
+def _calibration() -> dict[str, Any]:
+    path = ROOT / "monitor" / "calibration.json"
+    return json.loads(path.read_text()) if path.exists() else {}
 
 
 @app.get("/api/bootstrap")
 def bootstrap() -> dict[str, Any]:
-    cat = load_catalog()
-    cal = calibration()
+    sc = runner.load(DEFAULT_SCENARIO)
+    cal = _calibration()
     gng_path = ROOT / "results" / "go_no_go.json"
     gng = json.loads(gng_path.read_text()) if gng_path.exists() else {}
     return {
+        "company": {"name": "ShiftPoint", "persona": "Alex Chen"},
+        "scenario": {
+            "id": sc["id"],
+            "title": sc["title"],
+            "request": sc["request"],
+            "account": sc["account"],
+            "steps": {"careful": len(runner.steps_for(sc, False)), "mistakes": len(runner.steps_for(sc, True))},
+        },
+        "apps": {"mail": "/mail", "drive": "/drive", "crm": "/crm/deals", "calendar": "/calendar"},
         "catalog": {
             a.id: {"name": a.name, "app": a.app, "irreversible": a.irreversible, "role": a.role}
-            for a in cat.values()
+            for a in load_catalog().values()
         },
-        "runs": {k: load_run(ROOT / "runs" / f"{k}.jsonl") for k in RUN_LABELS},
-        "run_labels": RUN_LABELS,
-        "trigger": TRIGGER,
-        "sources": {
-            k: {"tab": s["tab"], "title": s["title"], "text": s["text"]} for k, s in SOURCES.items()
-        },
-        "context": default_context(),
         "rankers": {
-            k: {
-                "barrier": v["barrier"],
-                "caught": v["caught"],
-                "missed": v["missed"],
-                "false_alarms": v["false_alarms"],
-            }
-            for k, v in cal["rankers"].items()
-            if k in checks()
+            k: {key: v.get(key) for key in ("barrier", "caught", "missed", "false_alarms")}
+            for k, v in (cal.get("rankers") or {}).items()
         },
-        "default_ranker": default_ranker(),
-        "go_no_go": {
-            "careful_median_rank": gng.get("careful_median_rank"),
-            "careful_top5_share": gng.get("careful_top5_share"),
-            "catalog_size": gng.get("catalog_size"),
-        },
+        "default_ranker": cal.get("default", "workflow"),
+        "go_no_go": {k: gng.get(k) for k in ("careful_median_rank", "careful_top5_share", "catalog_size")},
         "live_available": live.available(),
         "behaviorgpt_live": bool(os.environ.get("UNBOXAI_API_KEY")),
+        "state": STATE.name,
     }
 
 
-@app.post("/api/check")
-def check(body: CheckIn) -> dict[str, Any]:
+@app.post("/api/runs")
+async def start_run(body: RunIn) -> dict[str, Any]:
+    if body.instruction:
+        if not live.available():
+            raise HTTPException(400, "Live mode needs ANTHROPIC_API_KEY on the server.")
+        return live.start(body.instruction)
     try:
-        validate_event({**body.event, "run_id": body.event.get("run_id", "x")})
-    except EventError as e:
-        raise HTTPException(422, f"bad event: {e}") from e
-    ctx = merged(default_context(), body.context) if body.context else None
-    return check_step(body.history, body.event, ctx, body.cusum, body.ranker)
+        return runner.start(body.scenario or DEFAULT_SCENARIO, body.mistakes)
+    except KeyError as e:
+        raise HTTPException(404, str(e)) from e
 
 
-@app.post("/api/rules/learn")
-def learn(body: LearnIn) -> dict[str, Any]:
-    if not body.reason.strip():
-        raise HTTPException(422, "Allow needs a reason; it becomes a rule.")
-    return learned_rule(body.event, body.failed, body.reason)
+@app.post("/api/runs/current/next")
+async def next_step() -> dict[str, Any]:
+    if (events.RUN_STATE.get("live") or {}).get("active"):
+        return await live.next_step(WORKSPACE)
+    return await runner.next_step(WORKSPACE)
 
 
-@app.post("/api/context/validate")
-def context_validate(body: ContextIn) -> dict[str, Any]:
-    ctx = merged(default_context(), body.context)
-    return {"errors": validate_context(ctx), "context": ctx}
+@app.get("/api/runs/current")
+def current_run() -> dict[str, Any]:
+    return runner.current()
+
+
+@app.get("/")
+def home() -> RedirectResponse:
+    return RedirectResponse("/monitor/")
 
 
 @app.get("/api/catalogs")
@@ -229,32 +240,6 @@ def catalog_preview(body: PreviewIn) -> dict[str, Any]:
     return {"next": [{"id": i.id, "name": i.data.get("name"), "score": i.score} for i in res.items]}
 
 
-@app.post("/api/agent/start")
-def agent_start(body: dict[str, Any]) -> dict[str, Any]:
-    if not live.available():
-        raise HTTPException(400, "Live mode needs ANTHROPIC_API_KEY on the server.")
-    ctx = merged(default_context(), body.get("context") or {})
-    return {
-        "instruction": body.get("instruction") or TRIGGER["text"],
-        "context": ctx,
-        "state": new_state(),
-        "history": [],
-        "messages": [],
-        "queue": [],
-        "results": [],
-        "cusum": 0.0,
-        "ranker": body.get("ranker"),
-        "run_id": "live",
-        "pending": None,
-    }
-
-
-@app.post("/api/agent/step")
-def agent_step(body: dict[str, Any]) -> dict[str, Any]:
-    if not live.available():
-        raise HTTPException(400, "Live mode needs ANTHROPIC_API_KEY on the server.")
-    return live.step(body)
-
-
-# Declared last: API routes above take priority over the static files.
-app.mount("/", StaticFiles(directory=ROOT / "web", html=True), name="web")
+app.mount("/monitor", StaticFiles(directory=ROOT / "web", html=True), name="monitor")
+# Declared last: the workspace app answers everything the monitor doesn't.
+app.mount("/", WORKSPACE, name="workspace")
