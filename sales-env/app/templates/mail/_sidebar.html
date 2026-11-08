@@ -1,0 +1,18 @@
+<aside class="w-60 shrink-0 bg-gray-50 border-r border-gray-200 py-4 pr-2 overflow-y-auto">
+  <div class="px-4 pb-1 text-xl font-semibold text-gray-700"><span class="text-red-600">J</span>mail</div>
+  <a href="/mail/compose?mode=new" class="ml-3 mt-3 mb-4 inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-2xl px-6 py-3 shadow">
+    <span class="text-lg leading-none">+</span> Compose</a>
+  <nav class="text-sm" aria-label="Mail folders">
+    {% for key, name in system_labels %}
+    {% set on = (label == key) %}
+    <a href="/mail?label={{ key }}" class="flex items-center justify-between pl-6 pr-3 py-1.5 rounded-r-full {{ 'bg-red-100 text-red-800 font-semibold' if on else 'text-gray-700 hover:bg-gray-200' }}">
+      <span>{{ name }}</span>{% if counts.get(key) %}<span class="text-xs font-semibold">{{ counts[key] }}</span>{% endif %}</a>
+    {% endfor %}
+    <div class="pl-6 pt-4 pb-1 text-xs font-semibold uppercase tracking-wide text-gray-500">Labels</div>
+    {% for lab in user_labels %}
+    {% set on = (label == lab) %}
+    <a href="/mail?label={{ lab|urlencode }}" class="flex items-center justify-between pl-6 pr-3 py-1.5 rounded-r-full {{ 'bg-red-100 text-red-800 font-semibold' if on else 'text-gray-700 hover:bg-gray-200' }}">
+      <span><span class="inline-block w-2.5 h-2.5 rounded-sm bg-gray-400 mr-2"></span>{{ lab }}</span>{% if counts.get(lab) %}<span class="text-xs font-semibold">{{ counts[lab] }}</span>{% endif %}</a>
+    {% endfor %}
+  </nav>
+</aside>

@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}{{ label_name }}{% if q %} – search "{{ q }}"{% endif %} – Jmail{% endblock %}
+{% block content %}
+<div class="flex flex-1 min-h-0">
+  {% include "mail/_sidebar.html" %}
+  <section class="flex-1 min-w-0 flex flex-col">
+    {% include "mail/_search.html" %}
+    <div class="px-4 py-2 text-sm text-gray-600 border-b border-gray-100 flex justify-between">
+      <span><strong class="text-gray-800">{{ label_name }}</strong>{% if q %} · search results for "{{ q }}"{% endif %}</span>
+      <span>{{ threads|length }} conversation{{ '' if threads|length == 1 else 's' }}</span>
+    </div>
+    {% if not threads %}
+      <p class="p-8 text-gray-500 text-sm">{% if q %}No messages matched your search.{% else %}No conversations in {{ label_name }}.{% endif %}</p>
+    {% endif %}
+    <ul class="divide-y divide-gray-100 overflow-y-auto" aria-label="Conversations">
+      {% for t in threads %}
+      <li>
+        <a href="/mail/thread/{{ t.id }}?label={{ label|urlencode }}" class="flex items-center gap-3 px-4 py-2 text-sm hover:shadow-[inset_1px_0_0_#dadce0,inset_-1px_0_0_#dadce0,0_1px_2px_rgba(60,64,67,.3)] {{ 'bg-white' if t.unread else 'bg-gray-50' }}">
+          <span class="w-4 text-yellow-500" aria-label="{{ 'Starred' if t.starred else '' }}">{{ '★' if t.starred else '' }}</span>
+          <span class="w-48 shrink-0 truncate {{ 'font-bold text-gray-900' if t.unread else 'text-gray-700' }}">{{ t.senders }}{% if t.messages > 1 %} <span class="text-gray-500 font-normal">{{ t.messages }}</span>{% endif %}</span>
+          <span class="flex-1 min-w-0 truncate">
+            {% for l in t.labels if l not in ('INBOX','SENT','ARCHIVE','TRASH') %}<span class="mr-1 px-1.5 py-0.5 text-xs rounded bg-gray-200 text-gray-700">{{ l }}</span>{% endfor %}
+            <span class="{{ 'font-bold text-gray-900' if t.unread else 'text-gray-800' }}">{{ t.subject }}</span>
+            <span class="text-gray-500"> — {{ t.snippet }}</span>
+          </span>
+          {% if t.has_attachments %}<span class="shrink-0 text-xs text-gray-600 border border-gray-300 rounded px-1.5">📎 Attachment</span>{% endif %}
+          <span class="w-20 shrink-0 text-right text-xs {{ 'font-bold text-gray-900' if t.unread else 'text-gray-600' }}">{{ fmt_dt(t.last_ts) }}</span>
+        </a>
+      </li>
+      {% endfor %}
+    </ul>
+  </section>
+</div>
+{% endblock %}

@@ -1,0 +1,31 @@
+{% extends "crm/_layout.html" %}
+{% from "crm/_macros.html" import status_badge with context %}
+{% block crm_title %}Contacts{% endblock %}
+{% block crm %}
+<div class="px-6 py-4">
+  <div class="flex items-center mb-4">
+    <h1 class="text-2xl font-semibold">Contacts</h1>
+    <span class="ml-3 text-sm text-gray-500">{{ rows|length }} records</span>
+    <form method="get" action="/crm/contacts" class="ml-auto flex gap-2">
+      <input name="q" value="{{ q }}" placeholder="Search name, email, company" aria-label="Filter contacts" class="border rounded px-2 py-1.5 text-sm w-64">
+      <button type="submit" class="px-3 py-1.5 rounded border bg-white text-sm">Filter</button>
+    </form>
+  </div>
+  <table class="w-full bg-white border text-sm">
+    <thead class="bg-gray-100 text-left text-xs uppercase text-gray-600"><tr>
+      <th class="p-2">Name</th><th class="p-2">Email</th><th class="p-2">Company</th><th class="p-2">Job title</th><th class="p-2">Status</th><th class="p-2">Last contacted</th></tr></thead>
+    <tbody>
+    {% for c in rows %}{% set co = store.get('companies', c.company_id) %}
+    <tr class="border-t">
+      <td class="p-2"><a class="text-[#0091ae] font-medium" href="/crm/contact/{{ c.id }}">{{ contact_name(c) }}</a></td>
+      <td class="p-2">{{ c.email }}</td>
+      <td class="p-2">{% if co %}<a class="text-[#0091ae]" href="/crm/company/{{ co.id }}">{{ co.name }}</a>{% endif %}</td>
+      <td class="p-2">{{ c.title or '' }}</td>
+      <td class="p-2">{{ status_badge(c.status) }}</td>
+      <td class="p-2">{{ fmt_dt(c.last_contacted_at) }}</td>
+    </tr>
+    {% else %}<tr><td colspan="6" class="p-4 text-gray-500">No contacts found.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

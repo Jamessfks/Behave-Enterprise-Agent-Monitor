@@ -1,0 +1,42 @@
+{% extends "calendar/_layout.html" %}
+{% block cal_title %}Week of {{ title_range }}{% endblock %}
+{% block toolbar %}
+  <a href="/calendar" class="px-4 py-1.5 border border-gray-300 rounded text-sm font-medium hover:bg-gray-100">Today</a>
+  <a href="/calendar?week={{ prev }}" class="px-3 py-1.5 rounded text-sm hover:bg-gray-100" aria-label="Previous week">&lsaquo; Previous week</a>
+  <a href="/calendar?week={{ next }}" class="px-3 py-1.5 rounded text-sm hover:bg-gray-100" aria-label="Next week">Next week &rsaquo;</a>
+  <h1 class="text-xl text-gray-800 ml-2">{{ title_range }}</h1>
+{% endblock %}
+{% block cal %}
+<div class="overflow-auto" style="max-height: calc(100vh - 110px)">
+  <div class="grid sticky top-0 bg-white z-10 border-b border-gray-200" style="grid-template-columns: 56px repeat(7, 1fr)">
+    <div></div>
+    {% for d in days %}
+    <div class="text-center py-2">
+      <div class="text-[11px] uppercase {{ 'text-[#1a73e8]' if d.is_today else 'text-gray-500' }}">{{ d.date.strftime('%a') }}</div>
+      <a href="/calendar/new?date={{ d.date.isoformat() }}&time=10:00" title="Create event on {{ d.date.strftime('%b %-d') }}"
+         class="inline-flex w-10 h-10 rounded-full items-center justify-center text-xl {{ 'bg-[#1a73e8] text-white' if d.is_today else 'text-gray-800 hover:bg-gray-100' }}">{{ d.date.day }}</a>
+    </div>
+    {% endfor %}
+  </div>
+  <div class="grid relative" style="grid-template-columns: 56px repeat(7, 1fr)">
+    <div>
+      {% for h in HOURS %}<div class="text-[10px] text-gray-500 text-right pr-2 -mt-1.5" style="height: {{ HOUR_PX }}px">{% if h > 0 %}{{ (h - 1) % 12 + 1 }} {{ 'AM' if h < 12 else 'PM' }}{% endif %}</div>{% endfor %}
+    </div>
+    {% for d in days %}
+    <div class="relative border-l border-gray-200" data-day="{{ d.date.isoformat() }}">
+      {% for h in HOURS %}
+      <a href="/calendar/new?date={{ d.date.isoformat() }}&time={{ '%02d' % h }}:00" class="block border-b border-gray-100 hover:bg-gray-50" style="height: {{ HOUR_PX }}px" aria-label="Create event {{ d.date.strftime('%b %-d') }} {{ h }}:00"></a>
+      {% endfor %}
+      {% for b in d.events %}
+      {% set internal = not b.e.account %}
+      <a href="/calendar/event/{{ b.e.id }}" class="absolute left-0.5 right-1 rounded px-1.5 py-0.5 text-white text-xs overflow-hidden shadow-sm {{ 'bg-[#33b679] hover:bg-[#2a9d66]' if internal else 'bg-[#039be5] hover:bg-[#0288d1]' }}"
+         style="top: {{ b.top }}px; height: {{ b.height }}px" data-event-id="{{ b.e.id }}">
+        <div class="font-semibold leading-tight truncate">{{ b.e.title }}</div>
+        <div class="leading-tight opacity-90">{{ b.time }}</div>
+      </a>
+      {% endfor %}
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% set titles = {'new': 'New message', 'reply': 'Reply', 'reply_all': 'Reply all', 'forward': 'Forward'} %}
+{% block title %}{{ titles[mode] }} – Jmail{% endblock %}
+{% block content %}
+<div class="flex flex-1 min-h-0">
+  {% include "mail/_sidebar.html" %}
+  <section class="flex-1 min-w-0 overflow-y-auto">
+    <div class="max-w-4xl m-4 border border-gray-300 rounded-lg shadow-sm">
+      <div class="bg-gray-100 px-4 py-2 rounded-t-lg text-sm font-medium text-gray-800 flex justify-between">
+        <span>{{ titles[mode] }}{% if t %} · in "{{ t.subject }}"{% endif %}</span>
+        <a href="{{ '/mail/thread/' ~ t.id if t else '/mail' }}" class="text-gray-600 underline">Discard</a>
+      </div>
+      <form data-api="/api/mail/send" class="text-sm" data-flash="Message sent.">
+        <input type="hidden" name="mode" value="{{ mode }}">
+        <input type="hidden" name="thread_id" value="{{ f.thread_id }}">
+        <label class="flex items-center border-b border-gray-200 px-4 py-2"><span class="w-16 text-gray-600">To</span>
+          <input name="to" value="{{ f.to }}" class="flex-1 outline-none" placeholder="name@company.com, other@company.com" aria-label="To"></label>
+        <label class="flex items-center border-b border-gray-200 px-4 py-2"><span class="w-16 text-gray-600">Cc</span>
+          <input name="cc" value="{{ f.cc }}" class="flex-1 outline-none" placeholder="comma-separated" aria-label="Cc"></label>
+        <label class="flex items-center border-b border-gray-200 px-4 py-2"><span class="w-16 text-gray-600">Subject</span>
+          <input name="subject" value="{{ f.subject }}" class="flex-1 outline-none" aria-label="Subject"></label>
+        <textarea name="body" rows="16" aria-label="Message body" class="w-full px-4 py-3 outline-none font-sans border-b border-gray-200" placeholder="Write your message">{{ f.body }}</textarea>
+        <fieldset class="px-4 py-3 border-b border-gray-200">
+          <legend class="text-gray-700 font-medium px-0">Attach from Jdrive <span class="text-gray-500 font-normal">(tick the files to attach)</span></legend>
+          <div class="mt-2 max-h-56 overflow-y-auto grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-1">
+            {% for d in docs %}
+            <label class="flex items-center gap-2 py-0.5">
+              <input type="checkbox" name="attachments[]" value="{{ d.id }}" {{ 'checked' if d.id in f.attachments }}>
+              <span>{{ d.name }} <span class="text-gray-500">({{ d.path }})</span></span>
+            </label>
+            {% endfor %}
+          </div>
+        </fieldset>
+        <div class="px-4 py-3 flex items-center gap-3">
+          <button type="submit" class="bg-red-600 hover:bg-red-700 text-white font-medium rounded-full px-6 py-2">Send</button>
+          <a href="{{ '/mail/thread/' ~ t.id if t else '/mail' }}" class="text-gray-600 underline">Discard</a>
+        </div>
+      </form>
+    </div>
+  </section>
+</div>
+{% endblock %}

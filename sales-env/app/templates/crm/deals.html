@@ -1,0 +1,54 @@
+{% extends "crm/_layout.html" %}
+{% from "crm/_macros.html" import stage_badge with context %}
+{% block crm_title %}Deals{% endblock %}
+{% block crm %}
+<div class="px-6 py-4">
+  <div class="flex items-center mb-4">
+    <h1 class="text-2xl font-semibold">Deals</h1>
+    <span class="ml-3 text-sm text-gray-500">{{ deals|length }} records</span>
+    <div class="ml-auto flex border rounded overflow-hidden text-sm">
+      <a href="/crm/deals?view=board" class="px-3 py-1.5 {{ 'bg-[#2d3e50] text-white' if view!='list' else 'bg-white' }}">Board view</a>
+      <a href="/crm/deals?view=list" class="px-3 py-1.5 {{ 'bg-[#2d3e50] text-white' if view=='list' else 'bg-white' }}">List view</a>
+    </div>
+  </div>
+  {% if view == 'list' %}
+  <table class="w-full bg-white border text-sm">
+    <thead class="bg-gray-100 text-left text-xs uppercase text-gray-600"><tr>
+      <th class="p-2">Deal name</th><th class="p-2">Company</th><th class="p-2">Stage</th><th class="p-2">Amount</th><th class="p-2">Close date</th><th class="p-2">Owner</th><th class="p-2">Next step</th></tr></thead>
+    <tbody>
+    {% for d in deals %}{% set co = store.get('companies', d.company_id) %}
+    <tr class="border-t">
+      <td class="p-2"><a class="text-[#0091ae] font-medium" href="/crm/deal/{{ d.id }}">{{ d.name }}</a></td>
+      <td class="p-2">{% if co %}<a class="text-[#0091ae]" href="/crm/company/{{ co.id }}">{{ co.name }}</a>{% endif %}</td>
+      <td class="p-2">{{ stage_badge(d.stage) }}</td>
+      <td class="p-2">{{ money(d.amount) }}</td>
+      <td class="p-2">{{ d.close_date or '' }}</td>
+      <td class="p-2">{{ user_name(d.owner) }}</td>
+      <td class="p-2 text-gray-600">{{ d.next_step or '' }}</td>
+    </tr>{% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="flex gap-2 overflow-x-auto pb-4">
+    {% for s in STAGES %}{% set items = cols[s] %}
+    <div class="flex-1 min-w-[160px] bg-gray-100 border rounded">
+      <div class="px-3 py-2 border-b bg-white rounded-t">
+        <div class="text-xs font-semibold uppercase text-gray-700">{{ STAGE_LABELS[s] }} <span class="text-gray-400">{{ items|length }}</span></div>
+        <div class="text-xs text-gray-500">Total: {{ money(totals[s]) }}</div>
+      </div>
+      <div class="p-2 space-y-2">
+      {% for d in items %}{% set co = store.get('companies', d.company_id) %}
+        <a href="/crm/deal/{{ d.id }}" class="block bg-white border rounded p-2 hover:border-[#ff7a59]">
+          <div class="text-sm font-medium text-[#0091ae]">{{ d.name }}</div>
+          <div class="text-xs text-gray-700 mt-1">Amount: {{ money(d.amount) }}</div>
+          <div class="text-xs text-gray-700">Close date: {{ d.close_date or '—' }}</div>
+          {% if co %}<div class="text-xs text-gray-500">{{ co.name }}</div>{% endif %}
+        </a>
+      {% endfor %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

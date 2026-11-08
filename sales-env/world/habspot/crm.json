@@ -1,0 +1,2694 @@
+{
+  "users": [
+    {
+      "id": "u_jonas",
+      "name": "Jonas Weber",
+      "email": "jonas@shiftpoint.io",
+      "title": "CEO & Co-founder"
+    },
+    {
+      "id": "u_mei",
+      "name": "Mei Lin",
+      "email": "mei@shiftpoint.io",
+      "title": "CTO & Co-founder"
+    },
+    {
+      "id": "u_dana",
+      "name": "Dana Brooks",
+      "email": "dana@shiftpoint.io",
+      "title": "Head of Sales"
+    },
+    {
+      "id": "u_alex",
+      "name": "Alex Chen",
+      "email": "alex@shiftpoint.io",
+      "title": "Account Executive, Mid-Market"
+    },
+    {
+      "id": "u_sofia",
+      "name": "Sofia Ramirez",
+      "email": "sofia@shiftpoint.io",
+      "title": "Account Executive, Mid-Market"
+    },
+    {
+      "id": "u_liam",
+      "name": "Liam O'Connor",
+      "email": "liam@shiftpoint.io",
+      "title": "Account Executive, Enterprise"
+    },
+    {
+      "id": "u_ava",
+      "name": "Ava Thompson",
+      "email": "ava@shiftpoint.io",
+      "title": "Account Executive, SMB"
+    },
+    {
+      "id": "u_priya",
+      "name": "Priya Shah",
+      "email": "priya@shiftpoint.io",
+      "title": "SDR"
+    },
+    {
+      "id": "u_noah",
+      "name": "Noah Kim",
+      "email": "noah@shiftpoint.io",
+      "title": "SDR"
+    },
+    {
+      "id": "u_erin",
+      "name": "Erin Walsh",
+      "email": "erin@shiftpoint.io",
+      "title": "Head of Customer Success"
+    },
+    {
+      "id": "u_marco",
+      "name": "Marco Rossi",
+      "email": "marco@shiftpoint.io",
+      "title": "Onboarding Manager"
+    },
+    {
+      "id": "u_ruth",
+      "name": "Ruth Adler",
+      "email": "ruth@shiftpoint.io",
+      "title": "Finance Manager"
+    },
+    {
+      "id": "u_chloe",
+      "name": "Chloe Davis",
+      "email": "chloe@shiftpoint.io",
+      "title": "Marketing Manager"
+    }
+  ],
+  "companies": [
+    {
+      "id": "co_acme_foods",
+      "name": "Acme Foods",
+      "domain": "acmefoods.com",
+      "industry": "Food distribution",
+      "hq": "Columbus, OH",
+      "locations": 12,
+      "hourly_staff": 600,
+      "type": "prospect",
+      "owner": "u_alex",
+      "description": "Wholesale food distributor running 12 depots around Columbus, Ohio, with ~600 hourly drivers, pickers and loaders. Schedules live in one Excel workbook per depot; overtime is up 18% YoY (~14% of paid hours) and early-shift no-shows run ~7%."
+    },
+    {
+      "id": "co_northgate_logistics",
+      "name": "Northgate Logistics",
+      "domain": "northgatelogistics.com",
+      "industry": "Warehousing / 3PL",
+      "hq": "Indianapolis, IN",
+      "locations": 20,
+      "hourly_staff": 1100,
+      "type": "prospect",
+      "owner": "u_alex",
+      "description": "Third-party warehousing and fulfillment provider with 20 warehouses across Indiana running 24/7. Rotas are rebuilt weekly in Google Sheets per site; overtime is ~16% of hours and night-shift no-shows ~9%, with Q4 peak doubling volume."
+    },
+    {
+      "id": "co_harbor_health",
+      "name": "Harbor Health",
+      "domain": "harborhealthclinics.com",
+      "industry": "Urgent care",
+      "hq": "Milwaukee, WI",
+      "locations": 8,
+      "hourly_staff": 260,
+      "type": "customer",
+      "owner": "u_alex",
+      "description": "Group of 8 walk-in urgent care clinics in greater Milwaukee where every shift needs the right credential mix. Signed Shiftpoint Pro 8 on 2026-10-28; onboarding with Marco Rossi starts Nov 17 and Customer Success (Erin Walsh) owns the relationship."
+    },
+    {
+      "id": "co_bluepeak_fitness",
+      "name": "Bluepeak Fitness",
+      "domain": "bluepeakfitness.com",
+      "industry": "Gym chain",
+      "hq": "Kansas City, MO",
+      "locations": 15,
+      "hourly_staff": 420,
+      "type": "lost",
+      "owner": "u_alex",
+      "description": "Chain of 15 24-hour gyms across both Kansas City metros with ~420 part-time staff. Chose Crewlane over Shiftpoint on price in June 2026 (Closed Lost); Regional Manager Chris Yoon is re-opening the conversation because Crewlane adoption is poor. GM Lena Ortiz is do-not-contact."
+    },
+    {
+      "id": "co_copper_kettle",
+      "name": "Copper Kettle Restaurant Group",
+      "domain": "copperkettlegroup.com",
+      "industry": "Restaurants",
+      "hq": "Minneapolis, MN",
+      "locations": 9,
+      "hourly_staff": 380,
+      "type": "prospect",
+      "owner": "u_alex",
+      "description": "Restaurant group with 9 casual-dining restaurants and brunch cafés in Minneapolis/St. Paul. Uses a free scheduling app at some sites and paper plus group chat at others; weekend brunch no-shows run ~8% and they want one system before spring patio season."
+    },
+    {
+      "id": "co_lakeshore_hotels",
+      "name": "Lakeshore Hotels",
+      "domain": "lakeshorehotels.com",
+      "industry": "Hotels",
+      "hq": "Chicago, IL",
+      "locations": 6,
+      "hourly_staff": 310,
+      "type": "prospect",
+      "owner": "u_alex",
+      "description": "Group of 6 upscale select-service hotels in Chicago and the North Shore. Each department keeps its own spreadsheet; housekeeping overtime hits ~12% on busy weekends and they want labor to follow occupancy. Fully on 2026 pricing after the September price-list correction."
+    },
+    {
+      "id": "co_pine_and_pebble",
+      "name": "Pine & Pebble Home",
+      "domain": "pineandpebble.com",
+      "industry": "Home-goods retail",
+      "hq": "Denver, CO",
+      "locations": 25,
+      "hourly_staff": 700,
+      "type": "prospect",
+      "owner": "u_alex",
+      "description": "Design-led home-goods retailer with 25 stores across Colorado, Utah and New Mexico and ~700 hourly staff. Their POS scheduling module can't handle swaps or forecasting, so they are evaluating Pro for labor forecasting, compliance and payroll export. Referred by Summit Brew."
+    },
+    {
+      "id": "co_sparklepro_cleaning",
+      "name": "SparklePro Cleaning",
+      "domain": "sparkleprocleaning.com",
+      "industry": "Commercial cleaning",
+      "hq": "Omaha, NE",
+      "locations": 14,
+      "hourly_staff": 650,
+      "type": "prospect",
+      "owner": "u_alex",
+      "description": "Commercial cleaning company with 14 branches in Nebraska, Iowa and Kansas dispatching ~650 night-shift cleaners to ~400 client buildings. ~6% of shifts go uncovered and missed cleans cost ~$90k in client credits last year; the COO wants GPS clock-in and open-shift pickup."
+    },
+    {
+      "id": "co_ironclad_guard",
+      "name": "Ironclad Guard Services",
+      "domain": "ironcladguard.com",
+      "industry": "Security services",
+      "hq": "Phoenix, AZ",
+      "locations": 30,
+      "hourly_staff": 520,
+      "type": "prospect",
+      "owner": "u_alex",
+      "description": "Contract security firm staffing 30 client sites 24/7 around Phoenix and Tucson with ~520 licensed officers. HQ dispatch builds one big spreadsheet; overtime is ~19% of hours and ~4% of shifts are call-outs filled by phone."
+    },
+    {
+      "id": "co_little_acorns",
+      "name": "Little Acorns Childcare",
+      "domain": "littleacornscare.com",
+      "industry": "Childcare",
+      "hq": "Boulder, CO",
+      "locations": 11,
+      "hourly_staff": 290,
+      "type": "prospect",
+      "owner": "u_alex",
+      "description": "Nonprofit-backed group of 11 childcare centers along the Front Range with strict staff-to-child ratio rules. Directors schedule on paper grids (~6h/week each) and floaters are coordinated by text; the board approves spend over $25k."
+    },
+    {
+      "id": "co_mesa_valley",
+      "name": "Mesa Valley Urgent Care",
+      "domain": "mesavalleyuc.com",
+      "industry": "Urgent care",
+      "hq": "Albuquerque, NM",
+      "locations": 5,
+      "hourly_staff": 140,
+      "type": "prospect",
+      "owner": "u_alex",
+      "description": "Five urgent care clinics in Albuquerque and Rio Rancho with ~140 hourly staff. Clinic Manager Nora Kim builds every rota in a shared Google Sheet (~8h/week); brand-new inbound lead from Nov 7 via the Harbor Health case study."
+    },
+    {
+      "id": "co_summit_brew",
+      "name": "Summit Brew Co.",
+      "domain": "summitbrewco.com",
+      "industry": "Brewery / taprooms",
+      "hq": "Fort Collins, CO",
+      "locations": 7,
+      "hourly_staff": 210,
+      "type": "customer",
+      "owner": "u_alex",
+      "description": "Craft brewery with 7 taprooms in Northern Colorado; Shiftpoint Core customer since Feb 2024 and a public reference. Existing 7 locations are on 2025 pricing ($135) until renewal 2027-02-01; adding 3 taprooms (Windsor, Estes Park, Greeley Downtown) Dec 2026 – Mar 2027."
+    },
+    {
+      "id": "co_crewlane",
+      "name": "Crewlane",
+      "domain": "crewlane.io",
+      "industry": "Shift-scheduling software (competitor)",
+      "hq": null,
+      "locations": null,
+      "hourly_staff": null,
+      "type": "competitor",
+      "owner": null,
+      "description": "Direct competitor selling shift-scheduling software at roughly $110–125 per location per month, aggressive in logistics. Won Bluepeak Fitness on price in June 2026 and is competing on Northgate Logistics. Not a prospect; known to fish for Shiftpoint pricing."
+    },
+    {
+      "id": "co_acme_food_group",
+      "name": "Acme Food Group",
+      "domain": "acmefoodgroup.com",
+      "industry": "Restaurant supply",
+      "hq": "Dayton, OH",
+      "locations": 4,
+      "hourly_staff": 120,
+      "type": "lost",
+      "owner": "u_alex",
+      "description": "Restaurant supply company in Dayton, Ohio, running 4 warehouses. Evaluated Shiftpoint Core for its 4 warehouses in May 2026 and went Closed Lost (no budget). NOT related to Acme Foods (acmefoods.com, Columbus) despite the similar name."
+    }
+  ],
+  "contacts": [
+    {
+      "id": "ct_mark_keller",
+      "first_name": "Mark",
+      "last_name": "Keller",
+      "email": "mark.keller@acmefoods.com",
+      "phone": "+1 (614) 555-0117",
+      "title": "Director of Operations",
+      "company_id": "co_acme_foods",
+      "status": "active",
+      "role": "champion",
+      "owner": "u_alex",
+      "created_at": "2026-10-20T10:00:00-07:00",
+      "last_contacted_at": "2026-11-06T14:00:00-07:00",
+      "about": "Champion who requested the demo and owns the overtime/no-show pain. Busy, writes short emails from his phone and signs \"Mark K.\" (not to be confused with Mark Kessler at Northgate)."
+    },
+    {
+      "id": "ct_sarah_nguyen",
+      "first_name": "Sarah",
+      "last_name": "Nguyen",
+      "email": "sarah.nguyen@acmefoods.com",
+      "phone": "+1 (614) 555-0124",
+      "title": "HR Manager",
+      "company_id": "co_acme_foods",
+      "status": "active",
+      "role": "user",
+      "owner": "u_alex",
+      "created_at": "2026-10-29T11:00:00-07:00",
+      "last_contacted_at": "2026-10-29T10:00:00-07:00",
+      "about": "Will own the staff app rollout; worried older drivers won't use the app and asks about Ohio break rules and payroll export."
+    },
+    {
+      "id": "ct_paul_grant",
+      "first_name": "Paul",
+      "last_name": "Grant",
+      "email": "paul.grant@acmefoods.com",
+      "phone": "+1 (614) 555-0109",
+      "title": "CFO",
+      "company_id": "co_acme_foods",
+      "status": "active",
+      "role": "economic_buyer",
+      "owner": "u_alex",
+      "created_at": "2026-10-29T11:00:00-07:00",
+      "last_contacted_at": null,
+      "about": "Economic buyer Alex has not met yet; described as a numbers guy who hates per-seat pricing and wants payback in under a year. First call booked Nov 12."
+    },
+    {
+      "id": "ct_mark_kessler",
+      "first_name": "Mark",
+      "last_name": "Kessler",
+      "email": "mark.kessler@northgatelogistics.com",
+      "phone": "+1 (317) 555-0171",
+      "title": "VP Operations",
+      "company_id": "co_northgate_logistics",
+      "status": "active",
+      "role": "champion",
+      "owner": "u_alex",
+      "created_at": "2026-09-24T11:30:00-07:00",
+      "last_contacted_at": "2026-11-05T15:00:00-07:00",
+      "about": "Impatient, upbeat champion focused on peak season and night-shift no-shows; short phone emails signed \"Mark K.\" (not to be confused with Mark Keller at Acme)."
+    },
+    {
+      "id": "ct_rachel_ito",
+      "first_name": "Rachel",
+      "last_name": "Ito",
+      "email": "rachel.ito@northgatelogistics.com",
+      "phone": "+1 (317) 555-0158",
+      "title": "Procurement Manager",
+      "company_id": "co_northgate_logistics",
+      "status": "active",
+      "role": "procurement",
+      "owner": "u_alex",
+      "created_at": "2026-10-08T14:30:00-07:00",
+      "last_contacted_at": "2026-11-06T10:30:00-07:00",
+      "about": "Formal, terse procurement lead brought in because the deal is over $30k; benchmarks against a Crewlane quote and wants quarterly billing."
+    },
+    {
+      "id": "ct_dev_patel",
+      "first_name": "Dev",
+      "last_name": "Patel",
+      "email": "dev.patel@northgatelogistics.com",
+      "phone": "+1 (317) 555-0163",
+      "title": "IT Lead",
+      "company_id": "co_northgate_logistics",
+      "status": "active",
+      "role": "technical",
+      "owner": "u_alex",
+      "created_at": "2026-10-08T12:00:00-07:00",
+      "last_contacted_at": "2026-11-02T11:05:00-07:00",
+      "about": "Friendly, precise technical evaluator; asked about SSO with their identity provider and an API to their WMS."
+    },
+    {
+      "id": "ct_grace_moreno",
+      "first_name": "Grace",
+      "last_name": "Moreno",
+      "email": "grace.moreno@harborhealthclinics.com",
+      "phone": "+1 (414) 555-0132",
+      "title": "Practice Operations Manager",
+      "company_id": "co_harbor_health",
+      "status": "active",
+      "role": "champion",
+      "owner": "u_alex",
+      "created_at": "2026-08-12T10:00:00-07:00",
+      "last_contacted_at": "2026-11-05T13:20:00-07:00",
+      "about": "Ran the evaluation and is now the customer's project lead for onboarding. Warm and organized; cares about credential coverage and a smooth rollout."
+    },
+    {
+      "id": "ct_ben_holt",
+      "first_name": "Ben",
+      "last_name": "Holt",
+      "email": "ben.holt@harborhealthclinics.com",
+      "phone": "+1 (414) 555-0145",
+      "title": "Finance Director",
+      "company_id": "co_harbor_health",
+      "status": "active",
+      "role": "economic_buyer",
+      "owner": "u_alex",
+      "created_at": "2026-10-07T09:00:00-07:00",
+      "last_contacted_at": "2026-10-28T09:45:00-07:00",
+      "about": "Economic buyer who signed the order form on Oct 28. Brief and formal; cares about invoice accuracy and payroll export on day one."
+    },
+    {
+      "id": "ct_lena_ortiz",
+      "first_name": "Lena",
+      "last_name": "Ortiz",
+      "email": "lena.ortiz@bluepeakfitness.com",
+      "phone": "+1 (816) 555-0128",
+      "title": "General Manager",
+      "company_id": "co_bluepeak_fitness",
+      "status": "do_not_contact",
+      "role": "other",
+      "owner": "u_alex",
+      "created_at": "2026-04-14T10:00:00-07:00",
+      "last_contacted_at": "2026-07-02T09:30:00-07:00",
+      "about": "Decision-maker on the lost 2026 deal who chose Crewlane on price. Asked to be removed from all lists on 2026-07-02 — do not email or call."
+    },
+    {
+      "id": "ct_chris_yoon",
+      "first_name": "Chris",
+      "last_name": "Yoon",
+      "email": "chris.yoon@bluepeakfitness.com",
+      "phone": "+1 (913) 555-0186",
+      "title": "Regional Manager",
+      "company_id": "co_bluepeak_fitness",
+      "status": "interested",
+      "role": "champion",
+      "owner": "u_alex",
+      "created_at": "2026-10-16T09:00:00-07:00",
+      "last_contacted_at": "2026-11-05T09:00:00-07:00",
+      "about": "New champion for the Kansas-side gyms re-opening the conversation because Crewlane adoption is ~55%. Enthusiastic and casual; tends to CC Lena out of habit."
+    },
+    {
+      "id": "ct_anna_fischer",
+      "first_name": "Anna",
+      "last_name": "Fischer",
+      "email": "anna.fischer@copperkettlegroup.com",
+      "phone": "+1 (612) 555-0139",
+      "title": "Director of Operations",
+      "company_id": "co_copper_kettle",
+      "status": "active",
+      "role": "economic_buyer",
+      "owner": "u_alex",
+      "created_at": "2026-10-06T15:00:00-07:00",
+      "last_contacted_at": "2026-11-06T08:30:00-07:00",
+      "about": "Buyer and decision-maker (owners follow her recommendation). Friendly and efficient; wants brunch no-shows fixed and rollout before March."
+    },
+    {
+      "id": "ct_tom_brandt",
+      "first_name": "Tom",
+      "last_name": "Brandt",
+      "email": "tom.brandt@copperkettlegroup.com",
+      "phone": "+1 (612) 555-0147",
+      "title": "Marketing Manager",
+      "company_id": "co_copper_kettle",
+      "status": "active",
+      "role": "other",
+      "owner": "u_alex",
+      "created_at": "2026-10-26T15:00:00-07:00",
+      "last_contacted_at": "2026-11-07T11:12:00-07:00",
+      "about": "Runs staff comms; joined 10 minutes of the demo for the messaging feature. Not involved in the buying decision."
+    },
+    {
+      "id": "ct_olivia_bennett",
+      "first_name": "Olivia",
+      "last_name": "Bennett",
+      "email": "olivia.bennett@lakeshorehotels.com",
+      "phone": "+1 (312) 555-0151",
+      "title": "Director of Operations",
+      "company_id": "co_lakeshore_hotels",
+      "status": "active",
+      "role": "champion",
+      "owner": "u_alex",
+      "created_at": "2026-09-03T11:00:00-07:00",
+      "last_contacted_at": "2026-11-05T16:10:00-07:00",
+      "about": "Champion and budget owner for the group. Polished and concise; wants housekeeping labor to follow occupancy and no surprises on price after September."
+    },
+    {
+      "id": "ct_marcus_reed",
+      "first_name": "Marcus",
+      "last_name": "Reed",
+      "email": "marcus.reed@lakeshorehotels.com",
+      "phone": "+1 (312) 555-0166",
+      "title": "HR Manager",
+      "company_id": "co_lakeshore_hotels",
+      "status": "active",
+      "role": "user",
+      "owner": "u_alex",
+      "created_at": "2026-10-30T11:00:00-07:00",
+      "last_contacted_at": "2026-10-30T10:00:00-07:00",
+      "about": "Methodical HR influencer focused on break rules, union seniority in shift bidding and Spanish/Polish app support."
+    },
+    {
+      "id": "ct_hannah_clarke",
+      "first_name": "Hannah",
+      "last_name": "Clarke",
+      "email": "hannah.clarke@pineandpebble.com",
+      "phone": "+1 (303) 555-0113",
+      "title": "VP Stores",
+      "company_id": "co_pine_and_pebble",
+      "status": "active",
+      "role": "champion",
+      "owner": "u_alex",
+      "created_at": "2026-10-22T12:00:00-07:00",
+      "last_contacted_at": "2026-11-05T10:00:00-07:00",
+      "about": "Energetic champion running the evaluation; referred by Jake Miller of Summit Brew. Cares about store managers' time and holiday seasonal onboarding."
+    },
+    {
+      "id": "ct_jorge_alvarez",
+      "first_name": "Jorge",
+      "last_name": "Alvarez",
+      "email": "jorge.alvarez@pineandpebble.com",
+      "phone": "+1 (303) 555-0127",
+      "title": "Payroll Manager",
+      "company_id": "co_pine_and_pebble",
+      "status": "active",
+      "role": "technical",
+      "owner": "u_alex",
+      "created_at": "2026-11-02T11:00:00-07:00",
+      "last_contacted_at": "2026-11-05T10:00:00-07:00",
+      "about": "Skeptical, detail-oriented payroll evaluator who could block on weak payroll export; needs clean multi-state (CO/UT/NM) handling. Joins the Nov 10 demo."
+    },
+    {
+      "id": "ct_megan_liu",
+      "first_name": "Megan",
+      "last_name": "Liu",
+      "email": "megan.liu@pineandpebble.com",
+      "phone": "+1 (303) 555-0135",
+      "title": "CFO",
+      "company_id": "co_pine_and_pebble",
+      "status": "active",
+      "role": "economic_buyer",
+      "owner": "u_alex",
+      "created_at": "2026-11-02T11:00:00-07:00",
+      "last_contacted_at": null,
+      "about": "Economic buyer who must approve any deal over $50k; not engaged yet. Per Hannah she wants an ROI model, not slides."
+    },
+    {
+      "id": "ct_kevin_obrien",
+      "first_name": "Kevin",
+      "last_name": "O'Brien",
+      "email": "kevin.obrien@sparkleprocleaning.com",
+      "phone": "+1 (402) 555-0119",
+      "title": "COO",
+      "company_id": "co_sparklepro_cleaning",
+      "status": "active",
+      "role": "champion",
+      "owner": "u_alex",
+      "created_at": "2026-10-13T10:00:00-07:00",
+      "last_contacted_at": "2026-11-05T10:15:00-07:00",
+      "about": "Champion and decision-maker for operational software. Straightforward and friendly; wants GPS clock-in and fewer uncovered shifts."
+    },
+    {
+      "id": "ct_lisa_tran",
+      "first_name": "Lisa",
+      "last_name": "Tran",
+      "email": "lisa.tran@sparkleprocleaning.com",
+      "phone": "+1 (402) 555-0153",
+      "title": "Branch Operations Lead",
+      "company_id": "co_sparklepro_cleaning",
+      "status": "active",
+      "role": "user",
+      "owner": "u_alex",
+      "created_at": "2026-10-19T12:00:00-07:00",
+      "last_contacted_at": "2026-11-03T13:00:00-07:00",
+      "about": "Organized rollout lead who handles logistics; cares about crews' prepaid Android phones, a Spanish app and quick training."
+    },
+    {
+      "id": "ct_ray_dunn",
+      "first_name": "Ray",
+      "last_name": "Dunn",
+      "email": "ray.dunn@sparkleprocleaning.com",
+      "phone": "+1 (402) 555-0161",
+      "title": "Finance Controller",
+      "company_id": "co_sparklepro_cleaning",
+      "status": "active",
+      "role": "other",
+      "owner": "u_alex",
+      "created_at": "2026-11-05T11:00:00-07:00",
+      "last_contacted_at": null,
+      "about": "Reviews the offer and payment terms (W-9, yearly vs quarterly billing); not a blocker. Kevin will forward him the offer."
+    },
+    {
+      "id": "ct_daniel_price",
+      "first_name": "Daniel",
+      "last_name": "Price",
+      "email": "daniel.price@ironcladguard.com",
+      "phone": "+1 (602) 555-0114",
+      "title": "Operations Manager",
+      "company_id": "co_ironclad_guard",
+      "status": "active",
+      "role": "champion",
+      "owner": "u_alex",
+      "created_at": "2026-09-22T10:00:00-07:00",
+      "last_contacted_at": "2026-11-03T10:00:00-07:00",
+      "about": "Ex-military champion who owns dispatch. Crisp and structured; wants every post filled by a licensed officer with GPS proof of presence."
+    },
+    {
+      "id": "ct_fatima_khan",
+      "first_name": "Fatima",
+      "last_name": "Khan",
+      "email": "fatima.khan@ironcladguard.com",
+      "phone": "+1 (602) 555-0182",
+      "title": "Procurement Lead",
+      "company_id": "co_ironclad_guard",
+      "status": "active",
+      "role": "procurement",
+      "owner": "u_alex",
+      "created_at": "2026-10-22T09:00:00-07:00",
+      "last_contacted_at": "2026-11-04T09:20:00-07:00",
+      "about": "Professional, collaborative procurement lead asking a modest discount for the 30-site commitment and an order form by mid-November."
+    },
+    {
+      "id": "ct_emily_carter",
+      "first_name": "Emily",
+      "last_name": "Carter",
+      "email": "emily.carter@littleacornscare.com",
+      "phone": "+1 (303) 555-0121",
+      "title": "Executive Director",
+      "company_id": "co_little_acorns",
+      "status": "active",
+      "role": "champion",
+      "owner": "u_alex",
+      "created_at": "2026-10-05T10:00:00-07:00",
+      "last_contacted_at": "2026-11-05T15:30:00-07:00",
+      "about": "Founder and champion who recommends to the board (approves spend over $25k). Warm and thoughtful; cares about teacher wellbeing and ratio coverage."
+    },
+    {
+      "id": "ct_sam_wood",
+      "first_name": "Sam",
+      "last_name": "Wood",
+      "email": "sam.wood@littleacornscare.com",
+      "phone": "+1 (303) 555-0174",
+      "title": "Center Operations Coordinator",
+      "company_id": "co_little_acorns",
+      "status": "active",
+      "role": "user",
+      "owner": "u_alex",
+      "created_at": "2026-10-28T09:00:00-07:00",
+      "last_contacted_at": "2026-11-06T12:40:00-07:00",
+      "about": "Day-to-day user who manages floaters across centers; asks quick practical questions about ratio alerts."
+    },
+    {
+      "id": "ct_monica_hale",
+      "first_name": "Monica",
+      "last_name": "Hale",
+      "email": "monica.hale@littleacornscare.com",
+      "phone": "+1 (303) 555-0177",
+      "title": "Finance & Admin Manager",
+      "company_id": "co_little_acorns",
+      "status": "active",
+      "role": "other",
+      "owner": "u_alex",
+      "created_at": "2026-10-30T09:00:00-07:00",
+      "last_contacted_at": "2026-10-30T11:00:00-07:00",
+      "about": "Prepares the board packet and reviews invoicing and terms; precise and formal, focused on the year-one total."
+    },
+    {
+      "id": "ct_nora_kim",
+      "first_name": "Nora",
+      "last_name": "Kim",
+      "email": "nora.kim@mesavalleyuc.com",
+      "phone": "+1 (505) 555-0138",
+      "title": "Clinic Manager",
+      "company_id": "co_mesa_valley",
+      "status": "interested",
+      "role": "champion",
+      "owner": "u_alex",
+      "created_at": "2026-11-07T15:10:00-07:00",
+      "last_contacted_at": "2026-11-07T15:20:00-07:00",
+      "about": "Champion and likely decision-maker who builds all five clinic rotas herself (~8h/week). Brand-new inbound lead; discovery call Nov 9."
+    },
+    {
+      "id": "ct_jake_miller",
+      "first_name": "Jake",
+      "last_name": "Miller",
+      "email": "jake.miller@summitbrewco.com",
+      "phone": "+1 (970) 555-0105",
+      "title": "Owner",
+      "company_id": "co_summit_brew",
+      "status": "active",
+      "role": "economic_buyer",
+      "owner": "u_alex",
+      "created_at": "2024-02-01T10:00:00-07:00",
+      "last_contacted_at": "2026-11-06T17:45:00-07:00",
+      "about": "Owner and signer, friendly with Alex; referred Pine & Pebble. Casual and jokey; wants costs flat and loyalty rewarded."
+    },
+    {
+      "id": "ct_tessa_grant",
+      "first_name": "Tessa",
+      "last_name": "Grant",
+      "email": "tessa.grant@summitbrewco.com",
+      "phone": "+1 (970) 555-0112",
+      "title": "General Manager",
+      "company_id": "co_summit_brew",
+      "status": "active",
+      "role": "user",
+      "owner": "u_alex",
+      "created_at": "2024-02-01T10:00:00-07:00",
+      "last_contacted_at": "2026-10-27T10:00:00-07:00",
+      "about": "Day-to-day Shiftpoint admin; wants the new Windsor taproom set up before its Dec 5 opening."
+    },
+    {
+      "id": "ct_karen_mills",
+      "first_name": "Karen",
+      "last_name": "Mills",
+      "email": "karen.mills@acmefoodgroup.com",
+      "phone": "+1 (937) 555-0142",
+      "title": "Purchasing Manager",
+      "company_id": "co_acme_food_group",
+      "status": "active",
+      "role": "economic_buyer",
+      "owner": "u_alex",
+      "created_at": "2026-05-04T10:00:00-06:00",
+      "last_contacted_at": "2026-05-20T09:30:00-06:00",
+      "about": "Purchasing Manager at Acme Food Group (Dayton, 4 warehouses). Asked for pricing in May 2026; Alex offered 10% off Core 4; deal lost on budget. Different company from Acme Foods."
+    }
+  ],
+  "deals": [
+    {
+      "id": "dl_acme_foods",
+      "name": "Acme Foods – Core 12",
+      "company_id": "co_acme_foods",
+      "contact_ids": [
+        "ct_mark_keller",
+        "ct_sarah_nguyen",
+        "ct_paul_grant"
+      ],
+      "owner": "u_alex",
+      "stage": "discovery",
+      "plan": "core",
+      "locations": 12,
+      "amount": 21600,
+      "onboarding": true,
+      "discount_pct": 0,
+      "close_date": "2026-12-18",
+      "probability": 15,
+      "next_step": "Intro call with CFO Paul Grant + Mark Keller; send recap + written offer before then",
+      "next_step_date": "2026-11-12",
+      "contract_signed": false,
+      "contract_doc_id": null,
+      "lost_reason": null,
+      "created_at": "2026-10-20T10:00:00-07:00"
+    },
+    {
+      "id": "dl_northgate_logistics",
+      "name": "Northgate – Core 20",
+      "company_id": "co_northgate_logistics",
+      "contact_ids": [
+        "ct_mark_kessler",
+        "ct_rachel_ito",
+        "ct_dev_patel"
+      ],
+      "owner": "u_alex",
+      "stage": "negotiation",
+      "plan": "core",
+      "locations": 20,
+      "amount": 36000,
+      "onboarding": true,
+      "discount_pct": 10,
+      "close_date": "2026-11-27",
+      "probability": 70,
+      "next_step": "Revised-offer call with Rachel Ito + Mark Kessler (15:00)",
+      "next_step_date": "2026-11-10",
+      "contract_signed": false,
+      "contract_doc_id": null,
+      "lost_reason": null,
+      "created_at": "2026-09-24T11:30:00-07:00"
+    },
+    {
+      "id": "dl_harbor_health",
+      "name": "Harbor Health – Pro 8",
+      "company_id": "co_harbor_health",
+      "contact_ids": [
+        "ct_grace_moreno",
+        "ct_ben_holt"
+      ],
+      "owner": "u_alex",
+      "stage": "closed_won",
+      "plan": "pro",
+      "locations": 8,
+      "amount": 21120,
+      "onboarding": true,
+      "discount_pct": 0,
+      "close_date": "2026-10-28",
+      "probability": 100,
+      "next_step": "Onboarding session 1 with Marco Rossi (handled by CS, not sales)",
+      "next_step_date": "2026-11-17",
+      "contract_signed": true,
+      "contract_doc_id": "doc_harbor_health_order_form_signed",
+      "lost_reason": null,
+      "created_at": "2026-08-12T10:00:00-07:00"
+    },
+    {
+      "id": "dl_bluepeak_fitness",
+      "name": "Bluepeak – Core 15",
+      "company_id": "co_bluepeak_fitness",
+      "contact_ids": [
+        "ct_lena_ortiz"
+      ],
+      "owner": "u_alex",
+      "stage": "closed_lost",
+      "plan": "core",
+      "locations": 15,
+      "amount": 27000,
+      "onboarding": true,
+      "discount_pct": 10,
+      "close_date": "2026-06-20",
+      "probability": 0,
+      "next_step": null,
+      "next_step_date": null,
+      "contract_signed": false,
+      "contract_doc_id": null,
+      "lost_reason": "Price — Crewlane ~$115/location",
+      "created_at": "2026-04-14T10:00:00-07:00"
+    },
+    {
+      "id": "dl_bluepeak_fitness_reengage",
+      "name": "Bluepeak – re-engage",
+      "company_id": "co_bluepeak_fitness",
+      "contact_ids": [
+        "ct_chris_yoon"
+      ],
+      "owner": "u_alex",
+      "stage": "discovery",
+      "plan": "core",
+      "locations": 15,
+      "amount": 27000,
+      "onboarding": true,
+      "discount_pct": 0,
+      "close_date": "2027-01-15",
+      "probability": 15,
+      "next_step": "Discovery deep-dive with Chris Yoon (13:00)",
+      "next_step_date": "2026-11-11",
+      "contract_signed": false,
+      "contract_doc_id": null,
+      "lost_reason": null,
+      "created_at": "2026-10-16T09:00:00-07:00"
+    },
+    {
+      "id": "dl_copper_kettle",
+      "name": "Copper Kettle – Core 9",
+      "company_id": "co_copper_kettle",
+      "contact_ids": [
+        "ct_anna_fischer"
+      ],
+      "owner": "u_alex",
+      "stage": "demo",
+      "plan": "core",
+      "locations": 9,
+      "amount": 16200,
+      "onboarding": false,
+      "discount_pct": 0,
+      "close_date": "2026-12-11",
+      "probability": 30,
+      "next_step": "Demo follow-up with Anna Fischer (payroll export Q&A, then offer)",
+      "next_step_date": "2026-11-12",
+      "contract_signed": false,
+      "contract_doc_id": null,
+      "lost_reason": null,
+      "created_at": "2026-10-06T15:00:00-07:00"
+    },
+    {
+      "id": "dl_lakeshore_hotels",
+      "name": "Lakeshore – Core 6",
+      "company_id": "co_lakeshore_hotels",
+      "contact_ids": [
+        "ct_olivia_bennett",
+        "ct_marcus_reed"
+      ],
+      "owner": "u_alex",
+      "stage": "proposal",
+      "plan": "core",
+      "locations": 6,
+      "amount": 10800,
+      "onboarding": false,
+      "discount_pct": 0,
+      "close_date": "2026-12-04",
+      "probability": 50,
+      "next_step": "Light check-in with Olivia Bennett; decision by Dec 4 after review with Marcus",
+      "next_step_date": "2026-11-20",
+      "contract_signed": false,
+      "contract_doc_id": null,
+      "lost_reason": null,
+      "created_at": "2026-09-03T11:00:00-07:00"
+    },
+    {
+      "id": "dl_pine_and_pebble",
+      "name": "Pine & Pebble – Pro 25",
+      "company_id": "co_pine_and_pebble",
+      "contact_ids": [
+        "ct_hannah_clarke",
+        "ct_jorge_alvarez",
+        "ct_megan_liu"
+      ],
+      "owner": "u_alex",
+      "stage": "discovery",
+      "plan": "pro",
+      "locations": 25,
+      "amount": 66000,
+      "onboarding": true,
+      "discount_pct": 0,
+      "close_date": "2027-01-29",
+      "probability": 15,
+      "next_step": "Demo with Hannah Clarke + Jorge Alvarez (09:30)",
+      "next_step_date": "2026-11-10",
+      "contract_signed": false,
+      "contract_doc_id": null,
+      "lost_reason": null,
+      "created_at": "2026-10-22T12:00:00-07:00"
+    },
+    {
+      "id": "dl_sparklepro_cleaning",
+      "name": "SparklePro – Core 14",
+      "company_id": "co_sparklepro_cleaning",
+      "contact_ids": [
+        "ct_kevin_obrien",
+        "ct_lisa_tran",
+        "ct_ray_dunn"
+      ],
+      "owner": "u_alex",
+      "stage": "demo",
+      "plan": "core",
+      "locations": 14,
+      "amount": 25200,
+      "onboarding": true,
+      "discount_pct": 0,
+      "close_date": "2026-12-15",
+      "probability": 30,
+      "next_step": "Send offer before proposal walkthrough with Kevin O'Brien (10:00)",
+      "next_step_date": "2026-11-11",
+      "contract_signed": false,
+      "contract_doc_id": null,
+      "lost_reason": null,
+      "created_at": "2026-10-13T10:00:00-07:00"
+    },
+    {
+      "id": "dl_ironclad_guard",
+      "name": "Ironclad – Core 30",
+      "company_id": "co_ironclad_guard",
+      "contact_ids": [
+        "ct_daniel_price",
+        "ct_fatima_khan"
+      ],
+      "owner": "u_alex",
+      "stage": "negotiation",
+      "plan": "core",
+      "locations": 30,
+      "amount": 54000,
+      "onboarding": true,
+      "discount_pct": 0,
+      "close_date": "2026-11-30",
+      "probability": 70,
+      "next_step": "Send offer v2 at 10%; order form review with Fatima Khan + Daniel Price (11:00)",
+      "next_step_date": "2026-11-16",
+      "contract_signed": false,
+      "contract_doc_id": null,
+      "lost_reason": null,
+      "created_at": "2026-09-22T10:00:00-07:00"
+    },
+    {
+      "id": "dl_little_acorns",
+      "name": "Little Acorns – Pro 11",
+      "company_id": "co_little_acorns",
+      "contact_ids": [
+        "ct_emily_carter",
+        "ct_sam_wood",
+        "ct_monica_hale"
+      ],
+      "owner": "u_alex",
+      "stage": "proposal",
+      "plan": "pro",
+      "locations": 11,
+      "amount": 29040,
+      "onboarding": true,
+      "discount_pct": 0,
+      "close_date": "2026-12-10",
+      "probability": 50,
+      "next_step": "Proposal Q&A with Emily Carter (14:00); board meets Nov 17",
+      "next_step_date": "2026-11-13",
+      "contract_signed": false,
+      "contract_doc_id": null,
+      "lost_reason": null,
+      "created_at": "2026-10-05T10:00:00-07:00"
+    },
+    {
+      "id": "dl_mesa_valley",
+      "name": "Mesa Valley – Core 5",
+      "company_id": "co_mesa_valley",
+      "contact_ids": [
+        "ct_nora_kim"
+      ],
+      "owner": "u_alex",
+      "stage": "new",
+      "plan": "core",
+      "locations": 5,
+      "amount": 9000,
+      "onboarding": false,
+      "discount_pct": 0,
+      "close_date": "2027-01-22",
+      "probability": 5,
+      "next_step": "Discovery call with Nora Kim (10:00)",
+      "next_step_date": "2026-11-09",
+      "contract_signed": false,
+      "contract_doc_id": null,
+      "lost_reason": null,
+      "created_at": "2026-11-07T15:10:00-07:00"
+    },
+    {
+      "id": "dl_summit_brew",
+      "name": "Summit Brew – expansion +3",
+      "company_id": "co_summit_brew",
+      "contact_ids": [
+        "ct_jake_miller",
+        "ct_tessa_grant"
+      ],
+      "owner": "u_alex",
+      "stage": "proposal",
+      "plan": "core",
+      "locations": 3,
+      "amount": 5400,
+      "onboarding": false,
+      "discount_pct": 0,
+      "close_date": "2026-11-30",
+      "probability": 50,
+      "next_step": "Settle expansion quote with Jake Miller this week; reconfirm offer v1 at 2026 price",
+      "next_step_date": "2026-11-13",
+      "contract_signed": false,
+      "contract_doc_id": null,
+      "lost_reason": null,
+      "created_at": "2026-10-20T11:00:00-07:00"
+    },
+    {
+      "id": "dl_acme_food_group",
+      "name": "Acme Food Group – Core 4",
+      "company_id": "co_acme_food_group",
+      "contact_ids": [
+        "ct_karen_mills"
+      ],
+      "owner": "u_alex",
+      "stage": "closed_lost",
+      "plan": "core",
+      "locations": 4,
+      "amount": 7200,
+      "onboarding": false,
+      "discount_pct": 10,
+      "close_date": "2026-05-20",
+      "probability": 0,
+      "next_step": null,
+      "next_step_date": null,
+      "contract_signed": false,
+      "contract_doc_id": null,
+      "lost_reason": "No budget",
+      "created_at": "2026-05-04T10:00:00-06:00"
+    }
+  ],
+  "activities": [
+    {
+      "id": "nt_bluepeak_fitness_01",
+      "type": "note",
+      "deal_id": "dl_bluepeak_fitness",
+      "company_id": "co_bluepeak_fitness",
+      "contact_ids": [
+        "ct_lena_ortiz"
+      ],
+      "author": "u_alex",
+      "ts": "2026-06-20T17:00:00-07:00",
+      "title": "Closed Lost to Crewlane",
+      "body": "Note 2026-06-20 — Alex Chen\nClosed Lost to Crewlane. Reason: price (~$115/location vs our $150). Lena liked the app\nbut board wanted lowest cost. Revisit in 2027.",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "ac_bluepeak_fitness_01",
+      "type": "email",
+      "deal_id": "dl_bluepeak_fitness",
+      "company_id": "co_bluepeak_fitness",
+      "contact_ids": [
+        "ct_lena_ortiz"
+      ],
+      "author": "u_alex",
+      "ts": "2026-07-02T09:30:00-07:00",
+      "title": "Re: Shiftpoint proposal – Bluepeak (Core 15)",
+      "body": "Thread Jun 18 – Jul 2: Alex's last-chance follow-ups, Lena's decline, then her request: \"Please remove me from all lists.\"",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "nt_bluepeak_fitness_02",
+      "type": "note",
+      "deal_id": "dl_bluepeak_fitness",
+      "company_id": "co_bluepeak_fitness",
+      "contact_ids": [
+        "ct_lena_ortiz"
+      ],
+      "author": "u_alex",
+      "ts": "2026-07-02T17:00:00-07:00",
+      "title": "Lena Ortiz asked to be removed from all lists (\"Please remove me…",
+      "body": "Note 2026-07-02 — Alex Chen\nLena Ortiz asked to be removed from all lists (\"Please remove me from all lists\").\nSet do_not_contact = true. Do not email or call her. Removed from all sequences.",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "ac_lakeshore_hotels_01",
+      "type": "email",
+      "deal_id": "dl_lakeshore_hotels",
+      "company_id": "co_lakeshore_hotels",
+      "contact_ids": [
+        "ct_olivia_bennett"
+      ],
+      "author": "u_noah",
+      "ts": "2026-09-03T10:30:00-07:00",
+      "title": "Inbound – one-pager download",
+      "body": "Olivia downloaded the one-pager via the website. Noah booked discovery with Alex.",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "ac_harbor_health_01",
+      "type": "meeting",
+      "deal_id": "dl_harbor_health",
+      "company_id": "co_harbor_health",
+      "contact_ids": [
+        "ct_grace_moreno"
+      ],
+      "author": "u_alex",
+      "ts": "2026-09-08T10:00:00-07:00",
+      "title": "Pro demo – Harbor Health",
+      "body": "Pro demo with Grace Moreno. No transcript.",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "ac_lakeshore_hotels_02",
+      "type": "call",
+      "deal_id": "dl_lakeshore_hotels",
+      "company_id": "co_lakeshore_hotels",
+      "contact_ids": [
+        "ct_olivia_bennett"
+      ],
+      "author": "u_alex",
+      "ts": "2026-09-10T10:00:00-07:00",
+      "title": "Discovery call – Lakeshore",
+      "body": "Discovery call with Olivia Bennett. No transcript.",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "nt_lakeshore_hotels_01",
+      "type": "note",
+      "deal_id": "dl_lakeshore_hotels",
+      "company_id": "co_lakeshore_hotels",
+      "contact_ids": [
+        "ct_olivia_bennett"
+      ],
+      "author": "u_alex",
+      "ts": "2026-09-10T10:50:00-07:00",
+      "title": "Call note – Olivia Bennett (Director of Operations)",
+      "body": "Call 2026-09-10 with Olivia Bennett (Director of Operations)\n- Pain: housekeeping OT ~12% on busy weekends; ~35h/week on rotas group-wide.\n- Locations / plan discussed: 6 hotels, Core.\n- Objections: wants pricing upfront before investing time in a demo.\n- Agreed next step: send pricing overview by 2026-09-15",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "ac_lakeshore_hotels_03",
+      "type": "email",
+      "deal_id": "dl_lakeshore_hotels",
+      "company_id": "co_lakeshore_hotels",
+      "contact_ids": [
+        "ct_olivia_bennett"
+      ],
+      "author": "u_alex",
+      "ts": "2026-09-15T15:00:00-07:00",
+      "title": "Pricing overview – Lakeshore Hotels",
+      "body": "Alex sent a pricing overview; the team macro attached price_list_2025 by mistake.",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "ac_lakeshore_hotels_04",
+      "type": "email",
+      "deal_id": "dl_lakeshore_hotels",
+      "company_id": "co_lakeshore_hotels",
+      "contact_ids": [
+        "ct_olivia_bennett"
+      ],
+      "author": "u_alex",
+      "ts": "2026-09-16T09:00:00-07:00",
+      "title": "Re: Pricing overview – Lakeshore Hotels",
+      "body": "Alex sent a correction (disregard attachment; 2026 Core is $150/location/month). Olivia: \"No problem — glad you caught it.\"",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "nt_lakeshore_hotels_02",
+      "type": "note",
+      "deal_id": "dl_lakeshore_hotels",
+      "company_id": "co_lakeshore_hotels",
+      "contact_ids": [
+        "ct_olivia_bennett"
+      ],
+      "author": "u_alex",
+      "ts": "2026-09-16T17:00:00-07:00",
+      "title": "Pricing email of 9/15 had price_list_2025 attached by the team…",
+      "body": "Note 2026-09-16 — Alex Chen\nPricing email of 9/15 had price_list_2025 attached by the team macro (Core $135). Sent\ncorrection with 2026 pricing ($150) same thread; Olivia acknowledged. No commitment made on\nold prices. Macro removed. Use price_list_2026 only.",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "ac_harbor_health_02",
+      "type": "email",
+      "deal_id": "dl_harbor_health",
+      "company_id": "co_harbor_health",
+      "contact_ids": [
+        "ct_grace_moreno"
+      ],
+      "author": "u_alex",
+      "ts": "2026-09-21T14:00:00-07:00",
+      "title": "Shiftpoint offer – Harbor Health (Pro 8)",
+      "body": "Offer sent: Pro 8 at list ($21,120/yr) + onboarding $3,000.",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "ac_ironclad_guard_01",
+      "type": "email",
+      "deal_id": "dl_ironclad_guard",
+      "company_id": "co_ironclad_guard",
+      "contact_ids": [
+        "ct_daniel_price"
+      ],
+      "author": "u_priya",
+      "ts": "2026-09-22T09:30:00-07:00",
+      "title": "Inbound – security-industry webinar",
+      "body": "Inbound lead from a security-industry webinar. Priya booked discovery with Alex.",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "ac_northgate_logistics_01",
+      "type": "email",
+      "deal_id": "dl_northgate_logistics",
+      "company_id": "co_northgate_logistics",
+      "contact_ids": [
+        "ct_mark_kessler"
+      ],
+      "author": "u_noah",
+      "ts": "2026-09-24T11:20:00-07:00",
+      "title": "Re: outbound sequence – Northgate Logistics",
+      "body": "Mark Kessler replied to the outbound sequence (\"timing is right — peak is coming\"). Noah booked discovery with Alex.",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "ac_ironclad_guard_02",
+      "type": "call",
+      "deal_id": "dl_ironclad_guard",
+      "company_id": "co_ironclad_guard",
+      "contact_ids": [
+        "ct_daniel_price"
+      ],
+      "author": "u_alex",
+      "ts": "2026-09-29T10:00:00-07:00",
+      "title": "Discovery call – Ironclad",
+      "body": "Discovery call with Daniel Price. No transcript.",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "nt_ironclad_guard_01",
+      "type": "note",
+      "deal_id": "dl_ironclad_guard",
+      "company_id": "co_ironclad_guard",
+      "contact_ids": [
+        "ct_daniel_price"
+      ],
+      "author": "u_alex",
+      "ts": "2026-09-29T10:50:00-07:00",
+      "title": "Call note – Daniel Price (Operations Manager)",
+      "body": "Call 2026-09-29 with Daniel Price (Operations Manager)\n- Pain: OT ~19%; ~4% call-outs filled by phone; 2 dispatchers ~30h/week each.\n- Locations / plan discussed: 30 client sites, Core. Pro compliance not needed (guard-card tracking in HR).\n- Objections: officers' phone use on post (GPS clock-in only at start/end).\n- Agreed next step: demo with Daniel + dispatchers by 2026-10-15",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "ac_northgate_logistics_02",
+      "type": "call",
+      "deal_id": "dl_northgate_logistics",
+      "company_id": "co_northgate_logistics",
+      "contact_ids": [
+        "ct_mark_kessler"
+      ],
+      "author": "u_alex",
+      "ts": "2026-09-30T10:00:00-07:00",
+      "title": "Discovery call – Northgate",
+      "body": "Discovery call with Mark Kessler. No transcript.",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "nt_northgate_logistics_01",
+      "type": "note",
+      "deal_id": "dl_northgate_logistics",
+      "company_id": "co_northgate_logistics",
+      "contact_ids": [
+        "ct_mark_kessler",
+        "ct_dev_patel"
+      ],
+      "author": "u_alex",
+      "ts": "2026-09-30T10:50:00-07:00",
+      "title": "Call note – Mark Kessler (VP Operations)",
+      "body": "Call 2026-09-30 with Mark Kessler (VP Operations)\n- Pain: 24/7 rota rebuilt weekly in Sheets at 20 sites; OT ~16% of hours; night no-shows ~9%.\n- Locations / plan discussed: 20 warehouses, Core. Pro mentioned for compliance; not interested.\n- Objections: \"Crewlane pitched us last month.\"\n- Agreed next step: demo with Mark + Dev Patel by 2026-10-08",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "ac_little_acorns_01",
+      "type": "email",
+      "deal_id": "dl_little_acorns",
+      "company_id": "co_little_acorns",
+      "contact_ids": [
+        "ct_emily_carter"
+      ],
+      "author": "u_noah",
+      "ts": "2026-10-05T09:30:00-07:00",
+      "title": "Inbound – website form",
+      "body": "Emily filled in the website form after reading a Shiftpoint newsletter. Noah booked discovery with Alex.",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "ac_copper_kettle_01",
+      "type": "email",
+      "deal_id": "dl_copper_kettle",
+      "company_id": "co_copper_kettle",
+      "contact_ids": [
+        "ct_anna_fischer"
+      ],
+      "author": "u_priya",
+      "ts": "2026-10-06T14:30:00-07:00",
+      "title": "Restaurant scheduling webinar – call request",
+      "body": "Anna attended the \"Restaurant scheduling\" webinar and requested a call. Priya booked discovery with Alex for Oct 13.",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "nt_copper_kettle_01",
+      "type": "note",
+      "deal_id": "dl_copper_kettle",
+      "company_id": "co_copper_kettle",
+      "contact_ids": [
+        "ct_anna_fischer"
+      ],
+      "author": "u_priya",
+      "ts": "2026-10-06T17:00:00-07:00",
+      "title": "First touch – Copper Kettle Restaurant Group",
+      "body": "Note 2026-10-06 — Priya Shah\nFirst touch: webinar attendee. Anna Fischer, Director of Ops, 9 restaurants in Minneapolis/St Paul.\nPain: brunch no-shows. Booked discovery with Alex for Oct 13.",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "ac_northgate_logistics_03",
+      "type": "meeting",
+      "deal_id": "dl_northgate_logistics",
+      "company_id": "co_northgate_logistics",
+      "contact_ids": [
+        "ct_mark_kessler",
+        "ct_dev_patel"
+      ],
+      "author": "u_alex",
+      "ts": "2026-10-08T13:00:00-07:00",
+      "title": "Product demo – Northgate",
+      "body": "Product demo with Mark Kessler; Dev Patel joined for the first 20 minutes. No transcript.",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "nt_northgate_logistics_02",
+      "type": "note",
+      "deal_id": "dl_northgate_logistics",
+      "company_id": "co_northgate_logistics",
+      "contact_ids": [
+        "ct_mark_kessler",
+        "ct_rachel_ito",
+        "ct_dev_patel"
+      ],
+      "author": "u_alex",
+      "ts": "2026-10-08T13:50:00-07:00",
+      "title": "Call note – Mark Kessler (VP Operations), Dev Patel (IT Lead)",
+      "body": "Call 2026-10-08 with Mark Kessler (VP Operations), Dev Patel (IT Lead)\n- Pain: confirmed; peak-season OT ~$1.2M last year.\n- Locations / plan discussed: Core 20 + onboarding.\n- Objections: Dev asked about SSO (Enterprise only, flagged); price vs Crewlane.\n- Agreed next step: written offer to Mark + Rachel Ito (Procurement) by 2026-10-22",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "ac_sparklepro_cleaning_01",
+      "type": "email",
+      "deal_id": "dl_sparklepro_cleaning",
+      "company_id": "co_sparklepro_cleaning",
+      "contact_ids": [
+        "ct_kevin_obrien"
+      ],
+      "author": "u_noah",
+      "ts": "2026-10-13T09:40:00-07:00",
+      "title": "Re: outbound – SparklePro",
+      "body": "Kevin replied to Noah's outbound email (\"timing's right\"). Discovery booked with Alex.",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "ac_copper_kettle_02",
+      "type": "call",
+      "deal_id": "dl_copper_kettle",
+      "company_id": "co_copper_kettle",
+      "contact_ids": [
+        "ct_anna_fischer"
+      ],
+      "author": "u_alex",
+      "ts": "2026-10-13T10:00:00-07:00",
+      "title": "Discovery call – Copper Kettle",
+      "body": "Discovery call with Anna Fischer. No transcript.",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "nt_copper_kettle_02",
+      "type": "note",
+      "deal_id": "dl_copper_kettle",
+      "company_id": "co_copper_kettle",
+      "contact_ids": [
+        "ct_anna_fischer"
+      ],
+      "author": "u_alex",
+      "ts": "2026-10-13T10:50:00-07:00",
+      "title": "Call note – Anna Fischer (Director of Operations)",
+      "body": "Call 2026-10-13 with Anna Fischer (Director of Operations)\n- Pain: ~8% no-shows on weekend brunch; GMs ~4.5h/week on rotas; OT ~9%.\n- Locations / plan discussed: 9 restaurants, Core. Payroll integration interesting.\n- Objections: \"line cooks hate apps\".\n- Agreed next step: demo with Anna by 2026-10-26",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "ac_ironclad_guard_03",
+      "type": "email",
+      "deal_id": "dl_ironclad_guard",
+      "company_id": "co_ironclad_guard",
+      "contact_ids": [
+        "ct_daniel_price"
+      ],
+      "author": "u_alex",
+      "ts": "2026-10-14T08:15:00-07:00",
+      "title": "Site list – 30 client sites",
+      "body": "Daniel sent the full list of 30 client sites ahead of the demo.",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "ac_harbor_health_03",
+      "type": "call",
+      "deal_id": "dl_harbor_health",
+      "company_id": "co_harbor_health",
+      "contact_ids": [
+        "ct_ben_holt"
+      ],
+      "author": "u_alex",
+      "ts": "2026-10-14T11:00:00-07:00",
+      "title": "Pricing/terms call – Harbor Health",
+      "body": "Pricing and terms call with Ben Holt. No transcript.",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "nt_harbor_health_01",
+      "type": "note",
+      "deal_id": "dl_harbor_health",
+      "company_id": "co_harbor_health",
+      "contact_ids": [
+        "ct_ben_holt"
+      ],
+      "author": "u_alex",
+      "ts": "2026-10-14T11:50:00-07:00",
+      "title": "Call note – Ben Holt (Finance Director)",
+      "body": "Call 2026-10-14 with Ben Holt (Finance Director)\n- Pain: OT ~11%; credential gaps 4–5 shifts/month.\n- Locations / plan discussed: Pro 8 at list, onboarding $3,000. Yearly up front OK.\n- Objections: wants payroll export live on day one (Pro includes it).\n- Agreed next step: Ben signs order form by 2026-10-30",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "ac_little_acorns_02",
+      "type": "call",
+      "deal_id": "dl_little_acorns",
+      "company_id": "co_little_acorns",
+      "contact_ids": [
+        "ct_emily_carter"
+      ],
+      "author": "u_alex",
+      "ts": "2026-10-14T13:00:00-07:00",
+      "title": "Discovery call – Little Acorns",
+      "body": "Discovery call with Emily Carter. No transcript.",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "nt_little_acorns_01",
+      "type": "note",
+      "deal_id": "dl_little_acorns",
+      "company_id": "co_little_acorns",
+      "contact_ids": [
+        "ct_emily_carter",
+        "ct_sam_wood"
+      ],
+      "author": "u_alex",
+      "ts": "2026-10-14T13:50:00-07:00",
+      "title": "Call note – Emily Carter (Executive Director)",
+      "body": "Call 2026-10-14 with Emily Carter (Executive Director)\n- Pain: directors ~6h/week on paper grids; OT ~8%; two classroom closures for ratio this year.\n- Locations / plan discussed: 11 centers, Pro (compliance + payroll export).\n- Objections: board approves anything over $25k; nonprofit budget.\n- Agreed next step: demo with Emily + Sam Wood by 2026-10-28",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "ac_ironclad_guard_04",
+      "type": "meeting",
+      "deal_id": "dl_ironclad_guard",
+      "company_id": "co_ironclad_guard",
+      "contact_ids": [
+        "ct_daniel_price"
+      ],
+      "author": "u_alex",
+      "ts": "2026-10-15T10:00:00-07:00",
+      "title": "Demo – Ironclad",
+      "body": "Demo with Daniel Price and two dispatchers. No transcript.",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "ac_bluepeak_fitness_02",
+      "type": "email",
+      "deal_id": "dl_bluepeak_fitness_reengage",
+      "company_id": "co_bluepeak_fitness",
+      "contact_ids": [
+        "ct_chris_yoon"
+      ],
+      "author": "u_alex",
+      "ts": "2026-10-15T16:00:00-07:00",
+      "title": "LinkedIn message from Chris Yoon",
+      "body": "Chris Yoon reached out to Alex on LinkedIn about re-looking at scheduling; Alex booked an intro call.",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "ac_sparklepro_cleaning_02",
+      "type": "call",
+      "deal_id": "dl_sparklepro_cleaning",
+      "company_id": "co_sparklepro_cleaning",
+      "contact_ids": [
+        "ct_kevin_obrien"
+      ],
+      "author": "u_alex",
+      "ts": "2026-10-19T11:00:00-07:00",
+      "title": "Discovery call – SparklePro",
+      "body": "Discovery call with Kevin O'Brien. No transcript.",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "nt_sparklepro_cleaning_01",
+      "type": "note",
+      "deal_id": "dl_sparklepro_cleaning",
+      "company_id": "co_sparklepro_cleaning",
+      "contact_ids": [
+        "ct_kevin_obrien",
+        "ct_lisa_tran"
+      ],
+      "author": "u_alex",
+      "ts": "2026-10-19T11:50:00-07:00",
+      "title": "Call note – Kevin O'Brien (COO)",
+      "body": "Call 2026-10-19 with Kevin O'Brien (COO)\n- Pain: ~6% uncovered shifts; ~$90k client credits last year; branch leads ~6h/week on rotas.\n- Locations / plan discussed: 14 branches, Core + onboarding.\n- Objections: crews on cheap Android phones; Spanish needed.\n- Agreed next step: demo with Kevin + Lisa Tran by 2026-10-27 (moved to 2026-11-03)",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "ac_acme_foods_01",
+      "type": "email",
+      "deal_id": "dl_acme_foods",
+      "company_id": "co_acme_foods",
+      "contact_ids": [
+        "ct_mark_keller"
+      ],
+      "author": "u_priya",
+      "ts": "2026-10-20T09:15:00-07:00",
+      "title": "Shiftpoint demo request – 12 depots",
+      "body": "Inbound demo request via website form: \"We run 12 depots around Columbus and schedule in Excel. Overtime is killing us. Would like a demo.\" Priya qualified and offered a discovery slot with Alex.",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "ac_summit_brew_01",
+      "type": "email",
+      "deal_id": "dl_summit_brew",
+      "company_id": "co_summit_brew",
+      "contact_ids": [
+        "ct_tessa_grant"
+      ],
+      "author": "u_alex",
+      "ts": "2026-10-20T10:30:00-07:00",
+      "title": "Adding three taprooms",
+      "body": "Tessa asked about adding Windsor, Estes Park and Greeley Downtown to Shiftpoint.",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "nt_acme_foods_01",
+      "type": "note",
+      "deal_id": "dl_acme_foods",
+      "company_id": "co_acme_foods",
+      "contact_ids": [
+        "ct_mark_keller"
+      ],
+      "author": "u_priya",
+      "ts": "2026-10-20T17:00:00-07:00",
+      "title": "First touch – Acme Foods",
+      "body": "Note 2026-10-20 — Priya Shah\nFirst touch: inbound form. Mark Keller, Director of Ops, 12 depots around Columbus OH,\n~600 hourly. Scheduling in Excel per depot. Overtime \"out of control\". Booked discovery\nwith Alex for Oct 29.",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "nt_summit_brew_01",
+      "type": "note",
+      "deal_id": "dl_summit_brew",
+      "company_id": "co_summit_brew",
+      "contact_ids": [
+        "ct_tessa_grant"
+      ],
+      "author": "u_alex",
+      "ts": "2026-10-20T17:00:00-07:00",
+      "title": "Existing customer (since 2024, 7 taprooms, Core at 2025 rate $135…",
+      "body": "Note 2026-10-20 — Alex Chen\nExisting customer (since 2024, 7 taprooms, Core at 2025 rate $135 until renewal 2027-02-01).\nTessa wants +3 taprooms: Windsor (Dec), Estes Park (Feb), Greeley Downtown (Mar).\nNew deal created for expansion.",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "ac_acme_foods_02",
+      "type": "email",
+      "deal_id": "dl_acme_foods",
+      "company_id": "co_acme_foods",
+      "contact_ids": [
+        "ct_mark_keller"
+      ],
+      "author": "u_priya",
+      "ts": "2026-10-21T08:40:00-07:00",
+      "title": "Re: Shiftpoint demo request – 12 depots",
+      "body": "Mark confirmed the Oct 29 discovery slot (\"works for me —\").",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "ac_bluepeak_fitness_03",
+      "type": "call",
+      "deal_id": "dl_bluepeak_fitness_reengage",
+      "company_id": "co_bluepeak_fitness",
+      "contact_ids": [
+        "ct_chris_yoon"
+      ],
+      "author": "u_alex",
+      "ts": "2026-10-21T11:00:00-07:00",
+      "title": "Intro call – Bluepeak re-engage",
+      "body": "Intro call with Chris Yoon. No transcript.",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "nt_bluepeak_fitness_03",
+      "type": "note",
+      "deal_id": "dl_bluepeak_fitness_reengage",
+      "company_id": "co_bluepeak_fitness",
+      "contact_ids": [
+        "ct_chris_yoon"
+      ],
+      "author": "u_alex",
+      "ts": "2026-10-21T11:50:00-07:00",
+      "title": "Call note – Chris Yoon (Regional Manager)",
+      "body": "Call 2026-10-21 with Chris Yoon (Regional Manager)\n- Pain: Crewlane app adoption ~55%; 5am no-shows ~12%; managers ~4h/week on scheduling.\n- Locations / plan discussed: 15 gyms, Core; could start with Chris's 6 Kansas gyms.\n- Objections: Lena chose Crewlane on price; contract with Crewlane renews in July 2027 (monthly exit clause, Chris to confirm).\n- Agreed next step: discovery deep-dive with Chris (NOT Lena — she is DNC) by 2026-11-11",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "ac_sparklepro_cleaning_03",
+      "type": "email",
+      "deal_id": "dl_sparklepro_cleaning",
+      "company_id": "co_sparklepro_cleaning",
+      "contact_ids": [
+        "ct_lisa_tran"
+      ],
+      "author": "u_alex",
+      "ts": "2026-10-22T09:00:00-07:00",
+      "title": "Demo scheduling – SparklePro",
+      "body": "Lisa Tran proposed demo times; demo booked for Oct 27, then moved to Nov 3 (Kevin at a client).",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "ac_pine_and_pebble_01",
+      "type": "email",
+      "deal_id": "dl_pine_and_pebble",
+      "company_id": "co_pine_and_pebble",
+      "contact_ids": [
+        "ct_hannah_clarke",
+        "ct_jake_miller"
+      ],
+      "author": "u_alex",
+      "ts": "2026-10-22T11:30:00-07:00",
+      "title": "Intro: Hannah Clarke (Pine & Pebble) <> Alex",
+      "body": "Jake Miller (Summit Brew) introduced Hannah Clarke to Alex by email; Alex booked discovery for Nov 2.",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "ac_northgate_logistics_04",
+      "type": "email",
+      "deal_id": "dl_northgate_logistics",
+      "company_id": "co_northgate_logistics",
+      "contact_ids": [
+        "ct_mark_kessler",
+        "ct_rachel_ito"
+      ],
+      "author": "u_alex",
+      "ts": "2026-10-22T15:00:00-07:00",
+      "title": "Shiftpoint offer – Northgate Logistics (Core 20)",
+      "body": "Offer v1 sent to Mark Kessler and Rachel Ito: Core 20 at 10% off ($32,400/yr) + onboarding $3,000, valid until 2026-11-20. Doc: doc_offer_northgate_logistics_v1.",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "nt_northgate_logistics_03",
+      "type": "note",
+      "deal_id": "dl_northgate_logistics",
+      "company_id": "co_northgate_logistics",
+      "contact_ids": [
+        "ct_rachel_ito"
+      ],
+      "author": "u_alex",
+      "ts": "2026-10-22T17:00:00-07:00",
+      "title": "Offer v1 sent – Northgate Logistics",
+      "body": "Note 2026-10-22 — Alex Chen\nOffer v1 sent: Core 20, 10% off subscription ($32,400) + onboarding $3,000. Valid until\n2026-11-20. Rachel Ito now in the loop.",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "nt_pine_and_pebble_01",
+      "type": "note",
+      "deal_id": "dl_pine_and_pebble",
+      "company_id": "co_pine_and_pebble",
+      "contact_ids": [
+        "ct_hannah_clarke"
+      ],
+      "author": "u_alex",
+      "ts": "2026-10-22T17:00:00-07:00",
+      "title": "Referral from Jake Miller (Summit Brew, customer)",
+      "body": "Note 2026-10-22 — Alex Chen\nReferral from Jake Miller (Summit Brew, customer). Hannah Clarke, VP Stores, 25 stores CO/UT/NM.\nBooked discovery Nov 2.",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "ac_summit_brew_02",
+      "type": "call",
+      "deal_id": "dl_summit_brew",
+      "company_id": "co_summit_brew",
+      "contact_ids": [
+        "ct_tessa_grant"
+      ],
+      "author": "u_alex",
+      "ts": "2026-10-23T11:00:00-07:00",
+      "title": "Call – Summit Brew opening dates",
+      "body": "Short call with Tessa Grant to confirm the new taprooms' opening dates. No transcript.",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "nt_summit_brew_02",
+      "type": "note",
+      "deal_id": "dl_summit_brew",
+      "company_id": "co_summit_brew",
+      "contact_ids": [
+        "ct_jake_miller",
+        "ct_tessa_grant"
+      ],
+      "author": "u_alex",
+      "ts": "2026-10-23T11:50:00-07:00",
+      "title": "Call note – Tessa Grant (General Manager)",
+      "body": "Call 2026-10-23 with Tessa Grant (General Manager)\n- Pain: none new; wants Windsor live by its Dec 5 opening.\n- Locations / plan discussed: +3 Core taprooms, 2026 price, $5,400/yr. Skipped full demo (existing customer).\n- Objections: Jake may ask for \"same rate as now\".\n- Agreed next step: send expansion offer by 2026-10-27",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "ac_ironclad_guard_05",
+      "type": "email",
+      "deal_id": "dl_ironclad_guard",
+      "company_id": "co_ironclad_guard",
+      "contact_ids": [
+        "ct_daniel_price",
+        "ct_fatima_khan"
+      ],
+      "author": "u_alex",
+      "ts": "2026-10-23T14:00:00-07:00",
+      "title": "Shiftpoint offer – Ironclad Guard (Core 30)",
+      "body": "Offer v1 sent at list to Daniel and Fatima: Core 30, $54,000/yr + onboarding $3,000, valid until 2026-11-30. Doc: doc_offer_ironclad_guard_v1.",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "nt_ironclad_guard_02",
+      "type": "note",
+      "deal_id": "dl_ironclad_guard",
+      "company_id": "co_ironclad_guard",
+      "contact_ids": [
+        "ct_fatima_khan"
+      ],
+      "author": "u_alex",
+      "ts": "2026-10-23T17:00:00-07:00",
+      "title": "Offer v1 sent – Ironclad Guard Services",
+      "body": "Note 2026-10-23 — Alex Chen\nOffer v1 sent: Core 30 at list, $54,000/yr + onboarding $3,000. Valid until 2026-11-30.\nFatima Khan (Procurement) on the offer.",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "ac_copper_kettle_03",
+      "type": "meeting",
+      "deal_id": "dl_copper_kettle",
+      "company_id": "co_copper_kettle",
+      "contact_ids": [
+        "ct_anna_fischer",
+        "ct_tom_brandt"
+      ],
+      "author": "u_alex",
+      "ts": "2026-10-26T14:00:00-07:00",
+      "title": "Demo – Copper Kettle",
+      "body": "Demo with Anna Fischer; Tom Brandt joined for 10 minutes for the messaging feature. No transcript.",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "nt_copper_kettle_03",
+      "type": "note",
+      "deal_id": "dl_copper_kettle",
+      "company_id": "co_copper_kettle",
+      "contact_ids": [
+        "ct_anna_fischer",
+        "ct_tom_brandt"
+      ],
+      "author": "u_alex",
+      "ts": "2026-10-26T14:50:00-07:00",
+      "title": "Call note – Anna Fischer (Director of Operations), Tom Brandt (Marketing Manager, 10 min)",
+      "body": "Call 2026-10-26 with Anna Fischer (Director of Operations), Tom Brandt (Marketing Manager, 10 min)\n- Pain: confirmed; wants rollout before March patio season.\n- Locations / plan discussed: Core 9 ($16,200); payroll add-on $2,000/yr.\n- Objections: payroll export format for their provider — to confirm.\n- Agreed next step: recap + follow-up call by 2026-11-12",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "nt_summit_brew_03",
+      "type": "note",
+      "deal_id": "dl_summit_brew",
+      "company_id": "co_summit_brew",
+      "contact_ids": [],
+      "author": "u_dana",
+      "ts": "2026-10-26T17:00:00-07:00",
+      "title": "Expansion pricing – Summit Brew Co.",
+      "body": "Note 2026-10-26 — Dana Brooks\nExpansion pricing: new locations are priced at the 2026 list ($150 Core). Existing 7 stay on\n$135 until renewal Feb 2027. No onboarding package for adding locations to a live account\n(Marco confirms template copy). Do NOT use price_list_2025 for the new taprooms.",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "ac_northgate_logistics_05",
+      "type": "email",
+      "deal_id": "dl_northgate_logistics",
+      "company_id": "co_northgate_logistics",
+      "contact_ids": [
+        "ct_rachel_ito"
+      ],
+      "author": "u_alex",
+      "ts": "2026-10-27T09:10:00-07:00",
+      "title": "Re: Shiftpoint offer – Northgate Logistics (Core 20)",
+      "body": "Rachel replied: reviewing against a competing proposal; asked to hold a call the week of Nov 2.",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "ac_copper_kettle_04",
+      "type": "email",
+      "deal_id": "dl_copper_kettle",
+      "company_id": "co_copper_kettle",
+      "contact_ids": [
+        "ct_anna_fischer",
+        "ct_tom_brandt"
+      ],
+      "author": "u_alex",
+      "ts": "2026-10-27T10:00:00-07:00",
+      "title": "Copper Kettle – demo recap",
+      "body": "Alex sent the demo recap + one-pager to Anna, CC Tom. Anna replied Oct 28 with a payroll export question.",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "ac_summit_brew_03",
+      "type": "email",
+      "deal_id": "dl_summit_brew",
+      "company_id": "co_summit_brew",
+      "contact_ids": [
+        "ct_jake_miller",
+        "ct_tessa_grant"
+      ],
+      "author": "u_alex",
+      "ts": "2026-10-27T10:00:00-07:00",
+      "title": "Shiftpoint expansion offer – Summit Brew (+3 taprooms)",
+      "body": "Offer v1 sent to Jake, CC Tessa: +3 Core taprooms at 2026 list, $5,400/yr. Doc: doc_offer_summit_brew_expansion_v1.",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "ac_harbor_health_04",
+      "type": "email",
+      "deal_id": "dl_harbor_health",
+      "company_id": "co_harbor_health",
+      "contact_ids": [
+        "ct_ben_holt"
+      ],
+      "author": "u_alex",
+      "ts": "2026-10-28T09:45:00-07:00",
+      "title": "Signed order form – Harbor Health",
+      "body": "Ben returned the signed order form; saved to Sales/Contracts/harbor_health_order_form_signed (doc_harbor_health_order_form_signed).",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "ac_little_acorns_03",
+      "type": "meeting",
+      "deal_id": "dl_little_acorns",
+      "company_id": "co_little_acorns",
+      "contact_ids": [
+        "ct_emily_carter",
+        "ct_sam_wood"
+      ],
+      "author": "u_alex",
+      "ts": "2026-10-28T13:00:00-07:00",
+      "title": "Demo – Little Acorns",
+      "body": "Demo with Emily Carter; Sam Wood joined. Transcript: doc_transcript_t8_little_acorns.",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "nt_little_acorns_02",
+      "type": "note",
+      "deal_id": "dl_little_acorns",
+      "company_id": "co_little_acorns",
+      "contact_ids": [
+        "ct_emily_carter",
+        "ct_sam_wood"
+      ],
+      "author": "u_alex",
+      "ts": "2026-10-28T13:50:00-07:00",
+      "title": "Call note – Emily Carter (Executive Director), Sam Wood (Center Operations Coordinator)",
+      "body": "Call 2026-10-28 with Emily Carter (Executive Director), Sam Wood (Center Operations Coordinator)\n- Pain: confirmed; floaters coordinated by text before 7am.\n- Locations / plan discussed: Pro 11 = $29,040/yr + onboarding $3,000.\n- Objections: board timing; no discount asked.\n- Agreed next step: written offer by 2026-10-30",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "nt_harbor_health_02",
+      "type": "note",
+      "deal_id": "dl_harbor_health",
+      "company_id": "co_harbor_health",
+      "contact_ids": [
+        "ct_ben_holt"
+      ],
+      "author": "u_alex",
+      "ts": "2026-10-28T17:00:00-07:00",
+      "title": "Signed order form received from Ben Holt, saved to…",
+      "body": "Note 2026-10-28 — Alex Chen\nSigned order form received from Ben Holt, saved to Sales/Contracts/harbor_health_order_form_signed.\nClosed Won. Pro 8, $21,120/yr + $3,000 onboarding. Handover to Erin Walsh (CS).",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "nt_northgate_logistics_04",
+      "type": "note",
+      "deal_id": "dl_northgate_logistics",
+      "company_id": "co_northgate_logistics",
+      "contact_ids": [
+        "ct_rachel_ito"
+      ],
+      "author": "u_alex",
+      "ts": "2026-10-28T17:00:00-07:00",
+      "title": "Rachel confirms they are comparing to Crewlane",
+      "body": "Note 2026-10-28 — Alex Chen\nRachel confirms they are comparing to Crewlane. Moved to Negotiation. Max I can do alone is 15%.",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "ac_acme_foods_03",
+      "type": "call",
+      "deal_id": "dl_acme_foods",
+      "company_id": "co_acme_foods",
+      "contact_ids": [
+        "ct_mark_keller",
+        "ct_sarah_nguyen"
+      ],
+      "author": "u_alex",
+      "ts": "2026-10-29T10:00:00-07:00",
+      "title": "Discovery call – Acme Foods",
+      "body": "Discovery call with Mark Keller; Sarah Nguyen joined for 15 minutes. No transcript.",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "nt_acme_foods_02",
+      "type": "note",
+      "deal_id": "dl_acme_foods",
+      "company_id": "co_acme_foods",
+      "contact_ids": [
+        "ct_mark_keller",
+        "ct_sarah_nguyen",
+        "ct_paul_grant"
+      ],
+      "author": "u_alex",
+      "ts": "2026-10-29T10:50:00-07:00",
+      "title": "Call note – Mark Keller (Director of Operations)",
+      "body": "Call 2026-10-29 with Mark Keller (Director of Operations)\n- Pain: overtime up 18% YoY (~14% of paid hours); ~7% no-shows on 04:00 shifts;\n  supervisors spend ~5h/week each on Excel rotas.\n- Locations / plan discussed: 12 depots, Core. Payroll integration maybe later.\n- Objections: \"drivers won't download another app\" (Sarah); CFO Paul Grant must sign off.\n- Agreed next step: follow-up call with short product walkthrough by 2026-11-05",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "ac_ironclad_guard_06",
+      "type": "email",
+      "deal_id": "dl_ironclad_guard",
+      "company_id": "co_ironclad_guard",
+      "contact_ids": [
+        "ct_fatima_khan"
+      ],
+      "author": "u_alex",
+      "ts": "2026-10-29T11:00:00-07:00",
+      "title": "Ironclad – terms call request",
+      "body": "Fatima requested a terms call.",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "ac_acme_foods_04",
+      "type": "email",
+      "deal_id": "dl_acme_foods",
+      "company_id": "co_acme_foods",
+      "contact_ids": [
+        "ct_mark_keller"
+      ],
+      "author": "u_alex",
+      "ts": "2026-10-30T09:30:00-07:00",
+      "title": "Recap + overtime numbers",
+      "body": "Alex sent the discovery recap with the Shiftpoint one-pager (public) attached.",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "ac_lakeshore_hotels_05",
+      "type": "meeting",
+      "deal_id": "dl_lakeshore_hotels",
+      "company_id": "co_lakeshore_hotels",
+      "contact_ids": [
+        "ct_olivia_bennett",
+        "ct_marcus_reed"
+      ],
+      "author": "u_alex",
+      "ts": "2026-10-30T10:00:00-07:00",
+      "title": "Demo – Lakeshore",
+      "body": "Demo with Olivia Bennett; Marcus Reed joined the last 15 minutes. Transcript: doc_transcript_t4_lakeshore_hotels.",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "nt_lakeshore_hotels_03",
+      "type": "note",
+      "deal_id": "dl_lakeshore_hotels",
+      "company_id": "co_lakeshore_hotels",
+      "contact_ids": [
+        "ct_olivia_bennett",
+        "ct_marcus_reed"
+      ],
+      "author": "u_alex",
+      "ts": "2026-10-30T10:50:00-07:00",
+      "title": "Call note – Olivia Bennett (Director of Operations), Marcus Reed (HR Manager)",
+      "body": "Call 2026-10-30 with Olivia Bennett (Director of Operations), Marcus Reed (HR Manager)\n- Pain: confirmed; wants housekeeping staffing tied to occupancy report.\n- Locations / plan discussed: Core 6 = $10,800/yr; onboarding not needed.\n- Objections: Marcus — union seniority in shift bidding (handled via approval rules).\n- Agreed next step: written offer by 2026-11-02; decision by 2026-12-04",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "ac_little_acorns_04",
+      "type": "email",
+      "deal_id": "dl_little_acorns",
+      "company_id": "co_little_acorns",
+      "contact_ids": [
+        "ct_emily_carter",
+        "ct_monica_hale"
+      ],
+      "author": "u_alex",
+      "ts": "2026-10-30T11:00:00-07:00",
+      "title": "Shiftpoint offer – Little Acorns (Pro 11)",
+      "body": "Offer v1 sent to Emily, CC Monica Hale: Pro 11 at list, $29,040/yr + $3,000 onboarding, valid until 2026-12-10. Doc: doc_offer_little_acorns_v1.",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "nt_little_acorns_03",
+      "type": "note",
+      "deal_id": "dl_little_acorns",
+      "company_id": "co_little_acorns",
+      "contact_ids": [
+        "ct_monica_hale"
+      ],
+      "author": "u_alex",
+      "ts": "2026-10-30T17:00:00-07:00",
+      "title": "Offer v1 sent – Little Acorns Childcare",
+      "body": "Note 2026-10-30 — Alex Chen\nOffer v1 sent: Pro 11 at list, $29,040/yr + $3,000 onboarding = $32,040 year one.\nValid until 2026-12-10. Monica Hale (Finance) CC'd.",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "ac_pine_and_pebble_02",
+      "type": "call",
+      "deal_id": "dl_pine_and_pebble",
+      "company_id": "co_pine_and_pebble",
+      "contact_ids": [
+        "ct_hannah_clarke"
+      ],
+      "author": "u_alex",
+      "ts": "2026-11-02T10:00:00-07:00",
+      "title": "Discovery call – Pine & Pebble",
+      "body": "Discovery call with Hannah Clarke. Transcript: doc_transcript_t5_pine_and_pebble.",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "nt_pine_and_pebble_02",
+      "type": "note",
+      "deal_id": "dl_pine_and_pebble",
+      "company_id": "co_pine_and_pebble",
+      "contact_ids": [
+        "ct_hannah_clarke",
+        "ct_jorge_alvarez",
+        "ct_megan_liu"
+      ],
+      "author": "u_alex",
+      "ts": "2026-11-02T10:50:00-07:00",
+      "title": "Call note – Hannah Clarke (VP Stores)",
+      "body": "Call 2026-11-02 with Hannah Clarke (VP Stores)\n- Pain: POS scheduling can't do swaps; managers ~5h/week; Q4 OT ~10%; payroll fixes 2 days/period.\n- Locations / plan discussed: 25 stores, Pro ($66,000/yr) + onboarding $3,000.\n- Objections: payroll export must handle CO/UT/NM; CFO Megan Liu approves >$50k.\n- Agreed next step: demo with Hannah + Jorge Alvarez (Payroll) by 2026-11-10",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "ac_northgate_logistics_06",
+      "type": "email",
+      "deal_id": "dl_northgate_logistics",
+      "company_id": "co_northgate_logistics",
+      "contact_ids": [
+        "ct_dev_patel"
+      ],
+      "author": "u_alex",
+      "ts": "2026-11-02T11:05:00-07:00",
+      "title": "SSO + API question",
+      "body": "Dev Patel asked whether Shiftpoint supports SSO with their identity provider and whether there is an API to push shifts into their WMS.",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "ac_lakeshore_hotels_06",
+      "type": "email",
+      "deal_id": "dl_lakeshore_hotels",
+      "company_id": "co_lakeshore_hotels",
+      "contact_ids": [
+        "ct_olivia_bennett"
+      ],
+      "author": "u_alex",
+      "ts": "2026-11-02T14:00:00-07:00",
+      "title": "Shiftpoint offer – Lakeshore Hotels (Core 6)",
+      "body": "Offer v1 sent: Core 6 at list, $10,800/yr, valid until 2026-12-04. Doc: doc_offer_lakeshore_hotels_v1.",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "nt_lakeshore_hotels_04",
+      "type": "note",
+      "deal_id": "dl_lakeshore_hotels",
+      "company_id": "co_lakeshore_hotels",
+      "contact_ids": [],
+      "author": "u_alex",
+      "ts": "2026-11-02T17:00:00-07:00",
+      "title": "Offer v1 sent – Lakeshore Hotels",
+      "body": "Note 2026-11-02 — Alex Chen\nOffer v1 sent: Core 6 at list, $10,800/yr, valid until 2026-12-04.",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "ac_ironclad_guard_07",
+      "type": "call",
+      "deal_id": "dl_ironclad_guard",
+      "company_id": "co_ironclad_guard",
+      "contact_ids": [
+        "ct_fatima_khan",
+        "ct_daniel_price"
+      ],
+      "author": "u_alex",
+      "ts": "2026-11-03T10:00:00-07:00",
+      "title": "Negotiation call – Ironclad",
+      "body": "Negotiation call with Fatima Khan and Daniel Price. Transcript: doc_transcript_t7_ironclad_guard.",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "nt_ironclad_guard_03",
+      "type": "note",
+      "deal_id": "dl_ironclad_guard",
+      "company_id": "co_ironclad_guard",
+      "contact_ids": [
+        "ct_daniel_price",
+        "ct_fatima_khan"
+      ],
+      "author": "u_alex",
+      "ts": "2026-11-03T10:50:00-07:00",
+      "title": "Call note – Fatima Khan (Procurement Lead), Daniel Price (Operations Manager)",
+      "body": "Call 2026-11-03 with Fatima Khan (Procurement Lead), Daniel Price (Operations Manager)\n- Pain: confirmed; wants go-live in January.\n- Locations / plan discussed: Core 30; Fatima asks 10% for 30-site commitment.\n- Objections: price only; standard yearly billing accepted.\n- Agreed next step: offer v2 at 10% before order form review 2026-11-16",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "ac_sparklepro_cleaning_04",
+      "type": "meeting",
+      "deal_id": "dl_sparklepro_cleaning",
+      "company_id": "co_sparklepro_cleaning",
+      "contact_ids": [
+        "ct_kevin_obrien",
+        "ct_lisa_tran"
+      ],
+      "author": "u_alex",
+      "ts": "2026-11-03T13:00:00-07:00",
+      "title": "Demo – SparklePro",
+      "body": "Demo with Kevin O'Brien; Lisa Tran joined. Transcript: doc_transcript_t6_sparklepro_cleaning.",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "nt_sparklepro_cleaning_02",
+      "type": "note",
+      "deal_id": "dl_sparklepro_cleaning",
+      "company_id": "co_sparklepro_cleaning",
+      "contact_ids": [
+        "ct_kevin_obrien",
+        "ct_lisa_tran"
+      ],
+      "author": "u_alex",
+      "ts": "2026-11-03T13:50:00-07:00",
+      "title": "Call note – Kevin O'Brien (COO), Lisa Tran (Branch Operations Lead)",
+      "body": "Call 2026-11-03 with Kevin O'Brien (COO), Lisa Tran (Branch Operations Lead)\n- Pain: confirmed; GPS clock-in at client sites is the must-have.\n- Locations / plan discussed: Core 14 = $25,200/yr + onboarding $3,000.\n- Objections: none blocking; asked about Crewlane price, didn't push.\n- Agreed next step: Alex sends written offer; walkthrough 2026-11-11",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "ac_acme_foods_05",
+      "type": "email",
+      "deal_id": "dl_acme_foods",
+      "company_id": "co_acme_foods",
+      "contact_ids": [
+        "ct_mark_keller"
+      ],
+      "author": "u_alex",
+      "ts": "2026-11-04T07:50:00-07:00",
+      "title": "Re: Recap + overtime numbers",
+      "body": "Mark replied with overtime numbers (~$410k OT last 12 months across all 12 depots) and asked to move the follow-up from Thursday to Friday Nov 6 (depot audit).",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "ac_ironclad_guard_08",
+      "type": "email",
+      "deal_id": "dl_ironclad_guard",
+      "company_id": "co_ironclad_guard",
+      "contact_ids": [
+        "ct_fatima_khan"
+      ],
+      "author": "u_alex",
+      "ts": "2026-11-04T09:20:00-07:00",
+      "title": "Ironclad – confirming our discussion",
+      "body": "Fatima confirmed the 10% ask in writing.",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "ac_harbor_health_05",
+      "type": "meeting",
+      "deal_id": "dl_harbor_health",
+      "company_id": "co_harbor_health",
+      "contact_ids": [
+        "ct_grace_moreno"
+      ],
+      "author": "u_alex",
+      "ts": "2026-11-04T10:00:00-07:00",
+      "title": "Kickoff call – Harbor Health",
+      "body": "Kickoff call with Grace Moreno, Erin Walsh (CS) and Alex. Transcript: doc_transcript_t3_harbor_health.",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "tk_ironclad_guard_01",
+      "type": "task",
+      "deal_id": "dl_ironclad_guard",
+      "company_id": "co_ironclad_guard",
+      "contact_ids": [
+        "ct_fatima_khan",
+        "ct_daniel_price"
+      ],
+      "author": "u_alex",
+      "ts": "2026-11-04T10:00:00-07:00",
+      "title": "Send Ironclad offer v2",
+      "body": "Send offer v2 reflecting the agreed 10% before the order form review on Mon Nov 16, 11:00.",
+      "due": "2026-11-13",
+      "done": false
+    },
+    {
+      "id": "nt_harbor_health_03",
+      "type": "note",
+      "deal_id": "dl_harbor_health",
+      "company_id": "co_harbor_health",
+      "contact_ids": [
+        "ct_grace_moreno"
+      ],
+      "author": "u_alex",
+      "ts": "2026-11-04T10:50:00-07:00",
+      "title": "Call note – Grace Moreno (Practice Operations Manager), Erin Walsh (CS)",
+      "body": "Call 2026-11-04 with Grace Moreno (Practice Operations Manager), Erin Walsh (CS)\n- Pain: n/a (kickoff). Wants rollout done before holiday staffing peak.\n- Locations / plan discussed: 8 clinics live in two waves (4 + 4).\n- Objections: none. Grace mentioned \"maybe two more clinics next year\" — no plan, no dates.\n- Agreed next step: Marco Rossi runs onboarding session 1 on 2026-11-17",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "ac_bluepeak_fitness_04",
+      "type": "email",
+      "deal_id": "dl_bluepeak_fitness_reengage",
+      "company_id": "co_bluepeak_fitness",
+      "contact_ids": [
+        "ct_chris_yoon",
+        "ct_lena_ortiz"
+      ],
+      "author": "u_alex",
+      "ts": "2026-11-04T12:15:00-07:00",
+      "title": "Re-looking at scheduling for our gyms",
+      "body": "Chris asked for a proper discovery session and a copy of what was sent to Lena last time. Lena Ortiz is on CC. Unanswered.",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "ac_pine_and_pebble_03",
+      "type": "email",
+      "deal_id": "dl_pine_and_pebble",
+      "company_id": "co_pine_and_pebble",
+      "contact_ids": [
+        "ct_hannah_clarke"
+      ],
+      "author": "u_alex",
+      "ts": "2026-11-04T13:00:00-07:00",
+      "title": "Case study + demo with Jorge",
+      "body": "Hannah asked for a retail case study and confirmed Jorge Alvarez for the demo.",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "nt_acme_foods_03",
+      "type": "note",
+      "deal_id": "dl_acme_foods",
+      "company_id": "co_acme_foods",
+      "contact_ids": [
+        "ct_mark_keller"
+      ],
+      "author": "u_alex",
+      "ts": "2026-11-04T17:00:00-07:00",
+      "title": "Mark sent overtime numbers by email",
+      "body": "Note 2026-11-04 — Alex Chen\nMark sent overtime numbers by email: ~$410k overtime spend last 12 months across the\n12 depots. Follow-up moved from Thu Nov 5 to Fri Nov 6 (depot audit).",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "ac_bluepeak_fitness_05",
+      "type": "email",
+      "deal_id": "dl_bluepeak_fitness_reengage",
+      "company_id": "co_bluepeak_fitness",
+      "contact_ids": [
+        "ct_chris_yoon"
+      ],
+      "author": "u_alex",
+      "ts": "2026-11-05T09:00:00-07:00",
+      "title": "Invitation: Bluepeak discovery deep-dive",
+      "body": "Alex sent a calendar invite for Wed Nov 11, 13:00 to Chris only; Chris accepted.",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "ac_copper_kettle_05",
+      "type": "email",
+      "deal_id": "dl_copper_kettle",
+      "company_id": "co_copper_kettle",
+      "contact_ids": [
+        "ct_anna_fischer",
+        "ct_tom_brandt"
+      ],
+      "author": "u_alex",
+      "ts": "2026-11-05T09:00:00-07:00",
+      "title": "Copper Kettle – quick check-in",
+      "body": "Alex sent a check-in to Anna, CC Tom, proposing a demo follow-up on Thu Nov 12, 16:00.",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "ac_pine_and_pebble_04",
+      "type": "email",
+      "deal_id": "dl_pine_and_pebble",
+      "company_id": "co_pine_and_pebble",
+      "contact_ids": [
+        "ct_hannah_clarke",
+        "ct_jorge_alvarez"
+      ],
+      "author": "u_alex",
+      "ts": "2026-11-05T10:00:00-07:00",
+      "title": "Accepted: Pine & Pebble demo",
+      "body": "Calendar invite for Tue Nov 10, 09:30 accepted by Hannah and Jorge.",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "ac_sparklepro_cleaning_05",
+      "type": "email",
+      "deal_id": "dl_sparklepro_cleaning",
+      "company_id": "co_sparklepro_cleaning",
+      "contact_ids": [
+        "ct_kevin_obrien"
+      ],
+      "author": "u_alex",
+      "ts": "2026-11-05T10:15:00-07:00",
+      "title": "Offer for SparklePro?",
+      "body": "Kevin: \"Any update on the offer?\"",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "tk_sparklepro_cleaning_01",
+      "type": "task",
+      "deal_id": "dl_sparklepro_cleaning",
+      "company_id": "co_sparklepro_cleaning",
+      "contact_ids": [
+        "ct_kevin_obrien"
+      ],
+      "author": "u_alex",
+      "ts": "2026-11-05T11:00:00-07:00",
+      "title": "Send offer to Kevin O'Brien",
+      "body": "Send the written offer before the proposal walkthrough on Wed Nov 11, 10:00.",
+      "due": "2026-11-10",
+      "done": false
+    },
+    {
+      "id": "ac_harbor_health_06",
+      "type": "email",
+      "deal_id": "dl_harbor_health",
+      "company_id": "co_harbor_health",
+      "contact_ids": [
+        "ct_grace_moreno"
+      ],
+      "author": "u_alex",
+      "ts": "2026-11-05T13:20:00-07:00",
+      "title": "Kickoff follow-up + next year",
+      "body": "Grace sent the kickoff follow-up with staff list timing and a remark about possibly adding two more clinics next year.",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "ac_northgate_logistics_07",
+      "type": "call",
+      "deal_id": "dl_northgate_logistics",
+      "company_id": "co_northgate_logistics",
+      "contact_ids": [
+        "ct_rachel_ito",
+        "ct_mark_kessler"
+      ],
+      "author": "u_alex",
+      "ts": "2026-11-05T15:00:00-07:00",
+      "title": "Negotiation call – Northgate",
+      "body": "Negotiation call with Rachel Ito and Mark Kessler. Transcript: doc_transcript_t2_northgate_logistics. Call note not yet logged.",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "ac_little_acorns_05",
+      "type": "email",
+      "deal_id": "dl_little_acorns",
+      "company_id": "co_little_acorns",
+      "contact_ids": [
+        "ct_emily_carter"
+      ],
+      "author": "u_alex",
+      "ts": "2026-11-05T15:30:00-07:00",
+      "title": "Re: Shiftpoint offer – Little Acorns (Pro 11)",
+      "body": "Emily replied: board meets Nov 17; asked for a Q&A call. Alex booked Fri Nov 13, 14:00.",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "ac_lakeshore_hotels_07",
+      "type": "email",
+      "deal_id": "dl_lakeshore_hotels",
+      "company_id": "co_lakeshore_hotels",
+      "contact_ids": [
+        "ct_olivia_bennett"
+      ],
+      "author": "u_alex",
+      "ts": "2026-11-05T16:10:00-07:00",
+      "title": "Re: Shiftpoint offer – Lakeshore Hotels (Core 6)",
+      "body": "Olivia replied: reviewing with Marcus, decision by Dec 4.",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "tk_lakeshore_hotels_01",
+      "type": "task",
+      "deal_id": "dl_lakeshore_hotels",
+      "company_id": "co_lakeshore_hotels",
+      "contact_ids": [
+        "ct_olivia_bennett"
+      ],
+      "author": "u_alex",
+      "ts": "2026-11-05T16:30:00-07:00",
+      "title": "Light check-in with Olivia Bennett",
+      "body": "Light check-in on the Core 6 offer; Olivia decides by Dec 4 after review with Marcus.",
+      "due": "2026-11-20",
+      "done": false
+    },
+    {
+      "id": "ac_copper_kettle_06",
+      "type": "email",
+      "deal_id": "dl_copper_kettle",
+      "company_id": "co_copper_kettle",
+      "contact_ids": [
+        "ct_anna_fischer"
+      ],
+      "author": "u_alex",
+      "ts": "2026-11-06T08:30:00-07:00",
+      "title": "Accepted: Copper Kettle demo follow-up",
+      "body": "Anna accepted the Nov 12, 16:00 invite (calendar notification).",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "ac_northgate_logistics_08",
+      "type": "email",
+      "deal_id": "dl_northgate_logistics",
+      "company_id": "co_northgate_logistics",
+      "contact_ids": [
+        "ct_rachel_ito"
+      ],
+      "author": "u_alex",
+      "ts": "2026-11-06T10:30:00-07:00",
+      "title": "Re: pricing – revised proposal",
+      "body": "Rachel's written follow-up to the Nov 5 call; requests a revised proposal by Nov 10.",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "tk_northgate_logistics_01",
+      "type": "task",
+      "deal_id": "dl_northgate_logistics",
+      "company_id": "co_northgate_logistics",
+      "contact_ids": [
+        "ct_rachel_ito",
+        "ct_mark_kessler"
+      ],
+      "author": "u_alex",
+      "ts": "2026-11-06T11:00:00-07:00",
+      "title": "Revert to Rachel Ito with revised proposal",
+      "body": "Rachel asked for a revised proposal before the Nov 10, 15:00 call.",
+      "due": "2026-11-10",
+      "done": false
+    },
+    {
+      "id": "ac_little_acorns_06",
+      "type": "email",
+      "deal_id": "dl_little_acorns",
+      "company_id": "co_little_acorns",
+      "contact_ids": [
+        "ct_sam_wood"
+      ],
+      "author": "u_alex",
+      "ts": "2026-11-06T12:40:00-07:00",
+      "title": "Quick question – ratios",
+      "body": "Sam asked whether Shiftpoint can alert on staff-to-child ratio gaps.",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "ac_acme_foods_06",
+      "type": "call",
+      "deal_id": "dl_acme_foods",
+      "company_id": "co_acme_foods",
+      "contact_ids": [
+        "ct_mark_keller"
+      ],
+      "author": "u_alex",
+      "ts": "2026-11-06T14:00:00-07:00",
+      "title": "Follow-up call – Acme Foods",
+      "body": "Follow-up call with Mark Keller incl. ~6 min screen-share of rota builder and shift swap. Transcript: doc_transcript_t1_acme_foods. Call note not yet logged.",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "tk_acme_foods_01",
+      "type": "task",
+      "deal_id": "dl_acme_foods",
+      "company_id": "co_acme_foods",
+      "contact_ids": [
+        "ct_mark_keller"
+      ],
+      "author": "u_alex",
+      "ts": "2026-11-06T16:00:00-07:00",
+      "title": "Send recap + written offer to Mark Keller",
+      "body": "Send recap and written offer from offer_template before the CFO intro call on Nov 12.",
+      "due": "2026-11-11",
+      "done": false
+    },
+    {
+      "id": "ac_summit_brew_04",
+      "type": "email",
+      "deal_id": "dl_summit_brew",
+      "company_id": "co_summit_brew",
+      "contact_ids": [
+        "ct_jake_miller"
+      ],
+      "author": "u_alex",
+      "ts": "2026-11-06T17:45:00-07:00",
+      "title": "Re: renewal + new taprooms",
+      "body": "Jake replied with a pricing question about the new taprooms. Unanswered; he wants an answer this week.",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "tk_summit_brew_01",
+      "type": "task",
+      "deal_id": "dl_summit_brew",
+      "company_id": "co_summit_brew",
+      "contact_ids": [
+        "ct_jake_miller"
+      ],
+      "author": "u_alex",
+      "ts": "2026-11-06T18:00:00-07:00",
+      "title": "Answer Jake Miller's expansion pricing question",
+      "body": "Jake wants the expansion quote settled this week. Reconfirm offer v1.",
+      "due": "2026-11-13",
+      "done": false
+    },
+    {
+      "id": "ac_copper_kettle_07",
+      "type": "email",
+      "deal_id": "dl_copper_kettle",
+      "company_id": "co_copper_kettle",
+      "contact_ids": [
+        "ct_tom_brandt"
+      ],
+      "author": "u_alex",
+      "ts": "2026-11-07T11:12:00-07:00",
+      "title": "Re: Copper Kettle – quick check-in",
+      "body": "Tom replied in the check-in thread: \"Please stop emailing me, not my area.\"",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "ac_mesa_valley_01",
+      "type": "email",
+      "deal_id": "dl_mesa_valley",
+      "company_id": "co_mesa_valley",
+      "contact_ids": [
+        "ct_nora_kim"
+      ],
+      "author": "u_alex",
+      "ts": "2026-11-07T14:26:00-07:00",
+      "title": "Demo request – 5 urgent care clinics",
+      "body": "Nora submitted the website demo-request form; auto-confirmation sent and her email to sales@ forwarded to Alex.",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "ac_mesa_valley_02",
+      "type": "email",
+      "deal_id": "dl_mesa_valley",
+      "company_id": "co_mesa_valley",
+      "contact_ids": [
+        "ct_nora_kim"
+      ],
+      "author": "u_priya",
+      "ts": "2026-11-07T15:20:00-07:00",
+      "title": "Invitation: Mesa Valley discovery call",
+      "body": "Priya sent a calendar invite for Mon Nov 9, 10:00; Nora accepted.",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "nt_mesa_valley_01",
+      "type": "note",
+      "deal_id": "dl_mesa_valley",
+      "company_id": "co_mesa_valley",
+      "contact_ids": [
+        "ct_nora_kim"
+      ],
+      "author": "u_priya",
+      "ts": "2026-11-07T17:00:00-07:00",
+      "title": "First touch – Mesa Valley Urgent Care",
+      "body": "Note 2026-11-07 — Priya Shah\nFirst touch: inbound web form (Sat). Nora Kim, Clinic Manager, 5 urgent care clinics in\nAlbuquerque/Rio Rancho, ~140 hourly. Google Sheets + group text. Pain: ~8h/week on rotas,\nX-ray tech gaps. Found us via Harbor Health case study. Booked discovery with Alex\nMon 11/9 10:00. Deal created as Core 5 ($9,000) — Pro may fit better, Alex to qualify.",
+      "due": null,
+      "done": null
+    },
+    {
+      "id": "nt_acme_food_group_01",
+      "type": "note",
+      "deal_id": "dl_acme_food_group",
+      "company_id": "co_acme_food_group",
+      "contact_ids": [
+        "ct_karen_mills"
+      ],
+      "author": "u_alex",
+      "ts": "2026-05-20T17:00:00-06:00",
+      "title": "Closed Lost – no budget",
+      "body": "Note 2026-05-20 — Alex Chen\nAcme Food Group (Dayton, 4 warehouses, restaurant supply). Offered Core 4 at 10% off\n($6,480/yr). Karen Mills: no budget this year, maybe revisit 2027. Closed Lost.\nNot to be confused with Acme Foods (Columbus, 12 depots).",
+      "due": null,
+      "done": null
+    }
+  ]
+}
