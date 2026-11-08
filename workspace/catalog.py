@@ -1,4 +1,5 @@
 """event -> catalog action string, driven by catalog/actions.json (owned by the catalog designer)."""
+
 import json
 from pathlib import Path
 

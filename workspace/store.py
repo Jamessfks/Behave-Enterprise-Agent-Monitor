@@ -3,25 +3,44 @@
 Persistence between requests is the StateStore's job (workspace/state.py, ADR 0003): this module
 never writes to disk, so it runs on a read-only filesystem. `save()` only marks the state changed.
 """
+
 import copy
 import json
 import uuid
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 ROOT = Path(__file__).resolve().parent.parent
 SEED_FILE = ROOT / "world" / "seed" / "state.json"
 
-COLLECTIONS = ["users", "companies", "contacts", "deals", "activities", "threads", "folders", "docs", "calendar"]
+COLLECTIONS = [
+    "users",
+    "companies",
+    "contacts",
+    "deals",
+    "activities",
+    "threads",
+    "folders",
+    "docs",
+    "calendar",
+]
 
 # object type (as used in events) -> collection
 TYPE_TO_COLL = {
-    "user": "users", "company": "companies", "contact": "contacts", "deal": "deals",
-    "activity": "activities", "note": "activities", "task": "activities",
-    "thread": "threads", "folder": "folders", "doc": "docs", "event": "calendar",
+    "user": "users",
+    "company": "companies",
+    "contact": "contacts",
+    "deal": "deals",
+    "activity": "activities",
+    "note": "activities",
+    "task": "activities",
+    "thread": "threads",
+    "folder": "folders",
+    "doc": "docs",
+    "event": "calendar",
 }
 
-DATA: Dict[str, Any] = {}
+DATA: dict[str, Any] = {}
 CHANGED = {"v": False}  # set by save()/events._log; the StateStore persists when True
 
 # In-world clock. Real event timestamps use wall time; displayed "today" is fixed.
@@ -29,11 +48,15 @@ NOW = "2026-11-09T09:00:00-07:00"
 ME = "u_alex"
 MY_EMAIL = "alex@shiftpoint.io"
 SELLER_DOMAIN = "shiftpoint.io"
-POLICY = {"max_discount_rep": 15, "max_discount_manager": 25,
-          "large_amount_change_pct": 20, "large_close_date_change_days": 30}
+POLICY = {
+    "max_discount_rep": 15,
+    "max_discount_manager": 25,
+    "large_amount_change_pct": 20,
+    "large_close_date_change_days": 30,
+}
 
 
-def load(data: Optional[Dict[str, Any]] = None) -> None:
+def load(data: dict[str, Any] | None = None) -> None:
     """Use `data` (from a snapshot) or, if there is none, the seed."""
     global DATA
     if data is None:
@@ -51,18 +74,20 @@ def save() -> None:
 def reset() -> None:
     global DATA
     if not SEED_FILE.exists():
-        raise RuntimeError("world/seed/state.json missing - run: python scripts/world/build_seed.py")
+        raise RuntimeError(
+            "world/seed/state.json missing - run: python scripts/world/build_seed.py"
+        )
     DATA = json.loads(SEED_FILE.read_text())
     for c in COLLECTIONS:
         DATA.setdefault(c, [])
     save()
 
 
-def items(coll: str) -> List[dict]:
+def items(coll: str) -> list[dict]:
     return DATA[coll]
 
 
-def get(coll: str, id: Optional[str]) -> Optional[dict]:  # noqa: A002
+def get(coll: str, id: str | None) -> dict | None:
     if not id:
         return None
     for o in DATA[coll]:
@@ -71,11 +96,11 @@ def get(coll: str, id: Optional[str]) -> Optional[dict]:  # noqa: A002
     return None
 
 
-def find(coll: str, **kw) -> List[dict]:
+def find(coll: str, **kw) -> list[dict]:
     return [o for o in DATA[coll] if all(o.get(k) == v for k, v in kw.items())]
 
 
-def first(coll: str, **kw) -> Optional[dict]:
+def first(coll: str, **kw) -> dict | None:
     r = find(coll, **kw)
     return r[0] if r else None
 
@@ -85,7 +110,7 @@ def add(coll: str, obj: dict) -> dict:
     return obj
 
 
-def remove(coll: str, id: str) -> Optional[dict]:  # noqa: A002
+def remove(coll: str, id: str) -> dict | None:
     o = get(coll, id)
     if o:
         DATA[coll].remove(o)
@@ -105,7 +130,7 @@ def new_id(prefix: str) -> str:
     return f"{prefix}_{uuid.uuid4().hex[:6]}"
 
 
-def snapshot(obj_type: str, obj_id: Optional[str]) -> Optional[dict]:
+def snapshot(obj_type: str, obj_id: str | None) -> dict | None:
     coll = TYPE_TO_COLL.get(obj_type)
     if not coll or not obj_id:
         return None
@@ -115,11 +140,12 @@ def snapshot(obj_type: str, obj_id: Optional[str]) -> Optional[dict]:
 
 # ---- lookups used by context derivation and templates ----
 
+
 def domain_of(email: str) -> str:
     return email.split("@")[-1].lower().strip() if "@" in email else ""
 
 
-def contact_by_email(email: str) -> Optional[dict]:
+def contact_by_email(email: str) -> dict | None:
     e = email.lower().strip()
     for c in DATA["contacts"]:
         if c.get("email", "").lower() == e:
@@ -127,14 +153,14 @@ def contact_by_email(email: str) -> Optional[dict]:
     return None
 
 
-def company_by_domain(domain: str) -> Optional[dict]:
+def company_by_domain(domain: str) -> dict | None:
     for c in DATA["companies"]:
         if c.get("domain", "").lower() == domain:
             return c
     return None
 
 
-def user_by_email(email: str) -> Optional[dict]:
+def user_by_email(email: str) -> dict | None:
     e = email.lower().strip()
     for u in DATA["users"]:
         if u.get("email", "").lower() == e:
@@ -142,7 +168,7 @@ def user_by_email(email: str) -> Optional[dict]:
     return None
 
 
-def folder_path(folder_id: Optional[str]) -> str:
+def folder_path(folder_id: str | None) -> str:
     parts = []
     f = get("folders", folder_id)
     while f:
@@ -158,5 +184,6 @@ def now_iso() -> str:
     """In-world time: Mon 9 Nov 2026 09:00 plus real seconds since the server started.
     Use this for timestamps shown in the apps (new messages, notes, docs)."""
     from datetime import datetime, timedelta
+
     t = datetime.fromisoformat(NOW) + timedelta(seconds=__import__("time").time() - _BOOT)
     return t.isoformat(timespec="seconds")

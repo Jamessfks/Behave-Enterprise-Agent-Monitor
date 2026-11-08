@@ -22,7 +22,13 @@ from workspace import dispatch, events, store
 ROOT = Path(__file__).resolve().parent.parent
 SCENARIOS = ROOT / "world" / "scenarios"
 REF = re.compile(r"\$\{([a-z0-9_]+)\.([a-z0-9_]+)\}")
-APP_NAMES = {"jmail": "Jmail", "jdrive": "Jdrive", "habspot": "Habspot", "calendar": "Calendario", "quote": "Quotes"}
+APP_NAMES = {
+    "jmail": "Jmail",
+    "jdrive": "Jdrive",
+    "habspot": "Habspot",
+    "calendar": "Calendario",
+    "quote": "Quotes",
+}
 SKIP_APPS = ("ui", "session", "sentinel")
 SIDE_ACTIONS = ("jmail.attach", "quote.discount")
 
@@ -43,7 +49,9 @@ def start(scenario_id: str, mistakes: bool) -> dict[str, Any]:
     sc = load(scenario_id)
     store.reset()
     label = f"{sc['title']} ({'with' if mistakes else 'without'} planted mistakes)"
-    run = events.start_run(agent=sc.get("agent", "C"), account_id=sc.get("account_id"), actor="agent", label=label)
+    run = events.start_run(
+        agent=sc.get("agent", "C"), account_id=sc.get("account_id"), actor="agent", label=label
+    )
     events.RUN_STATE["scenario"] = {
         "id": scenario_id,
         "mistakes": mistakes,
@@ -54,14 +62,18 @@ def start(scenario_id: str, mistakes: bool) -> dict[str, Any]:
         "awaiting": None,
     }
     store.save()
-    return {"run": {**run, "scenario": scenario_id, "mistakes": mistakes, "live": False},
-            "steps_total": events.RUN_STATE["scenario"]["total"]}
+    return {
+        "run": {**run, "scenario": scenario_id, "mistakes": mistakes, "live": False},
+        "steps_total": events.RUN_STATE["scenario"]["total"],
+    }
 
 
 def _resolve(value: Any, saved: dict[str, Any]) -> Any:
     """Fill ${name.field} references from earlier responses. Missing ones stay unresolved."""
     if isinstance(value, str):
-        return REF.sub(lambda m: str((saved.get(m.group(1)) or {}).get(m.group(2), m.group(0))), value)
+        return REF.sub(
+            lambda m: str((saved.get(m.group(1)) or {}).get(m.group(2), m.group(0))), value
+        )
     if isinstance(value, list):
         return [_resolve(v, saved) for v in value]
     if isinstance(value, dict):
@@ -74,16 +86,24 @@ def _settle_awaiting(sc: dict[str, Any]) -> None:
     awaiting = sc.get("awaiting")
     if not awaiting or awaiting["approval_id"] in events.PENDING:
         return
-    replayed = next((e for e in reversed(events.EVENTS) if e.get("approval_id") == awaiting["approval_id"]), None)
+    replayed = next(
+        (e for e in reversed(events.EVENTS) if e.get("approval_id") == awaiting["approval_id"]),
+        None,
+    )
     if replayed and awaiting.get("save_as") and replayed.get("object"):
-        sc["saved"][awaiting["save_as"]] = {"doc_id": replayed["object"]["id"], "id": replayed["object"]["id"]}
+        sc["saved"][awaiting["save_as"]] = {
+            "doc_id": replayed["object"]["id"],
+            "id": replayed["object"]["id"],
+        }
     for step in sc["steps"]:
         if step.get("approval_id") == awaiting["approval_id"]:
             step["resolution"] = "approved" if replayed else "blocked"
     sc["awaiting"] = None
 
 
-def step_view(ev: dict[str, Any] | None, spec: dict[str, Any], index: int, page: str) -> dict[str, Any]:
+def step_view(
+    ev: dict[str, Any] | None, spec: dict[str, Any], index: int, page: str
+) -> dict[str, Any]:
     """One step as the canvas shows it (contract in docs/event-schema.md)."""
     from monitor.catalog import load_catalog
 
@@ -109,7 +129,9 @@ def step_view(ev: dict[str, Any] | None, spec: dict[str, Any], index: int, page:
         "planted": bool(spec.get("planted")),
         "event_id": (ev or {}).get("id"),
         "check": {
-            "verdict": {"allow": "pass", "flag": "flag", "pause": "pause", "block": "block"}.get(decision, decision),
+            "verdict": {"allow": "pass", "flag": "flag", "pause": "pause", "block": "block"}.get(
+                decision, decision
+            ),
             "failed": monitor.get("failed", []),
             "headline": monitor.get("headline", ""),
             "reasons": monitor.get("reasons", []),
@@ -123,7 +145,8 @@ def step_view(ev: dict[str, Any] | None, spec: dict[str, Any], index: int, page:
 
 def _step_event(new_events: list[dict[str, Any]]) -> dict[str, Any] | None:
     meaningful = [
-        e for e in new_events
+        e
+        for e in new_events
         if e.get("app") not in SKIP_APPS and e.get("action") not in SIDE_ACTIONS
     ]
     return meaningful[-1] if meaningful else None
@@ -149,8 +172,14 @@ async def next_step(app: FastAPI) -> dict[str, Any]:
     query = spec.get("query") or ""
     if "${" in path or "${" in json.dumps(body or {}):
         view = step_view(None, spec, index, "")
-        view.update(decision="skipped", check={**view["check"], "verdict": "skipped",
-                    "headline": "Skipped: it depends on an earlier step that didn't happen."})
+        view.update(
+            decision="skipped",
+            check={
+                **view["check"],
+                "verdict": "skipped",
+                "headline": "Skipped: it depends on an earlier step that didn't happen.",
+            },
+        )
         sc["steps"].append(view)
         store.save()
         return {"done": sc["cursor"] >= len(spec_list), "step": view, "changed": changed()}
@@ -172,10 +201,16 @@ async def next_step(app: FastAPI) -> dict[str, Any]:
         view["approval_id"] = approval_id
     if status >= 400 and status != 403:
         view["decision"] = "error"
-        view["check"]["headline"] = f"The app answered {status}: {(out or {}).get('detail') if isinstance(out, dict) else out}"
+        view["check"]["headline"] = (
+            f"The app answered {status}: {(out or {}).get('detail') if isinstance(out, dict) else out}"
+        )
     sc["steps"].append(view)
     store.save()
-    return {"done": sc["cursor"] >= len(spec_list) and not sc.get("awaiting"), "step": view, "changed": changed()}
+    return {
+        "done": sc["cursor"] >= len(spec_list) and not sc.get("awaiting"),
+        "step": view,
+        "changed": changed(),
+    }
 
 
 def current() -> dict[str, Any]:
@@ -183,7 +218,12 @@ def current() -> dict[str, Any]:
     if sc:
         _settle_awaiting(sc)
     return {
-        "run": {**events.RUN, "scenario": sc.get("id"), "mistakes": sc.get("mistakes"), "live": False},
+        "run": {
+            **events.RUN,
+            "scenario": sc.get("id"),
+            "mistakes": sc.get("mistakes"),
+            "live": False,
+        },
         "steps": sc.get("steps", []),
         "changed": changed(),
         "done": bool(sc) and sc.get("cursor", 0) >= sc.get("total", 0) and not sc.get("awaiting"),
@@ -224,18 +264,28 @@ def _link(e: dict[str, Any]) -> dict[str, str] | None:
     action = e.get("action", "")
     if action.startswith("jmail.draft"):
         return {"app": "Jmail", "label": "Draft saved in Jmail", "url": "/mail?label=DRAFT"}
-    if action.startswith(("jmail.send", "jmail.reply", "jmail.forward", "quote.send", "quote.request_approval")):
+    if action.startswith(
+        ("jmail.send", "jmail.reply", "jmail.forward", "quote.send", "quote.request_approval")
+    ):
         return {"app": "Jmail", "label": "Sent mail in Jmail", "url": "/mail?label=SENT"}
     if t == "deal" or (t in ("note", "task", "activity") and (e.get("args") or {}).get("deal_id")):
         deal = i if t == "deal" else e["args"]["deal_id"]
         d = store.get("deals", deal) or {}
-        return {"app": "Habspot", "label": f"Deal: {d.get('name', deal)}", "url": f"/crm/deal/{deal}"}
+        return {
+            "app": "Habspot",
+            "label": f"Deal: {d.get('name', deal)}",
+            "url": f"/crm/deal/{deal}",
+        }
     if t == "doc" and i:
         d = store.get("docs", i) or {}
         return {"app": "Jdrive", "label": d.get("name", "Document"), "url": f"/drive/doc/{i}"}
     if t == "event" and i:
         ev = store.get("calendar", i) or {}
-        return {"app": "Calendario", "label": ev.get("title", "Calendar event"), "url": f"/calendar/event/{i}"}
+        return {
+            "app": "Calendario",
+            "label": ev.get("title", "Calendar event"),
+            "url": f"/calendar/event/{i}",
+        }
     if t == "contact" and i:
         return {"app": "Habspot", "label": "Contact", "url": f"/crm/contact/{i}"}
     return None

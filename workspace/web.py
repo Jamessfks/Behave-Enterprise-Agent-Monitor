@@ -1,7 +1,8 @@
 """Shared helpers for routers: templates, request parsing, standard JSON response."""
+
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 from fastapi import Request
 from fastapi.templating import Jinja2Templates
@@ -11,12 +12,12 @@ from . import events, store
 templates = Jinja2Templates(directory=str(Path(__file__).parent / "templates"))
 
 
-def fmt_dt(ts: Optional[str], short: bool = True) -> str:
+def fmt_dt(ts: str | None, short: bool = True) -> str:
     if not ts:
         return ""
     try:
         d = datetime.fromisoformat(ts)
-    except Exception:
+    except (TypeError, ValueError):
         return ts
     if short:
         if d.date().isoformat() == store.NOW[:10]:
@@ -27,23 +28,29 @@ def fmt_dt(ts: Optional[str], short: bool = True) -> str:
 
 def money(v: Any) -> str:
     try:
-        return "${:,.0f}".format(float(v))
-    except Exception:
+        return f"${float(v):,.0f}"
+    except (TypeError, ValueError, OverflowError):
         return str(v or "")
 
 
-def user_name(uid: Optional[str]) -> str:
+def user_name(uid: str | None) -> str:
     u = store.get("users", uid)
     return u["name"] if u else (uid or "")
 
 
-def contact_name(c: Optional[dict]) -> str:
-    return f"{c.get('first_name','')} {c.get('last_name','')}".strip() if c else ""
+def contact_name(c: dict | None) -> str:
+    return f"{c.get('first_name', '')} {c.get('last_name', '')}".strip() if c else ""
 
 
 templates.env.globals.update(
-    fmt_dt=fmt_dt, money=money, user_name=user_name, contact_name=contact_name,
-    store=store, RUN=events.RUN, folder_path=store.folder_path, NOW=store.NOW,
+    fmt_dt=fmt_dt,
+    money=money,
+    user_name=user_name,
+    contact_name=contact_name,
+    store=store,
+    RUN=events.RUN,
+    folder_path=store.folder_path,
+    NOW=store.NOW,
 )
 
 
@@ -51,12 +58,18 @@ def page(request: Request, name: str, **ctx):
     return templates.TemplateResponse(request, name, ctx)
 
 
-def ok(res: Optional[dict] = None, redirect: Optional[str] = None, **extra) -> dict:
+def ok(res: dict | None = None, redirect: str | None = None, **extra) -> dict:
     """Standard JSON response for every write endpoint."""
     out = {"ok": True, "redirect": redirect}
     if res:
-        out.update({"decision": res["decision"], "event_id": res["event"]["id"],
-                    "catalog_action": res["event"]["catalog_action"], "reason": res.get("reason", "")})
+        out.update(
+            {
+                "decision": res["decision"],
+                "event_id": res["event"]["id"],
+                "catalog_action": res["event"]["catalog_action"],
+                "reason": res.get("reason", ""),
+            }
+        )
     out.update(extra)
     return out
 

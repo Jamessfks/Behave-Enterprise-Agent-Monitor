@@ -2,7 +2,6 @@
 
 Every read is logged via events.log_read, every write goes through events.commit.
 """
-from typing import List, Optional
 
 from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import RedirectResponse
@@ -13,15 +12,25 @@ from ..web import body, contact_name, ok, page
 router = APIRouter()
 
 STAGE_LABELS = {
-    "new": "New", "discovery": "Discovery", "demo": "Demo", "proposal": "Proposal",
-    "negotiation": "Negotiation", "closed_won": "Closed Won", "closed_lost": "Closed Lost",
+    "new": "New",
+    "discovery": "Discovery",
+    "demo": "Demo",
+    "proposal": "Proposal",
+    "negotiation": "Negotiation",
+    "closed_won": "Closed Won",
+    "closed_lost": "Closed Lost",
 }
 CONTACT_STATUSES = ["active", "interested", "unsubscribed", "do_not_contact"]
-STATUS_LABELS = {"active": "Active", "interested": "Interested", "unsubscribed": "Unsubscribed",
-                 "do_not_contact": "Do not contact"}
+STATUS_LABELS = {
+    "active": "Active",
+    "interested": "Interested",
+    "unsubscribed": "Unsubscribed",
+    "do_not_contact": "Do not contact",
+}
 
 
 # ---------------------------------------------------------------- helpers
+
 
 def _deal(deal_id: str) -> dict:
     d = store.get("deals", deal_id)
@@ -44,15 +53,19 @@ def _company(company_id: str) -> dict:
     return c
 
 
-def _timeline(deal_id: Optional[str] = None, contact_id: Optional[str] = None,
-              company_id: Optional[str] = None) -> List[dict]:
+def _timeline(
+    deal_id: str | None = None, contact_id: str | None = None, company_id: str | None = None
+) -> list[dict]:
     out = []
     for a in store.items("activities"):
-        if deal_id and a.get("deal_id") == deal_id:
-            out.append(a)
-        elif contact_id and contact_id in (a.get("contact_ids") or []):
-            out.append(a)
-        elif company_id and a.get("company_id") == company_id:
+        if (
+            deal_id
+            and a.get("deal_id") == deal_id
+            or contact_id
+            and contact_id in (a.get("contact_ids") or [])
+            or company_id
+            and a.get("company_id") == company_id
+        ):
             out.append(a)
     return sorted(out, key=lambda a: a.get("ts") or "", reverse=True)
 
@@ -65,20 +78,32 @@ def _matches(q: str, *vals) -> bool:
 def _search(q: str) -> dict:
     if not q.strip():
         return {"contacts": [], "companies": [], "deals": []}
-    contacts = [c for c in store.items("contacts")
-                if _matches(q, contact_name(c), c.get("email"), c.get("title"))]
+    contacts = [
+        c
+        for c in store.items("contacts")
+        if _matches(q, contact_name(c), c.get("email"), c.get("title"))
+    ]
     companies = [c for c in store.items("companies") if _matches(q, c.get("name"), c.get("domain"))]
     deals = [d for d in store.items("deals") if _matches(q, d.get("name"))]
     return {"contacts": contacts, "companies": companies, "deals": deals}
 
 
-def _contacts_filtered(q: str = "", email: str = "") -> List[dict]:
+def _contacts_filtered(q: str = "", email: str = "") -> list[dict]:
     rows = store.items("contacts")
     if email:
         rows = [c for c in rows if c.get("email", "").lower() == email.lower().strip()]
     if q:
-        rows = [c for c in rows if _matches(q, contact_name(c), c.get("email"), c.get("title"),
-                                            (store.get("companies", c.get("company_id")) or {}).get("name"))]
+        rows = [
+            c
+            for c in rows
+            if _matches(
+                q,
+                contact_name(c),
+                c.get("email"),
+                c.get("title"),
+                (store.get("companies", c.get("company_id")) or {}).get("name"),
+            )
+        ]
     return rows
 
 
@@ -88,8 +113,8 @@ def _num(v):
     try:
         f = float(str(v).replace(",", "").replace("$", ""))
         return int(f) if f == int(f) else f
-    except Exception:
-        raise HTTPException(400, f"Invalid number: {v}")
+    except (TypeError, ValueError, OverflowError) as e:
+        raise HTTPException(400, f"Invalid number: {v}") from e
 
 
 def _ctx(**kw):
@@ -103,6 +128,7 @@ def _ctx(**kw):
 
 # ---------------------------------------------------------------- pages
 
+
 @router.get("/crm")
 def crm_root():
     return RedirectResponse("/crm/deals")
@@ -113,40 +139,73 @@ def deals_page(request: Request, view: str = "board"):
     events.log_read("habspot", "habspot.list_deals", None, None, args={"view": view})
     deals = store.items("deals")
     cols = {s: [d for d in deals if d.get("stage") == s] for s in events.STAGES}
-    return page(request, "crm/deals.html", **_ctx(view=view, deals=deals, cols=cols, totals={s: sum((d.get("amount") or 0) for d in v) for s, v in cols.items()}, section="deals"))
+    return page(
+        request,
+        "crm/deals.html",
+        **_ctx(
+            view=view,
+            deals=deals,
+            cols=cols,
+            totals={s: sum((d.get("amount") or 0) for d in v) for s, v in cols.items()},
+            section="deals",
+        ),
+    )
 
 
 @router.get("/crm/deal/{deal_id}")
 def deal_page(request: Request, deal_id: str):
     d = _deal(deal_id)
     events.log_read("habspot", "habspot.open_deal", "deal", deal_id)
-    return page(request, "crm/deal.html", **_ctx(
-        d=d, company=store.get("companies", d.get("company_id")),
-        contacts=[c for c in (store.get("contacts", i) for i in d.get("contact_ids") or []) if c],
-        acts=_timeline(deal_id=deal_id), section="deals",
-        contract=store.get("docs", d.get("contract_doc_id"))))
+    return page(
+        request,
+        "crm/deal.html",
+        **_ctx(
+            d=d,
+            company=store.get("companies", d.get("company_id")),
+            contacts=[
+                c for c in (store.get("contacts", i) for i in d.get("contact_ids") or []) if c
+            ],
+            acts=_timeline(deal_id=deal_id),
+            section="deals",
+            contract=store.get("docs", d.get("contract_doc_id")),
+        ),
+    )
 
 
 @router.get("/crm/contacts")
 def contacts_page(request: Request, q: str = ""):
     if q:
         events.log_read("habspot", "habspot.search", None, None, args={"q": q})
-    return page(request, "crm/contacts.html", **_ctx(rows=_contacts_filtered(q), q=q, section="contacts"))
+    return page(
+        request, "crm/contacts.html", **_ctx(rows=_contacts_filtered(q), q=q, section="contacts")
+    )
 
 
 @router.get("/crm/contact/{contact_id}")
 def contact_page(request: Request, contact_id: str):
     c = _contact(contact_id)
-    events.log_read("habspot", "habspot.open_contact", "contact", contact_id, ctx={"status": c.get("status")})
+    events.log_read(
+        "habspot", "habspot.open_contact", "contact", contact_id, ctx={"status": c.get("status")}
+    )
     deals = [d for d in store.items("deals") if contact_id in (d.get("contact_ids") or [])]
-    return page(request, "crm/contact.html", **_ctx(
-        c=c, company=store.get("companies", c.get("company_id")), deals=deals,
-        acts=_timeline(contact_id=contact_id), section="contacts"))
+    return page(
+        request,
+        "crm/contact.html",
+        **_ctx(
+            c=c,
+            company=store.get("companies", c.get("company_id")),
+            deals=deals,
+            acts=_timeline(contact_id=contact_id),
+            section="contacts",
+        ),
+    )
 
 
 @router.get("/crm/companies")
 def companies_page(request: Request, q: str = ""):
-    rows = [c for c in store.items("companies") if not q or _matches(q, c.get("name"), c.get("domain"))]
+    rows = [
+        c for c in store.items("companies") if not q or _matches(q, c.get("name"), c.get("domain"))
+    ]
     return page(request, "crm/companies.html", **_ctx(rows=rows, q=q, section="companies"))
 
 
@@ -154,10 +213,17 @@ def companies_page(request: Request, q: str = ""):
 def company_page(request: Request, company_id: str):
     co = _company(company_id)
     events.log_read("habspot", "habspot.open_company", "company", company_id)
-    return page(request, "crm/company.html", **_ctx(
-        co=co, contacts=store.find("contacts", company_id=company_id),
-        deals=store.find("deals", company_id=company_id),
-        acts=_timeline(company_id=company_id), section="companies"))
+    return page(
+        request,
+        "crm/company.html",
+        **_ctx(
+            co=co,
+            contacts=store.find("contacts", company_id=company_id),
+            deals=store.find("deals", company_id=company_id),
+            acts=_timeline(company_id=company_id),
+            section="companies",
+        ),
+    )
 
 
 @router.get("/crm/search")
@@ -167,6 +233,7 @@ def search_page(request: Request, q: str = ""):
 
 
 # ---------------------------------------------------------------- JSON reads
+
 
 @router.get("/api/crm/deals")
 def api_deals(stage: str = "", company_id: str = ""):
@@ -194,7 +261,9 @@ def api_contacts(q: str = "", email: str = ""):
 @router.get("/api/crm/contact/{contact_id}")
 def api_contact(contact_id: str):
     c = _contact(contact_id)
-    events.log_read("habspot", "habspot.open_contact", "contact", contact_id, ctx={"status": c.get("status")})
+    events.log_read(
+        "habspot", "habspot.open_contact", "contact", contact_id, ctx={"status": c.get("status")}
+    )
     return {"contact": c, "activities": _timeline(contact_id=contact_id)}
 
 
@@ -207,8 +276,12 @@ def api_companies():
 def api_company(company_id: str):
     co = _company(company_id)
     events.log_read("habspot", "habspot.open_company", "company", company_id)
-    return {"company": co, "contacts": store.find("contacts", company_id=company_id),
-            "deals": store.find("deals", company_id=company_id), "activities": _timeline(company_id=company_id)}
+    return {
+        "company": co,
+        "contacts": store.find("contacts", company_id=company_id),
+        "deals": store.find("deals", company_id=company_id),
+        "activities": _timeline(company_id=company_id),
+    }
 
 
 @router.get("/api/crm/search")
@@ -218,6 +291,7 @@ def api_search(q: str = ""):
 
 
 # ---------------------------------------------------------------- writes
+
 
 @router.post("/api/crm/deal/{deal_id}/stage")
 async def api_stage(request: Request, deal_id: str):
@@ -232,8 +306,15 @@ async def api_stage(request: Request, deal_id: str):
         d["stage"] = new
         return {"stage": new}
 
-    res = events.commit("habspot", "habspot.stage", "deal", deal_id, {"from": old, "stage": new},
-                        {"crm_change": events.stage_change(old, new, d)}, apply)
+    res = events.commit(
+        "habspot",
+        "habspot.stage",
+        "deal",
+        deal_id,
+        {"from": old, "stage": new},
+        {"crm_change": events.stage_change(old, new, d)},
+        apply,
+    )
     return ok(res, redirect=f"/crm/deal/{deal_id}")
 
 
@@ -246,29 +327,53 @@ async def api_deal_update(request: Request, deal_id: str):
         new = _num(b["amount"])
         old = d.get("amount")
         if new != old:
+
             def apply_amount(new=new):
                 d["amount"] = new
                 return {"amount": new}
-            res = events.commit("habspot", "habspot.amount", "deal", deal_id, {"from": old, "amount": new},
-                                {"crm_change": events.amount_change(old or 0, new)}, apply_amount)
+
+            res = events.commit(
+                "habspot",
+                "habspot.amount",
+                "deal",
+                deal_id,
+                {"from": old, "amount": new},
+                {"crm_change": events.amount_change(old or 0, new)},
+                apply_amount,
+            )
     if b.get("close_date"):
         new = str(b["close_date"])[:10]
         old = d.get("close_date") or ""
         if new != old[:10]:
+
             def apply_close(new=new):
                 d["close_date"] = new
                 return {"close_date": new}
-            res = events.commit("habspot", "habspot.close_date", "deal", deal_id, {"from": old, "close_date": new},
-                                {"crm_change": events.close_date_change(old, new)}, apply_close)
+
+            res = events.commit(
+                "habspot",
+                "habspot.close_date",
+                "deal",
+                deal_id,
+                {"from": old, "close_date": new},
+                {"crm_change": events.close_date_change(old, new)},
+                apply_close,
+            )
     ch = {}
     if "next_step" in b and (b["next_step"] or "") != (d.get("next_step") or ""):
         ch["next_step"] = b["next_step"] or ""
-    if "next_step_date" in b and b["next_step_date"] and b["next_step_date"] != (d.get("next_step_date") or ""):
+    if (
+        "next_step_date" in b
+        and b["next_step_date"]
+        and b["next_step_date"] != (d.get("next_step_date") or "")
+    ):
         ch["next_step_date"] = b["next_step_date"]
     if ch:
+
         def apply_ns(ch=ch):
             d.update(ch)
             return ch
+
         res = events.commit("habspot", "habspot.next_step", "deal", deal_id, dict(ch), {}, apply_ns)
     return ok(res, redirect=f"/crm/deal/{deal_id}", changed=res is not None)
 
@@ -279,7 +384,11 @@ async def api_note(request: Request):
     text = (b.get("body") or "").strip()
     if not text:
         raise HTTPException(400, "Note body is empty")
-    deal_id, contact_id, company_id = b.get("deal_id") or None, b.get("contact_id") or None, b.get("company_id") or None
+    deal_id, contact_id, company_id = (
+        b.get("deal_id") or None,
+        b.get("contact_id") or None,
+        b.get("company_id") or None,
+    )
     if deal_id:
         d = _deal(deal_id)
         obj_type, obj_id = "deal", deal_id
@@ -301,13 +410,32 @@ async def api_note(request: Request):
     nid = store.new_id("nt")
 
     def apply():
-        return store.add("activities", {
-            "id": nid, "type": "note", "deal_id": deal_id, "company_id": company_id,
-            "contact_ids": contact_ids, "author": store.ME, "ts": store.now_iso(),
-            "title": "Note", "body": text, "due": None, "done": None})
+        return store.add(
+            "activities",
+            {
+                "id": nid,
+                "type": "note",
+                "deal_id": deal_id,
+                "company_id": company_id,
+                "contact_ids": contact_ids,
+                "author": store.ME,
+                "ts": store.now_iso(),
+                "title": "Note",
+                "body": text,
+                "due": None,
+                "done": None,
+            },
+        )
 
-    res = events.commit("habspot", "habspot.note", obj_type, obj_id, {"body": text, "note_id": nid},
-                        {"crm_change": "note_append"}, apply)
+    res = events.commit(
+        "habspot",
+        "habspot.note",
+        obj_type,
+        obj_id,
+        {"body": text, "note_id": nid},
+        {"crm_change": "note_append"},
+        apply,
+    )
     return ok(res, redirect=redirect, note_id=nid)
 
 
@@ -325,10 +453,24 @@ async def api_note_edit(request: Request, note_id: str):
         n["edited_at"] = store.now_iso()
         return {"body": text}
 
-    res = events.commit("habspot", "habspot.note", "activity", note_id, {"from": old, "body": text, "deal_id": n.get("deal_id")},
-                        {"crm_change": "note_overwrite"}, apply)
-    redirect = f"/crm/deal/{n['deal_id']}" if n.get("deal_id") else (
-        f"/crm/contact/{n['contact_ids'][0]}" if n.get("contact_ids") else f"/crm/company/{n.get('company_id')}")
+    res = events.commit(
+        "habspot",
+        "habspot.note",
+        "activity",
+        note_id,
+        {"from": old, "body": text, "deal_id": n.get("deal_id")},
+        {"crm_change": "note_overwrite"},
+        apply,
+    )
+    redirect = (
+        f"/crm/deal/{n['deal_id']}"
+        if n.get("deal_id")
+        else (
+            f"/crm/contact/{n['contact_ids'][0]}"
+            if n.get("contact_ids")
+            else f"/crm/company/{n.get('company_id')}"
+        )
+    )
     return ok(res, redirect=redirect)
 
 
@@ -345,12 +487,28 @@ async def api_contact_status(request: Request, contact_id: str):
         c["status"] = new
         return {"status": new}
 
-    res = events.commit("habspot", "habspot.contact_status", "contact", contact_id, {"from": old, "status": new},
-                        {"status": new}, apply)
+    res = events.commit(
+        "habspot",
+        "habspot.contact_status",
+        "contact",
+        contact_id,
+        {"from": old, "status": new},
+        {"status": new},
+        apply,
+    )
     return ok(res, redirect=f"/crm/contact/{contact_id}")
 
 
-CONTACT_FIELDS = ("first_name", "last_name", "email", "phone", "title", "role", "about", "company_id")
+CONTACT_FIELDS = (
+    "first_name",
+    "last_name",
+    "email",
+    "phone",
+    "title",
+    "role",
+    "about",
+    "company_id",
+)
 
 
 @router.post("/api/crm/contact/{contact_id}/update")
@@ -365,7 +523,9 @@ async def api_contact_update(request: Request, contact_id: str):
         c.update(ch)
         return ch
 
-    res = events.commit("habspot", "habspot.contact_update", "contact", contact_id, dict(ch), {}, apply)
+    res = events.commit(
+        "habspot", "habspot.contact_update", "contact", contact_id, dict(ch), {}, apply
+    )
     return ok(res, redirect=f"/crm/contact/{contact_id}", changed=True)
 
 
@@ -375,17 +535,34 @@ async def api_contact_create(request: Request):
     if not b.get("email"):
         raise HTTPException(400, "email required")
     cid = store.new_id("ct")
-    obj = {"id": cid, "first_name": b.get("first_name", ""), "last_name": b.get("last_name", ""),
-           "email": b["email"].strip(), "phone": b.get("phone", ""), "title": b.get("title", ""),
-           "company_id": b.get("company_id") or None, "status": "active", "role": b.get("role", ""),
-           "owner": store.ME, "created_at": store.now_iso(), "last_contacted_at": None, "about": b.get("about", "")}
+    obj = {
+        "id": cid,
+        "first_name": b.get("first_name", ""),
+        "last_name": b.get("last_name", ""),
+        "email": b["email"].strip(),
+        "phone": b.get("phone", ""),
+        "title": b.get("title", ""),
+        "company_id": b.get("company_id") or None,
+        "status": "active",
+        "role": b.get("role", ""),
+        "owner": store.ME,
+        "created_at": store.now_iso(),
+        "last_contacted_at": None,
+        "about": b.get("about", ""),
+    }
 
     def apply():
         return store.add("contacts", obj)
 
-    res = events.commit("habspot", "habspot.contact_create", "contact", cid,
-                        {k: obj[k] for k in ("first_name", "last_name", "email", "title", "company_id")},
-                        {"scope": events.scope_tag("contact", obj)}, apply)
+    res = events.commit(
+        "habspot",
+        "habspot.contact_create",
+        "contact",
+        cid,
+        {k: obj[k] for k in ("first_name", "last_name", "email", "title", "company_id")},
+        {"scope": events.scope_tag("contact", obj)},
+        apply,
+    )
     return ok(res, redirect=f"/crm/contact/{cid}", contact_id=cid)
 
 
@@ -397,7 +574,7 @@ async def api_task(request: Request):
         raise HTTPException(400, "Task title required")
     deal_id, contact_id = b.get("deal_id") or None, b.get("contact_id") or None
     company_id = b.get("company_id") or None
-    contact_ids: List[str] = []
+    contact_ids: list[str] = []
     if deal_id:
         d = _deal(deal_id)
         obj_type, obj_id = "deal", deal_id
@@ -418,13 +595,32 @@ async def api_task(request: Request):
     tid = store.new_id("tk")
 
     def apply():
-        return store.add("activities", {
-            "id": tid, "type": "task", "deal_id": deal_id, "company_id": company_id,
-            "contact_ids": contact_ids, "author": store.ME, "ts": store.now_iso(),
-            "title": title, "body": b.get("body", ""), "due": b.get("due") or None, "done": False})
+        return store.add(
+            "activities",
+            {
+                "id": tid,
+                "type": "task",
+                "deal_id": deal_id,
+                "company_id": company_id,
+                "contact_ids": contact_ids,
+                "author": store.ME,
+                "ts": store.now_iso(),
+                "title": title,
+                "body": b.get("body", ""),
+                "due": b.get("due") or None,
+                "done": False,
+            },
+        )
 
-    res = events.commit("habspot", "habspot.task_create", obj_type, obj_id,
-                        {"title": title, "due": b.get("due"), "task_id": tid}, {}, apply)
+    res = events.commit(
+        "habspot",
+        "habspot.task_create",
+        obj_type,
+        obj_id,
+        {"title": title, "due": b.get("due"), "task_id": tid},
+        {},
+        apply,
+    )
     return ok(res, redirect=redirect, task_id=tid)
 
 
@@ -438,7 +634,18 @@ async def api_task_complete(request: Request, task_id: str):
         t["done"] = True
         return {"done": True}
 
-    res = events.commit("habspot", "habspot.task_complete", "activity", task_id, {"title": t.get("title")}, {}, apply)
-    redirect = f"/crm/deal/{t['deal_id']}" if t.get("deal_id") else (
-        f"/crm/contact/{t['contact_ids'][0]}" if t.get("contact_ids") else "/crm/deals")
+    res = events.commit(
+        "habspot",
+        "habspot.task_complete",
+        "activity",
+        task_id,
+        {"title": t.get("title")},
+        {},
+        apply,
+    )
+    redirect = (
+        f"/crm/deal/{t['deal_id']}"
+        if t.get("deal_id")
+        else (f"/crm/contact/{t['contact_ids'][0]}" if t.get("contact_ids") else "/crm/deals")
+    )
     return ok(res, redirect=redirect)

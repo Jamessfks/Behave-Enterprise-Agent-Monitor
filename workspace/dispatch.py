@@ -70,7 +70,9 @@ async def call(
         messages.append(message)
 
     actor = events.ACTOR.set("agent")
-    req = events.CURRENT_REQUEST.set({"method": method.upper(), "path": path, "query": qs, "body": body})
+    req = events.CURRENT_REQUEST.set(
+        {"method": method.upper(), "path": path, "query": qs, "body": body}
+    )
     try:
         # FastAPI's own middleware normally provides this exit stack; dispatch skips middleware.
         async with AsyncExitStack() as stack:
@@ -92,7 +94,9 @@ async def call(
 
 async def replay(app: FastAPI, request: dict[str, Any]) -> Any:
     """Re-run a recorded request (an approved, previously paused write)."""
-    status, out = await call(app, request["method"], request["path"], request.get("body"), request.get("query", ""))
+    status, out = await call(
+        app, request["method"], request["path"], request.get("body"), request.get("query", "")
+    )
     if status >= 400:
         raise HTTPException(status, (out or {}).get("detail") if isinstance(out, dict) else out)
     return out

@@ -6,12 +6,14 @@ write actions -> commit()     : derive ctx -> monitor.check() -> allow/flag/paus
 
 See docs/EVENT-CONTRACT.md for the shape and how to adapt it.
 """
+
 import copy
 import json
 import time
+from collections.abc import Awaitable, Callable
 from contextvars import ContextVar
-from datetime import date, datetime, timezone
-from typing import Any, Awaitable, Callable, Dict, List, Optional
+from datetime import UTC, date, datetime
+from typing import Any
 
 from fastapi import HTTPException
 
@@ -22,14 +24,16 @@ OPEN_STAGES = STAGES[:5]
 
 # ---------------------------------------------------------------- run state
 
-RUN: Dict[str, Any] = {}
-RUN_STATE: Dict[str, Any] = {}
-EVENTS: List[dict] = []          # events of the active run (history sent to the monitor)
-PENDING: Dict[str, dict] = {}    # approval_id -> {"event": ..., "request": {method, path, query, body}}
-UNDO: Dict[str, dict] = {}       # event_id -> {"type": ..., "before": ...}
-LEARNED: List[dict] = []         # rules learned from Allow/Block reasons; survive world resets (ADR 0008)
+RUN: dict[str, Any] = {}
+RUN_STATE: dict[str, Any] = {}
+EVENTS: list[dict] = []  # events of the active run (history sent to the monitor)
+PENDING: dict[
+    str, dict
+] = {}  # approval_id -> {"event": ..., "request": {method, path, query, body}}
+UNDO: dict[str, dict] = {}  # event_id -> {"type": ..., "before": ...}
+LEARNED: list[dict] = []  # rules learned from Allow/Block reasons; survive world resets (ADR 0008)
 _counter = {"n": 0}
-_last_read: Dict[str, float] = {}
+_last_read: dict[str, float] = {}
 
 # Who is acting in this request (ADR 0005): "agent" requests (the scenario runner and the live
 # agent, header X-Actor: agent) are logged and gated; "human" requests (someone browsing the apps)
@@ -38,10 +42,10 @@ ACTOR: ContextVar[str] = ContextVar("ACTOR", default="human")
 # The request being handled: set by the state middleware (method/path/query) and web.body() (body).
 # A paused write stores it, so approving later replays it. No closures, so it survives being saved
 # to Redis and approved on another instance (ADR 0003).
-CURRENT_REQUEST: ContextVar[Optional[dict]] = ContextVar("CURRENT_REQUEST", default=None)
+CURRENT_REQUEST: ContextVar[dict | None] = ContextVar("CURRENT_REQUEST", default=None)
 # Set while an approved request is replayed: the first matching commit skips the monitor.
-APPROVED: ContextVar[Optional[dict]] = ContextVar("APPROVED", default=None)
-_REPLAY: Dict[str, Callable[[dict], Awaitable[dict]]] = {}
+APPROVED: ContextVar[dict | None] = ContextVar("APPROVED", default=None)
+_REPLAY: dict[str, Callable[[dict], Awaitable[dict]]] = {}
 
 
 def set_replayer(fn: Callable[[dict], Awaitable[dict]]) -> None:
@@ -50,18 +54,31 @@ def set_replayer(fn: Callable[[dict], Awaitable[dict]]) -> None:
 
 def snapshot() -> dict:
     """Everything that must survive between requests, as plain JSON."""
-    return {"data": store.DATA, "run": RUN, "run_state": RUN_STATE, "events": EVENTS,
-            "pending": PENDING, "undo": UNDO, "learned": LEARNED, "counter": _counter["n"]}
+    return {
+        "data": store.DATA,
+        "run": RUN,
+        "run_state": RUN_STATE,
+        "events": EVENTS,
+        "pending": PENDING,
+        "undo": UNDO,
+        "learned": LEARNED,
+        "counter": _counter["n"],
+    }
 
 
-def restore(snap: Optional[dict]) -> None:
+def restore(snap: dict | None) -> None:
     """Load a snapshot in place (templates hold references to RUN, so never rebind it)."""
     if snap is None:
         store.reset()
         start_run()
         return
     store.load(snap["data"])
-    for target, key in ((RUN, "run"), (RUN_STATE, "run_state"), (PENDING, "pending"), (UNDO, "undo")):
+    for target, key in (
+        (RUN, "run"),
+        (RUN_STATE, "run_state"),
+        (PENDING, "pending"),
+        (UNDO, "undo"),
+    ):
         target.clear()
         target.update(snap.get(key) or {})
     EVENTS[:] = snap.get("events") or []
@@ -69,14 +86,24 @@ def restore(snap: Optional[dict]) -> None:
     _counter["n"] = max(_counter["n"], snap.get("counter", 0))
 
 
-def start_run(agent: str = "human", account_id: Optional[str] = None, actor: str = "human",
-              label: str = "", run_id: Optional[str] = None) -> dict:
+def start_run(
+    agent: str = "human",
+    account_id: str | None = None,
+    actor: str = "human",
+    label: str = "",
+    run_id: str | None = None,
+) -> dict:
     RUN.clear()
-    RUN.update({
-        "id": run_id or time.strftime("run_%Y%m%d_%H%M%S_") + store.new_id("r")[2:],
-        "agent": agent, "account_id": account_id, "actor": actor, "label": label,
-        "started_at": _now(),
-    })
+    RUN.update(
+        {
+            "id": run_id or time.strftime("run_%Y%m%d_%H%M%S_") + store.new_id("r")[2:],
+            "agent": agent,
+            "account_id": account_id,
+            "actor": actor,
+            "label": label,
+            "started_at": _now(),
+        }
+    )
     RUN_STATE.clear()
     RUN_STATE.update({"last_email_source": "trusted_internal", "last_transcript_deal": None})
     EVENTS.clear()
@@ -89,17 +116,22 @@ def start_run(agent: str = "human", account_id: Optional[str] = None, actor: str
 
 
 def _now() -> str:
-    return datetime.now(timezone.utc).isoformat(timespec="seconds")
+    return datetime.now(UTC).isoformat(timespec="seconds")
 
 
-def _base(app: str, action: str, obj_type: Optional[str], obj_id: Optional[str],
-          args: dict, ctx: dict) -> dict:
+def _base(
+    app: str, action: str, obj_type: str | None, obj_id: str | None, args: dict, ctx: dict
+) -> dict:
     _counter["n"] += 1
     ev = {
-        "id": f"ev_{int(time.time()*1000)}_{_counter['n']}",
+        "id": f"ev_{int(time.time() * 1000)}_{_counter['n']}",
         "ts": _now(),
         "run_id": RUN.get("id"),
-        "run": {"agent": RUN.get("agent"), "actor": RUN.get("actor"), "account_id": RUN.get("account_id")},
+        "run": {
+            "agent": RUN.get("agent"),
+            "actor": RUN.get("actor"),
+            "account_id": RUN.get("account_id"),
+        },
         "app": app,
         "action": action,
         "object": {"type": obj_type, "id": obj_id} if obj_type else None,
@@ -110,7 +142,7 @@ def _base(app: str, action: str, obj_type: Optional[str], obj_id: Optional[str],
     return ev
 
 
-def _log(ev: dict, decision: str = "allow", score: Optional[float] = None, reason: str = "") -> dict:
+def _log(ev: dict, decision: str = "allow", score: float | None = None, reason: str = "") -> dict:
     ev["decision"] = decision
     ev["score"] = score
     ev["reason"] = reason
@@ -122,7 +154,14 @@ def _log(ev: dict, decision: str = "allow", score: Optional[float] = None, reaso
 
 # ---------------------------------------------------------------- context derivation
 
-RECIPIENT_RANK = ["internal", "known_contact", "new_contact", "new_external_domain", "do_not_contact", "competitor"]
+RECIPIENT_RANK = [
+    "internal",
+    "known_contact",
+    "new_contact",
+    "new_external_domain",
+    "do_not_contact",
+    "competitor",
+]
 
 
 def recipient_class(email: str) -> str:
@@ -142,7 +181,7 @@ def recipient_class(email: str) -> str:
     return "new_external_domain"
 
 
-def recipients_class(emails: List[str]) -> str:
+def recipients_class(emails: list[str]) -> str:
     """Worst recipient wins."""
     classes = [recipient_class(e) for e in emails if e] or ["internal"]
     return max(classes, key=RECIPIENT_RANK.index)
@@ -167,22 +206,30 @@ def amount_change(old: float, new: float) -> str:
     if not old:
         return "amount_changed_large"
     pct = abs(new - old) / old * 100
-    return "amount_changed_large" if pct > store.POLICY["large_amount_change_pct"] else "amount_changed_small"
+    return (
+        "amount_changed_large"
+        if pct > store.POLICY["large_amount_change_pct"]
+        else "amount_changed_small"
+    )
 
 
 def close_date_change(old: str, new: str) -> str:
     try:
         d = abs((date.fromisoformat(new[:10]) - date.fromisoformat(old[:10])).days)
-    except Exception:
+    except (TypeError, ValueError):
         return "close_date_changed_large"
-    return "close_date_changed_large" if d > store.POLICY["large_close_date_change_days"] else "close_date_changed_small"
+    return (
+        "close_date_changed_large"
+        if d > store.POLICY["large_close_date_change_days"]
+        else "close_date_changed_small"
+    )
 
 
 def discount_class(pct: float) -> str:
     return "within_limit" if pct <= store.POLICY["max_discount_rep"] else "over_limit"
 
 
-def account_of(obj_type: Optional[str], obj: Optional[dict]) -> Optional[str]:
+def account_of(obj_type: str | None, obj: dict | None) -> str | None:
     """Company id an object belongs to (for agent D's scope tag)."""
     if not obj:
         return None
@@ -204,7 +251,7 @@ def account_of(obj_type: Optional[str], obj: Optional[dict]) -> Optional[str]:
     return None
 
 
-def scope_tag(obj_type: Optional[str], obj: Optional[dict]) -> Optional[str]:
+def scope_tag(obj_type: str | None, obj: dict | None) -> str | None:
     acc = RUN.get("account_id")
     if not acc:
         return None
@@ -214,7 +261,7 @@ def scope_tag(obj_type: Optional[str], obj: Optional[dict]) -> Optional[str]:
     return "in_scope" if owner == acc else "out_of_scope"
 
 
-def target_tag(deal_id: Optional[str]) -> Optional[str]:
+def target_tag(deal_id: str | None) -> str | None:
     src = RUN_STATE.get("last_transcript_deal")
     if not src or not deal_id:
         return None
@@ -223,8 +270,15 @@ def target_tag(deal_id: Optional[str]) -> Optional[str]:
 
 # ---------------------------------------------------------------- public API
 
-def log_read(app: str, action: str, obj_type: str, obj_id: str, ctx: Optional[dict] = None,
-             args: Optional[dict] = None) -> Optional[dict]:
+
+def log_read(
+    app: str,
+    action: str,
+    obj_type: str,
+    obj_id: str,
+    ctx: dict | None = None,
+    args: dict | None = None,
+) -> dict | None:
     """Log a read. Collapses repeats of the same object within 5 seconds (reloads, screenshot retries)."""
     if not RUN:
         start_run()
@@ -235,7 +289,11 @@ def log_read(app: str, action: str, obj_type: str, obj_id: str, ctx: Optional[di
     if t - _last_read.get(key, 0) < 5:
         return None
     _last_read[key] = t
-    obj = store.get(store.TYPE_TO_COLL.get(obj_type, ""), obj_id) if obj_type in store.TYPE_TO_COLL else None
+    obj = (
+        store.get(store.TYPE_TO_COLL.get(obj_type, ""), obj_id)
+        if obj_type in store.TYPE_TO_COLL
+        else None
+    )
     ctx = dict(ctx or {})
     ctx.setdefault("scope", scope_tag(obj_type, obj))
     # run memory used by later context tags
@@ -246,7 +304,9 @@ def log_read(app: str, action: str, obj_type: str, obj_id: str, ctx: Optional[di
     ev = _base(app, action, obj_type, obj_id, args or {}, ctx)
     verdict = monitor.check(ev, EVENTS, RUN, RUN_STATE, gate=False)
     _attach(ev, verdict)
-    return _log(ev, verdict.get("decision", "allow"), verdict.get("score"), verdict.get("reason", ""))
+    return _log(
+        ev, verdict.get("decision", "allow"), verdict.get("score"), verdict.get("reason", "")
+    )
 
 
 def _attach(ev: dict, verdict: dict) -> None:
@@ -255,8 +315,14 @@ def _attach(ev: dict, verdict: dict) -> None:
         ev["monitor"] = extra  # checks, failed, headline... shown by the canvas and /events
 
 
-def emit(app: str, action: str, obj_type: Optional[str], obj_id: Optional[str], ctx: dict,
-         args: Optional[dict] = None) -> dict:
+def emit(
+    app: str,
+    action: str,
+    obj_type: str | None,
+    obj_id: str | None,
+    ctx: dict,
+    args: dict | None = None,
+) -> dict:
     """Ungated side event that adds risk signal (e.g. jmail.attach:confidential, quote.discount:over_limit)."""
     if not RUN:
         start_run()
@@ -265,8 +331,16 @@ def emit(app: str, action: str, obj_type: Optional[str], obj_id: Optional[str], 
     return _log(_base(app, action, obj_type, obj_id, args or {}, ctx))
 
 
-def commit(app: str, action: str, obj_type: Optional[str], obj_id: Optional[str], args: dict,
-           ctx: dict, apply: Callable[[], Any], irreversible: bool = False) -> dict:
+def commit(
+    app: str,
+    action: str,
+    obj_type: str | None,
+    obj_id: str | None,
+    args: dict,
+    ctx: dict,
+    apply: Callable[[], Any],
+    irreversible: bool = False,
+) -> dict:
     """The ONE path for every write. Returns {"decision", "event", "result"}; raises 403 on block."""
     if not RUN:
         start_run()
@@ -285,9 +359,17 @@ def commit(app: str, action: str, obj_type: Optional[str], obj_id: Optional[str]
     approved = APPROVED.get()
     if ACTOR.get() != "agent":
         verdict = {"decision": "allow", "reason": "done by a person in the app"}
-    elif approved and not approved.get("used") and approved.get("catalog_action") == ev["catalog_action"]:
+    elif (
+        approved
+        and not approved.get("used")
+        and approved.get("catalog_action") == ev["catalog_action"]
+    ):
         approved["used"] = True
-        verdict = {"decision": "allow", "reason": "Approved by a person" + (f": {approved['reason']}" if approved.get("reason") else "")}
+        verdict = {
+            "decision": "allow",
+            "reason": "Approved by a person"
+            + (f": {approved['reason']}" if approved.get("reason") else ""),
+        }
         ev["approval_id"] = approved["approval_id"]
     else:
         verdict = monitor.check(ev, EVENTS, RUN, RUN_STATE, gate=True)
@@ -296,14 +378,28 @@ def commit(app: str, action: str, obj_type: Optional[str], obj_id: Optional[str]
 
     if decision == "block":
         _log(ev, "block", score, reason)
-        raise HTTPException(status_code=403, detail={"decision": "block", "reason": reason or "Blocked by Sentinel", "event_id": ev["id"]})
+        raise HTTPException(
+            status_code=403,
+            detail={
+                "decision": "block",
+                "reason": reason or "Blocked by Sentinel",
+                "event_id": ev["id"],
+            },
+        )
 
     if decision == "pause":
         approval_id = f"ap_{ev['id']}"
         PENDING[approval_id] = {"event": ev, "request": CURRENT_REQUEST.get()}
         _log(ev, "pause", score, reason)
-        raise HTTPException(status_code=202, detail={"decision": "pause", "reason": reason or "Waiting for approval",
-                                                     "approval_id": approval_id, "event_id": ev["id"]})
+        raise HTTPException(
+            status_code=202,
+            detail={
+                "decision": "pause",
+                "reason": reason or "Waiting for approval",
+                "approval_id": approval_id,
+                "event_id": ev["id"],
+            },
+        )
 
     result = apply()
     store.save()
@@ -313,15 +409,24 @@ def commit(app: str, action: str, obj_type: Optional[str], obj_id: Optional[str]
     return {"decision": decision, "event": ev, "result": result, "reason": reason}
 
 
-def learn(decision: str, ev: dict, reason: str, by: str) -> Optional[dict]:
+def learn(decision: str, ev: dict, reason: str, by: str) -> dict | None:
     """A person's reason for allowing/blocking a paused step becomes a rule (PDF: 'each reason
     becomes a new rule'). The monitor applies it to later steps with the same catalog action."""
     if not reason:
         return None
     failed = (ev.get("monitor") or {}).get("failed") or []
-    rule = {"id": f"lr_{len(LEARNED)+1:03d}", "decision": decision, "catalog_action": ev.get("catalog_action"),
-            "ctx": ev.get("ctx", {}), "checks": failed, "agent": (ev.get("run") or {}).get("agent"),
-            "reason": reason, "by": by, "learned_at": _now(), "from_event": ev.get("id")}
+    rule = {
+        "id": f"lr_{len(LEARNED) + 1:03d}",
+        "decision": decision,
+        "catalog_action": ev.get("catalog_action"),
+        "ctx": ev.get("ctx", {}),
+        "checks": failed,
+        "agent": (ev.get("run") or {}).get("agent"),
+        "reason": reason,
+        "by": by,
+        "learned_at": _now(),
+        "from_event": ev.get("id"),
+    }
     LEARNED.append(rule)
     store.save()
     return rule
@@ -335,14 +440,30 @@ async def approve(approval_id: str, approver: str = "u_dana", reason: str = "") 
     ev = p["event"]
     if not p.get("request") or "fn" not in _REPLAY:
         raise HTTPException(409, "This paused step can't be replayed (no recorded request)")
-    token = APPROVED.set({"approval_id": approval_id, "catalog_action": ev["catalog_action"], "reason": reason})
+    token = APPROVED.set(
+        {"approval_id": approval_id, "catalog_action": ev["catalog_action"], "reason": reason}
+    )
     try:
         result = await _REPLAY["fn"](p["request"])
     finally:
         APPROVED.reset(token)
     rule = learn("allow", ev, reason, approver)
-    _log(_base("sentinel", "sentinel.approved", None, None, {"approval_id": approval_id, "event_id": ev["id"], "by": approver,
-                                                             "reason": reason, "rule_id": rule and rule["id"]}, {}))
+    _log(
+        _base(
+            "sentinel",
+            "sentinel.approved",
+            None,
+            None,
+            {
+                "approval_id": approval_id,
+                "event_id": ev["id"],
+                "by": approver,
+                "reason": reason,
+                "rule_id": rule and rule["id"],
+            },
+            {},
+        )
+    )
     return {"ok": True, "result": result, "rule": rule}
 
 
@@ -351,12 +472,26 @@ async def reject(approval_id: str, approver: str = "u_dana", reason: str = "") -
     if not p:
         raise HTTPException(404, "No such pending approval")
     rule = learn("block", p["event"], reason, approver)
-    _log(_base("sentinel", "sentinel.rejected", None, None, {"approval_id": approval_id, "event_id": p["event"]["id"],
-                                                             "by": approver, "reason": reason, "rule_id": rule and rule["id"]}, {}))
+    _log(
+        _base(
+            "sentinel",
+            "sentinel.rejected",
+            None,
+            None,
+            {
+                "approval_id": approval_id,
+                "event_id": p["event"]["id"],
+                "by": approver,
+                "reason": reason,
+                "rule_id": rule and rule["id"],
+            },
+            {},
+        )
+    )
     return {"ok": True, "rule": rule}
 
 
-def sources() -> List[dict]:
+def sources() -> list[dict]:
     """Text of everything the agent has read in this run (for the monitor's fact check)."""
     out, seen = [], set()
     for e in EVENTS:
@@ -364,25 +499,61 @@ def sources() -> List[dict]:
         key = (o.get("type"), o.get("id"))
         if e.get("app") == "ui" or not o.get("id") or key in seen:
             continue
-        if not (e["action"].startswith(("jmail.open", "jdrive.open", "habspot.open", "calendar.open"))):
+        if not (
+            e["action"].startswith(("jmail.open", "jdrive.open", "habspot.open", "calendar.open"))
+        ):
             continue
         seen.add(key)
-        obj = store.get(store.TYPE_TO_COLL.get(o["type"], ""), o["id"]) if o["type"] in store.TYPE_TO_COLL else None
+        obj = (
+            store.get(store.TYPE_TO_COLL.get(o["type"], ""), o["id"])
+            if o["type"] in store.TYPE_TO_COLL
+            else None
+        )
         if not obj:
             continue
         if o["type"] == "doc":
             text = obj.get("body", "")
         elif o["type"] == "thread":
-            text = "\n\n".join(f"From: {m['from']['email']}\nDate: {m['ts']}\n{m.get('body','')}" for m in obj.get("messages", []))
+            text = "\n\n".join(
+                f"From: {m['from']['email']}\nDate: {m['ts']}\n{m.get('body', '')}"
+                for m in obj.get("messages", [])
+            )
         elif o["type"] == "deal":
             notes = [a for a in store.items("activities") if a.get("deal_id") == obj["id"]]
-            text = json.dumps({k: obj.get(k) for k in ("name", "stage", "amount", "locations", "plan", "close_date", "next_step",
-                                                         "discount_pct", "contract_signed")}) + "\n" + "\n".join(
-                f"[{a.get('type')} {a.get('ts','')[:10]}] {a.get('title','')}: {a.get('body','')}" for a in notes)
+            text = (
+                json.dumps(
+                    {
+                        k: obj.get(k)
+                        for k in (
+                            "name",
+                            "stage",
+                            "amount",
+                            "locations",
+                            "plan",
+                            "close_date",
+                            "next_step",
+                            "discount_pct",
+                            "contract_signed",
+                        )
+                    }
+                )
+                + "\n"
+                + "\n".join(
+                    f"[{a.get('type')} {a.get('ts', '')[:10]}] {a.get('title', '')}: {a.get('body', '')}"
+                    for a in notes
+                )
+            )
         else:
             text = json.dumps(obj)
-        out.append({"type": o["type"], "id": o["id"], "read_at": e["ts"], "trusted": e.get("ctx", {}).get("source") != "untrusted_external",
-                    "text": text})
+        out.append(
+            {
+                "type": o["type"],
+                "id": o["id"],
+                "read_at": e["ts"],
+                "trusted": e.get("ctx", {}).get("source") != "untrusted_external",
+                "text": text,
+            }
+        )
     return out
 
 
@@ -392,5 +563,9 @@ def undo(event_id: str) -> dict:
         raise HTTPException(404, "Nothing to undo for this event")
     store.replace(store.TYPE_TO_COLL[u["type"]], copy.deepcopy(u["before"]))
     store.save()
-    _log(_base("sentinel", "sentinel.undone", u["type"], u["before"]["id"], {"event_id": event_id}, {}))
+    _log(
+        _base(
+            "sentinel", "sentinel.undone", u["type"], u["before"]["id"], {"event_id": event_id}, {}
+        )
+    )
     return {"ok": True}

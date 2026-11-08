@@ -1,4 +1,6 @@
 """Run control, reset, event log, approvals and undo."""
+
+import contextlib
 import json
 
 from fastapi import APIRouter, Request
@@ -13,12 +15,12 @@ router = APIRouter()
 async def reset(request: Request):
     """Restore seed state and start a fresh run. Optional JSON: {agent, account_id, actor, label, run_id}."""
     b = {}
-    try:
+    with contextlib.suppress(ValueError):  # no or invalid JSON body: use defaults
         b = await request.json()
-    except Exception:
-        pass
     store.reset()
-    run = events.start_run(**{k: b[k] for k in ("agent", "account_id", "actor", "label", "run_id") if b.get(k)})
+    run = events.start_run(
+        **{k: b[k] for k in ("agent", "account_id", "actor", "label", "run_id") if b.get(k)}
+    )
     return {"ok": True, "run": run}
 
 
@@ -26,7 +28,9 @@ async def reset(request: Request):
 async def new_run(request: Request):
     """Start a new labelled run WITHOUT resetting data. JSON: {agent, account_id, actor, label, run_id}."""
     b = await body(request)
-    run = events.start_run(**{k: b[k] for k in ("agent", "account_id", "actor", "label", "run_id") if b.get(k)})
+    run = events.start_run(
+        **{k: b[k] for k in ("agent", "account_id", "actor", "label", "run_id") if b.get(k)}
+    )
     return {"ok": True, "run": run}
 
 
@@ -68,7 +72,7 @@ async def reject(approval_id: str, request: Request):
 async def _json(request: Request) -> dict:
     try:
         return await request.json()
-    except Exception:
+    except ValueError:
         return {}
 
 
@@ -81,16 +85,28 @@ def run_sources():
 @router.get("/api/rules")
 def rules():
     """Written rules (policies), unwritten rules (Liam O'Connor - only the monitor sees these) and learned rules."""
+
     def load(p):
         d = json.loads(p.read_text()) if p.exists() else []
         return d.get("rules", []) if isinstance(d, dict) else d
+
     w = store.ROOT / "world" / "rules"
-    return {"written": load(w / "written_rules.json"), "unwritten": load(w / "unwritten_rules.json"),
-            "learned": list(events.LEARNED)}
+    return {
+        "written": load(w / "written_rules.json"),
+        "unwritten": load(w / "unwritten_rules.json"),
+        "learned": list(events.LEARNED),
+    }
 
 
 @router.get("/events")
 def events_page(request: Request, ui: int = 0):
     """?ui=1 also shows click-level events (page views, clicks, field changes)."""
     evs = [e for e in events.EVENTS if ui or e.get("app") != "ui"]
-    return page(request, "events.html", active_tab="", evs=list(reversed(evs)), pending=events.PENDING, show_ui=ui)
+    return page(
+        request,
+        "events.html",
+        active_tab="",
+        evs=list(reversed(evs)),
+        pending=events.PENDING,
+        show_ui=ui,
+    )

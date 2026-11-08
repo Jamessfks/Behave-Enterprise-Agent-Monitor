@@ -88,7 +88,7 @@ def test_approval_replays_the_original_request(client, monkeypatch):
     monkeypatch.setenv("MONITOR_MODE", "off")
     monkeypatch.setenv("APPROVE_EXTERNAL_SENDS", "1")
     steps, _ = play(client, mistakes=True, decide=lambda s: ("approve", "Dana approved by phone"))
-    send = [s for s in steps if (s["catalog_action"] or "").startswith("quote.send")][0]
+    send = next(s for s in steps if (s["catalog_action"] or "").startswith("quote.send"))
     assert send["decision"] == "pause"
     sent = client.get("/api/mail/threads", params={"label": "SENT"}).json()
     assert any("Your Shiftpoint quote" in (t.get("subject") or "") for t in sent.get("threads", sent))

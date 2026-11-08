@@ -10,22 +10,32 @@ APPROVE_EXTERNAL_SENDS=1 -> every email/quote/invite to someone outside shiftpoi
 """
 
 import os
-from typing import Dict, List
 
 
-def check(event: dict, history: List[dict], run: dict, run_state: dict, *, gate: bool) -> Dict:
+def check(event: dict, history: list[dict], run: dict, run_state: dict, *, gate: bool) -> dict:
     v = _check(event, history, run, run_state, gate=gate)
-    if (gate and os.getenv("APPROVE_EXTERNAL_SENDS") == "1" and v.get("decision") in ("allow", "flag")
-            and event.get("irreversible") and event.get("ctx", {}).get("recipient") not in (None, "internal")):
-        return {**v, "decision": "pause", "reason": (v.get("reason") or "External send") + " - waiting for a person to approve"}
+    if (
+        gate
+        and os.getenv("APPROVE_EXTERNAL_SENDS") == "1"
+        and v.get("decision") in ("allow", "flag")
+        and event.get("irreversible")
+        and event.get("ctx", {}).get("recipient") not in (None, "internal")
+    ):
+        return {
+            **v,
+            "decision": "pause",
+            "reason": (v.get("reason") or "External send") + " - waiting for a person to approve",
+        }
     return v
 
 
-def _check(event: dict, history: List[dict], run: dict, run_state: dict, *, gate: bool) -> Dict:
+def _check(event: dict, history: list[dict], run: dict, run_state: dict, *, gate: bool) -> dict:
     if os.getenv("MONITOR_MODE", "agent") == "off":
         return {"decision": "allow"}
     from monitor import workspace_gate  # local import: the monitor package never imports workspace
 
     from . import events, store
 
-    return workspace_gate.check(event, history, run, run_state, store.DATA, events.LEARNED, gate=gate)
+    return workspace_gate.check(
+        event, history, run, run_state, store.DATA, events.LEARNED, gate=gate
+    )

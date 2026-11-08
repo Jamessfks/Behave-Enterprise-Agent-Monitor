@@ -23,7 +23,15 @@ from . import dispatch, events, session
 from .routers import admin, calendar, crm, drive, mail, quotes, ui
 from .state import MemoryStore, StateStore, make_store
 
-ROUTERS = (mail.router, drive.router, crm.router, calendar.router, quotes.router, ui.router, admin.router)
+ROUTERS = (
+    mail.router,
+    drive.router,
+    crm.router,
+    calendar.router,
+    quotes.router,
+    ui.router,
+    admin.router,
+)
 
 
 def create_app(*, standalone: bool = True, state: StateStore | None = None) -> FastAPI:

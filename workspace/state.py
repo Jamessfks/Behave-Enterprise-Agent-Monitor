@@ -122,6 +122,8 @@ def make_store() -> StateStore:
     creds = _upstash_credentials()
     if backend == "redis" or (backend is None and creds):
         if not creds:
-            raise RuntimeError("STATE_BACKEND=redis needs UPSTASH_REDIS_REST_URL/TOKEN (or KV_REST_API_*)")
+            raise RuntimeError(
+                "STATE_BACKEND=redis needs UPSTASH_REDIS_REST_URL/TOKEN (or KV_REST_API_*)"
+            )
         return RedisStore(*creds)
     return MemoryStore()

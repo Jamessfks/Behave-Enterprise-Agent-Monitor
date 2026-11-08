@@ -9,6 +9,7 @@
 Usage: .venv/bin/python scripts/build_seed.py   (then POST /api/admin/reset)
 Missing inputs are skipped with a warning so partial content still builds.
 """
+
 import json
 import re
 import sys
@@ -24,7 +25,7 @@ BOOL = {"true": True, "false": False}
 def parse_md(path: Path) -> dict:
     text = path.read_text()
     meta, body = {}, text
-    m = re.match(r"^---\n(.*?)\n---\n?(.*)$", text, re.S)
+    m = re.match(r"^---\n(.*?)\n---\n?(.*)$", text, re.DOTALL)
     if m:
         body = m.group(2)
         for line in m.group(1).splitlines():
@@ -57,7 +58,7 @@ def ensure_folders(path: str, folders: dict) -> str:
 def to_int(v, default=0):
     try:
         return int(float(v))
-    except Exception:
+    except (TypeError, ValueError, OverflowError):
         return default
 
 
@@ -65,7 +66,9 @@ def doc_from_md(path: Path, folders: dict) -> dict:
     p = parse_md(path)
     m = p["meta"]
     name = m.get("name") or path.stem
-    folder = m.get("folder") or ("Sales/Call Transcripts" if m.get("kind") == "transcript" else "My Drive")
+    folder = m.get("folder") or (
+        "Sales/Call Transcripts" if m.get("kind") == "transcript" else "My Drive"
+    )
     shared = []
     for item in [s.strip() for s in m.get("shared_with", "").split(",") if s.strip()]:
         email, _, role = item.partition(":")
@@ -103,8 +106,17 @@ def doc_from_md(path: Path, folders: dict) -> dict:
 
 
 def main() -> int:
-    state = {"users": [], "companies": [], "contacts": [], "deals": [], "activities": [],
-             "threads": [], "folders": [], "docs": [], "calendar": []}
+    state = {
+        "users": [],
+        "companies": [],
+        "contacts": [],
+        "deals": [],
+        "activities": [],
+        "threads": [],
+        "folders": [],
+        "docs": [],
+        "calendar": [],
+    }
     crm = WORLD / "habspot" / "crm.json"
     if crm.exists():
         data = json.loads(crm.read_text())
@@ -127,8 +139,18 @@ def main() -> int:
 
     folders: dict = {}
     # always-present roots, so the tree looks right even before content exists
-    for root in ("My Drive/Alex – Private", "Sales/Pricing", "Sales/Templates", "Sales/Call Transcripts",
-                 "Sales/Offers", "Sales/Contracts", "Sales/Playbook", "Marketing", "Finance", "Shared/Team"):
+    for root in (
+        "My Drive/Alex – Private",
+        "Sales/Pricing",
+        "Sales/Templates",
+        "Sales/Call Transcripts",
+        "Sales/Offers",
+        "Sales/Contracts",
+        "Sales/Playbook",
+        "Marketing",
+        "Finance",
+        "Shared/Team",
+    ):
         ensure_folders(root, folders)
     docs = []
     for f in sorted((WORLD / "drive").glob("*.md")):

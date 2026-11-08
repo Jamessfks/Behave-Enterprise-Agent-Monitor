@@ -3,9 +3,9 @@
 Reads are logged via events.log_read, every write goes through events.commit
 (create/update/delete are irreversible: invites go out to attendees).
 """
+
 import copy
 from datetime import date, datetime, timedelta
-from typing import List, Optional, Tuple
 
 from fastapi import APIRouter, HTTPException, Request
 
@@ -16,13 +16,14 @@ router = APIRouter()
 
 COLL = "calendar"
 TZ = "-07:00"
-HOURS = list(range(7, 20))   # 7:00 .. 19:00 rows
+HOURS = list(range(7, 20))  # 7:00 .. 19:00 rows
 HOUR_PX = 48
 
 
 # ---------------------------------------------------------------- helpers
 
-def _events() -> List[dict]:
+
+def _events() -> list[dict]:
     return store.DATA.setdefault(COLL, [])
 
 
@@ -41,7 +42,7 @@ def _monday(d: date) -> date:
     return d - timedelta(days=d.weekday())
 
 
-def _parse_day(s: Optional[str]) -> date:
+def _parse_day(s: str | None) -> date:
     try:
         return date.fromisoformat((s or "")[:10])
     except ValueError:
@@ -57,13 +58,15 @@ def _in_range(e: dict, start: date, end: date) -> bool:
     return start.isoformat() <= d < end.isoformat()
 
 
-def _recipients(attendees: List[dict]) -> List[str]:
-    return [a["email"] for a in attendees if a.get("email") and a["email"].lower() != store.MY_EMAIL]
+def _recipients(attendees: list[dict]) -> list[str]:
+    return [
+        a["email"] for a in attendees if a.get("email") and a["email"].lower() != store.MY_EMAIL
+    ]
 
 
-def _attendees(raw) -> List[dict]:
+def _attendees(raw) -> list[dict]:
     out = [{"name": "Alex Chen", "email": store.MY_EMAIL}]
-    for x in (raw if isinstance(raw, list) else as_list(raw)):
+    for x in raw if isinstance(raw, list) else as_list(raw):
         email = (x.get("email") if isinstance(x, dict) else str(x)).strip()
         if not email or email.lower() == store.MY_EMAIL:
             continue
@@ -90,7 +93,7 @@ def _iso(day: str, hm: str) -> str:
         raise HTTPException(400, f"Invalid date/time: {day} {hm}")
 
 
-def _times(b: dict) -> Tuple[str, str]:
+def _times(b: dict) -> tuple[str, str]:
     """Accept either full ISO start/end, or date + start/end (HH:MM) from the form."""
     start, end = b.get("start") or "", b.get("end") or ""
     if b.get("date"):
@@ -98,17 +101,17 @@ def _times(b: dict) -> Tuple[str, str]:
     for v in (start, end):
         try:
             _dt(v)
-        except Exception:
-            raise HTTPException(400, f"Invalid date/time: {v}")
+        except (TypeError, ValueError) as e:
+            raise HTTPException(400, f"Invalid date/time: {v}") from e
     if _dt(end) <= _dt(start):
         raise HTTPException(400, "End must be after start")
     return start, end
 
 
-def _account_of_deal(deal_id: Optional[str]) -> Optional[str]:
+def _account_of_deal(deal_id: str | None) -> str | None:
     d = store.get("deals", deal_id) if deal_id and store.DATA.get("deals") is not None else None
     if d and d.get("company_id"):
-        return d["company_id"][3:] if d["company_id"].startswith("co_") else d["company_id"]
+        return d["company_id"].removeprefix("co_")
     return None
 
 
@@ -117,8 +120,12 @@ def _layout(e: dict) -> dict:
     s, en = _dt(e["start"]), _dt(e["end"])
     top = max(0.0, (s.hour + s.minute / 60 - HOURS[0])) * HOUR_PX
     dur = max(0.5, (en - s).total_seconds() / 3600)
-    return {"e": e, "top": int(top), "height": max(22, int(dur * HOUR_PX) - 2),
-            "time": f"{s.strftime('%-I:%M')} – {en.strftime('%-I:%M %p')}"}
+    return {
+        "e": e,
+        "top": int(top),
+        "height": max(22, int(dur * HOUR_PX) - 2),
+        "time": f"{s.strftime('%-I:%M')} – {en.strftime('%-I:%M %p')}",
+    }
 
 
 def _deals():
@@ -134,32 +141,54 @@ def _ctx(**kw):
 
 # ---------------------------------------------------------------- pages
 
+
 @router.get("/calendar")
-def week_page(request: Request, week: Optional[str] = None):
+def week_page(request: Request, week: str | None = None):
     mon = _monday(_parse_day(week) if week else _today())
     events.log_read("calendar", "calendar.open_week", "event", f"week:{mon.isoformat()}")
     days = []
     for i in range(7):
         d = mon + timedelta(days=i)
-        evs = sorted([e for e in _events() if e["start"][:10] == d.isoformat()], key=lambda e: e["start"])
+        evs = sorted(
+            [e for e in _events() if e["start"][:10] == d.isoformat()], key=lambda e: e["start"]
+        )
         days.append({"date": d, "is_today": d == _today(), "events": [_layout(e) for e in evs]})
-    return page(request, "calendar/week.html", **_ctx(
-        mon=mon, days=days, prev=(mon - timedelta(days=7)).isoformat(),
-        next=(mon + timedelta(days=7)).isoformat(), today=_monday(_today()).isoformat(),
-        title_range=f"{mon.strftime('%b %-d')} – {(mon + timedelta(days=6)).strftime('%b %-d, %Y')}"))
+    return page(
+        request,
+        "calendar/week.html",
+        **_ctx(
+            mon=mon,
+            days=days,
+            prev=(mon - timedelta(days=7)).isoformat(),
+            next=(mon + timedelta(days=7)).isoformat(),
+            today=_monday(_today()).isoformat(),
+            title_range=f"{mon.strftime('%b %-d')} – {(mon + timedelta(days=6)).strftime('%b %-d, %Y')}",
+        ),
+    )
 
 
 @router.get("/calendar/new")
-def new_page(request: Request, date: str = "", time: str = "10:00"):  # noqa: A002
+def new_page(request: Request, date: str = "", time: str = "10:00"):
     d = date or store.NOW[:10]
     t = time or "10:00"
     try:
         end = (datetime.fromisoformat(f"{d}T{t[:5]}") + timedelta(minutes=30)).strftime("%H:%M")
     except ValueError:
         end = "10:30"
-    form = {"title": "", "date": d, "start": t[:5], "end": end, "attendees": "", "description": "", "deal": ""}
-    return page(request, "calendar/form.html", **_ctx(form=form, ev=None, deals=_deals(),
-                                                      api="/api/calendar/create"))
+    form = {
+        "title": "",
+        "date": d,
+        "start": t[:5],
+        "end": end,
+        "attendees": "",
+        "description": "",
+        "deal": "",
+    }
+    return page(
+        request,
+        "calendar/form.html",
+        **_ctx(form=form, ev=None, deals=_deals(), api="/api/calendar/create"),
+    )
 
 
 @router.get("/calendar/event/{ev_id}")
@@ -167,32 +196,53 @@ def event_page(request: Request, ev_id: str):
     e = _event(ev_id)
     events.log_read("calendar", "calendar.open_event", "event", ev_id)
     s, en = _dt(e["start"]), _dt(e["end"])
-    return page(request, "calendar/event.html", **_ctx(
-        e=e, when=f"{s.strftime('%A, %B %-d, %Y')} · {s.strftime('%-I:%M')} – {en.strftime('%-I:%M %p')}",
-        week=_monday(s.date()).isoformat(),
-        deal=store.get("deals", e.get("deal")) if store.DATA.get("deals") is not None else None))
+    return page(
+        request,
+        "calendar/event.html",
+        **_ctx(
+            e=e,
+            when=f"{s.strftime('%A, %B %-d, %Y')} · {s.strftime('%-I:%M')} – {en.strftime('%-I:%M %p')}",
+            week=_monday(s.date()).isoformat(),
+            deal=store.get("deals", e.get("deal")) if store.DATA.get("deals") is not None else None,
+        ),
+    )
 
 
 @router.get("/calendar/event/{ev_id}/edit")
 def edit_page(request: Request, ev_id: str):
     e = _event(ev_id)
     events.log_read("calendar", "calendar.open_event", "event", ev_id)
-    form = {"title": e["title"], "date": e["start"][:10], "start": e["start"][11:16], "end": e["end"][11:16],
-            "attendees": ", ".join(_recipients(e.get("attendees") or [])),
-            "description": e.get("description") or "", "deal": e.get("deal") or ""}
-    return page(request, "calendar/form.html", **_ctx(form=form, ev=e, deals=_deals(),
-                                                      api=f"/api/calendar/event/{ev_id}/update"))
+    form = {
+        "title": e["title"],
+        "date": e["start"][:10],
+        "start": e["start"][11:16],
+        "end": e["end"][11:16],
+        "attendees": ", ".join(_recipients(e.get("attendees") or [])),
+        "description": e.get("description") or "",
+        "deal": e.get("deal") or "",
+    }
+    return page(
+        request,
+        "calendar/form.html",
+        **_ctx(form=form, ev=e, deals=_deals(), api=f"/api/calendar/event/{ev_id}/update"),
+    )
 
 
 # ---------------------------------------------------------------- JSON API
+
 
 @router.get("/api/calendar/events")
 def api_events(request: Request):
     q = request.query_params
     start = _parse_day(q.get("from")) if q.get("from") else _monday(_today())
     end = _parse_day(q.get("to")) + timedelta(days=1) if q.get("to") else start + timedelta(days=7)
-    events.log_read("calendar", "calendar.open_week", "event", f"week:{start.isoformat()}",
-                    args={"from": start.isoformat(), "to": (end - timedelta(days=1)).isoformat()})
+    events.log_read(
+        "calendar",
+        "calendar.open_week",
+        "event",
+        f"week:{start.isoformat()}",
+        args={"from": start.isoformat(), "to": (end - timedelta(days=1)).isoformat()},
+    )
     rows = sorted([e for e in _events() if _in_range(e, start, end)], key=lambda e: e["start"])
     return {"events": rows}
 
@@ -214,14 +264,31 @@ async def api_create(request: Request):
     att = _attendees(b.get("attendees"))
     deal = b.get("deal") or None
     ev_id = store.new_id("ev_cal")
-    obj = {"id": ev_id, "title": title, "start": start, "end": end, "attendees": att,
-           "location": b.get("location") or "Video call", "description": b.get("description") or "",
-           "account": b.get("account") or _account_of_deal(deal), "deal": deal,
-           "organizer": store.MY_EMAIL, "created_at": store.now_iso()}
+    obj = {
+        "id": ev_id,
+        "title": title,
+        "start": start,
+        "end": end,
+        "attendees": att,
+        "location": b.get("location") or "Video call",
+        "description": b.get("description") or "",
+        "account": b.get("account") or _account_of_deal(deal),
+        "deal": deal,
+        "organizer": store.MY_EMAIL,
+        "created_at": store.now_iso(),
+    }
     args = {"title": title, "start": start, "end": end, "attendees": _recipients(att), "deal": deal}
     ctx = {"recipient": events.recipients_class(_recipients(att))}
-    res = events.commit("calendar", "calendar.create", "event", ev_id, args, ctx,
-                        lambda: _events().append(obj) or obj, irreversible=True)
+    res = events.commit(
+        "calendar",
+        "calendar.create",
+        "event",
+        ev_id,
+        args,
+        ctx,
+        lambda: _events().append(obj) or obj,
+        irreversible=True,
+    )
     return ok(res, redirect=f"/calendar/event/{ev_id}", id=ev_id)
 
 
@@ -233,9 +300,11 @@ async def api_update(ev_id: str, request: Request):
     if "title" in b:
         new["title"] = (b.get("title") or "").strip() or e["title"]
     if b.get("start") or b.get("end") or b.get("date"):
-        merged = {"start": b.get("start") or (e["start"][11:16] if b.get("date") else e["start"]),
-                  "end": b.get("end") or (e["end"][11:16] if b.get("date") else e["end"]),
-                  "date": b.get("date")}
+        merged = {
+            "start": b.get("start") or (e["start"][11:16] if b.get("date") else e["start"]),
+            "end": b.get("end") or (e["end"][11:16] if b.get("date") else e["end"]),
+            "date": b.get("date"),
+        }
         new["start"], new["end"] = _times(merged)
     if "attendees" in b:
         new["attendees"] = _attendees(b.get("attendees"))
@@ -244,7 +313,9 @@ async def api_update(ev_id: str, request: Request):
             new[k] = b.get(k) or ""
     if "deal" in b:
         new["deal"] = b.get("deal") or None
-        new["account"] = _account_of_deal(new["deal"]) or (e.get("account") if new["deal"] == e.get("deal") else None)
+        new["account"] = _account_of_deal(new["deal"]) or (
+            e.get("account") if new["deal"] == e.get("deal") else None
+        )
     new["updated_at"] = store.now_iso()
     change = "time_moved" if new["start"] != e["start"] else "details"
     rcpt = _recipients(new["attendees"])
@@ -255,7 +326,10 @@ async def api_update(ev_id: str, request: Request):
     def apply():
         store.replace(COLL, new)
         return new
-    res = events.commit("calendar", "calendar.update", "event", ev_id, args, ctx, apply, irreversible=True)
+
+    res = events.commit(
+        "calendar", "calendar.update", "event", ev_id, args, ctx, apply, irreversible=True
+    )
     return ok(res, redirect=f"/calendar/event/{ev_id}")
 
 
@@ -265,7 +339,14 @@ async def api_delete(ev_id: str, request: Request):
     rcpt = _recipients(e.get("attendees") or [])
     ctx = {"recipient": events.recipients_class(rcpt)}
     week = _monday(_dt(e["start"]).date()).isoformat()
-    res = events.commit("calendar", "calendar.delete", "event", ev_id,
-                        {"title": e["title"], "start": e["start"], "attendees": rcpt}, ctx,
-                        lambda: store.remove(COLL, ev_id), irreversible=True)
+    res = events.commit(
+        "calendar",
+        "calendar.delete",
+        "event",
+        ev_id,
+        {"title": e["title"], "start": e["start"], "attendees": rcpt},
+        ctx,
+        lambda: store.remove(COLL, ev_id),
+        irreversible=True,
+    )
     return ok(res, redirect=f"/calendar?week={week}")

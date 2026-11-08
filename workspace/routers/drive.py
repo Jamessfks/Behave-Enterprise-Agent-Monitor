@@ -1,6 +1,7 @@
 """Jdrive: Drive/Docs lookalike. Pages under /drive, JSON API under /api/drive."""
+
 import copy
-from typing import Any, List, Optional
+from typing import Any
 
 import markdown as md
 from fastapi import APIRouter, HTTPException, Request
@@ -14,11 +15,21 @@ router = APIRouter()
 PRICE = {"core": 1800, "pro": 2640}
 ONBOARDING = 3000
 PAYROLL = 2000
-OFFER_FIELDS = ("account", "plan", "locations", "discount_pct", "onboarding", "payroll_addon", "valid_until", "notes")
+OFFER_FIELDS = (
+    "account",
+    "plan",
+    "locations",
+    "discount_pct",
+    "onboarding",
+    "payroll_addon",
+    "valid_until",
+    "notes",
+)
 SENS = ("public", "internal", "confidential", "outdated")
 
 
 # ---------------------------------------------------------------- helpers
+
 
 def _truthy(v: Any) -> bool:
     if isinstance(v, bool):
@@ -30,11 +41,11 @@ def _num(v: Any, default: float = 0) -> float:
     try:
         f = float(str(v).strip().rstrip("%"))
         return int(f) if f == int(f) else f
-    except Exception:
+    except (TypeError, ValueError, OverflowError):
         return default
 
 
-def folder_kind(fid: Optional[str]) -> str:
+def folder_kind(fid: str | None) -> str:
     p = store.folder_path(fid)
     if p.startswith("My Drive"):
         return "private"
@@ -43,21 +54,21 @@ def folder_kind(fid: Optional[str]) -> str:
     return "team"
 
 
-def _doc(doc_id: Optional[str]) -> dict:
+def _doc(doc_id: str | None) -> dict:
     d = store.get("docs", doc_id)
     if not d:
         raise HTTPException(404, f"No such doc: {doc_id}")
     return d
 
 
-def _folder(fid: Optional[str]) -> dict:
+def _folder(fid: str | None) -> dict:
     f = store.get("folders", fid)
     if not f:
         raise HTTPException(404, f"No such folder: {fid}")
     return f
 
 
-def offer_totals(o: Optional[dict]) -> Optional[dict]:
+def offer_totals(o: dict | None) -> dict | None:
     if not o:
         return None
     plan = (o.get("plan") or "core").lower()
@@ -69,44 +80,60 @@ def offer_totals(o: Optional[dict]) -> Optional[dict]:
     subscription = list_price - discount_amt
     onboarding = ONBOARDING if o.get("onboarding") else 0
     payroll = PAYROLL if (o.get("payroll_addon") and plan == "core") else 0
-    return {"per_location": per, "locations": locs, "list_price": list_price, "discount_pct": disc,
-            "discount_amt": discount_amt, "subscription": subscription, "onboarding": onboarding,
-            "payroll": payroll, "first_year_total": subscription + onboarding + payroll,
-            "annual_recurring": subscription + payroll}
+    return {
+        "per_location": per,
+        "locations": locs,
+        "list_price": list_price,
+        "discount_pct": disc,
+        "discount_amt": discount_amt,
+        "subscription": subscription,
+        "onboarding": onboarding,
+        "payroll": payroll,
+        "first_year_total": subscription + onboarding + payroll,
+        "annual_recurring": subscription + payroll,
+    }
 
 
-def account_options() -> List[str]:
+def account_options() -> list[str]:
     slugs = [c["id"][3:] for c in store.items("companies") if c.get("id", "").startswith("co_")]
     if not slugs:  # CRM data not loaded yet: fall back to accounts seen in docs
-        slugs = sorted({d.get("account") for d in store.items("docs") if d.get("account")} |
-                       {(d.get("offer") or {}).get("account") for d in store.items("docs")
-                        if (d.get("offer") or {}).get("account")})
+        slugs = sorted(
+            {d.get("account") for d in store.items("docs") if d.get("account")}
+            | {
+                (d.get("offer") or {}).get("account")
+                for d in store.items("docs")
+                if (d.get("offer") or {}).get("account")
+            }
+        )
     return sorted(set(slugs))
 
 
-def account_name(slug: Optional[str]) -> str:
+def account_name(slug: str | None) -> str:
     if not slug:
         return ""
     co = store.get("companies", f"co_{slug}")
     return co.get("name", slug) if co else slug.replace("_", " ").title()
 
 
-def folder_tree() -> List[dict]:
+def folder_tree() -> list[dict]:
     """Depth-first list of folders with depth for indentation."""
     fs = store.items("folders")
-    out: List[dict] = []
+    out: list[dict] = []
 
-    def walk(parent: Optional[str], depth: int):
-        kids = sorted([f for f in fs if f.get("parent_id") == parent],
-                      key=lambda f: (f["name"] != "My Drive", f["name"]))
+    def walk(parent: str | None, depth: int):
+        kids = sorted(
+            [f for f in fs if f.get("parent_id") == parent],
+            key=lambda f: (f["name"] != "My Drive", f["name"]),
+        )
         for f in kids:
             out.append({"f": f, "depth": depth})
             walk(f["id"], depth + 1)
+
     walk(None, 0)
     return out
 
 
-def breadcrumb(fid: Optional[str]) -> List[dict]:
+def breadcrumb(fid: str | None) -> list[dict]:
     out = []
     f = store.get("folders", fid)
     while f:
@@ -116,10 +143,12 @@ def breadcrumb(fid: Optional[str]) -> List[dict]:
 
 
 def summary(d: dict) -> dict:
-    return dict({k: v for k, v in d.items() if k != "body"}, path=store.folder_path(d.get("folder_id")))
+    return dict(
+        {k: v for k, v in d.items() if k != "body"}, path=store.folder_path(d.get("folder_id"))
+    )
 
 
-def search_docs(q: str, folder: Optional[str] = None) -> List[dict]:
+def search_docs(q: str, folder: str | None = None) -> list[dict]:
     ql = (q or "").lower().strip()
     out = []
     for d in store.items("docs"):
@@ -135,49 +164,93 @@ def render_md(text: str) -> str:
     return md.markdown(text or "", extensions=["tables", "fenced_code"])
 
 
-def _sidebar_ctx(current_folder: Optional[str]) -> dict:
+def _sidebar_ctx(current_folder: str | None) -> dict:
     return {"tree": folder_tree(), "current_folder": current_folder, "active_tab": "drive"}
 
 
 # ---------------------------------------------------------------- pages
 
+
 @router.get("/drive")
-def drive_home(request: Request, folder: Optional[str] = None, q: Optional[str] = None):
+def drive_home(request: Request, folder: str | None = None, q: str | None = None):
     if q is not None and q.strip():
         q = q.strip()
         events.emit("jdrive", "jdrive.search", None, None, {}, args={"q": q})
         docs = search_docs(q)
-        return page(request, "drive/folder.html", folder=None, crumbs=[], subfolders=[], docs=docs, q=q,
-                    **_sidebar_ctx(None))
+        return page(
+            request,
+            "drive/folder.html",
+            folder=None,
+            crumbs=[],
+            subfolders=[],
+            docs=docs,
+            q=q,
+            **_sidebar_ctx(None),
+        )
     fid = folder or "fd_sales"
     f = store.get("folders", fid)
     if not f:
         return RedirectResponse("/drive?folder=fd_sales")
     events.log_read("jdrive", "jdrive.open_folder", "folder", fid, {})
-    subs = sorted([x for x in store.items("folders") if x.get("parent_id") == fid], key=lambda x: x["name"])
-    docs = sorted([d for d in store.items("docs") if d.get("folder_id") == fid], key=lambda d: d["name"].lower())
-    return page(request, "drive/folder.html", folder=f, crumbs=breadcrumb(fid), subfolders=subs, docs=docs, q="",
-                **_sidebar_ctx(fid))
+    subs = sorted(
+        [x for x in store.items("folders") if x.get("parent_id") == fid], key=lambda x: x["name"]
+    )
+    docs = sorted(
+        [d for d in store.items("docs") if d.get("folder_id") == fid],
+        key=lambda d: d["name"].lower(),
+    )
+    return page(
+        request,
+        "drive/folder.html",
+        folder=f,
+        crumbs=breadcrumb(fid),
+        subfolders=subs,
+        docs=docs,
+        q="",
+        **_sidebar_ctx(fid),
+    )
 
 
 @router.get("/drive/doc/{doc_id}")
 def doc_page(request: Request, doc_id: str):
     d = _doc(doc_id)
-    events.log_read("jdrive", "jdrive.open", "doc", doc_id, {"sensitivity": d.get("sensitivity"), "kind": d.get("kind")})
-    return page(request, "drive/doc.html", doc=d, html=render_md(d.get("body")), crumbs=breadcrumb(d.get("folder_id")),
-                totals=offer_totals(d.get("offer")), account_name=account_name,
-                participants=d.get("participants") or [], **_sidebar_ctx(d.get("folder_id")))
+    events.log_read(
+        "jdrive",
+        "jdrive.open",
+        "doc",
+        doc_id,
+        {"sensitivity": d.get("sensitivity"), "kind": d.get("kind")},
+    )
+    return page(
+        request,
+        "drive/doc.html",
+        doc=d,
+        html=render_md(d.get("body")),
+        crumbs=breadcrumb(d.get("folder_id")),
+        totals=offer_totals(d.get("offer")),
+        account_name=account_name,
+        participants=d.get("participants") or [],
+        **_sidebar_ctx(d.get("folder_id")),
+    )
 
 
 @router.get("/drive/doc/{doc_id}/edit")
 def edit_page(request: Request, doc_id: str):
     d = _doc(doc_id)
-    return page(request, "drive/edit.html", doc=d, crumbs=breadcrumb(d.get("folder_id")),
-                accounts=account_options(), account_name=account_name, totals=offer_totals(d.get("offer")),
-                **_sidebar_ctx(d.get("folder_id")))
+    return page(
+        request,
+        "drive/edit.html",
+        doc=d,
+        crumbs=breadcrumb(d.get("folder_id")),
+        accounts=account_options(),
+        account_name=account_name,
+        totals=offer_totals(d.get("offer")),
+        **_sidebar_ctx(d.get("folder_id")),
+    )
 
 
 # ---------------------------------------------------------------- JSON reads
+
 
 @router.get("/api/drive/folders")
 def api_folders():
@@ -185,7 +258,7 @@ def api_folders():
 
 
 @router.get("/api/drive/docs")
-def api_docs(folder: Optional[str] = None, q: Optional[str] = None):
+def api_docs(folder: str | None = None, q: str | None = None):
     if q:
         events.emit("jdrive", "jdrive.search", None, None, {}, args={"q": q})
     elif folder:
@@ -196,11 +269,21 @@ def api_docs(folder: Optional[str] = None, q: Optional[str] = None):
 @router.get("/api/drive/doc/{doc_id}")
 def api_doc(doc_id: str):
     d = _doc(doc_id)
-    events.log_read("jdrive", "jdrive.open", "doc", doc_id, {"sensitivity": d.get("sensitivity"), "kind": d.get("kind")})
-    return {"doc": dict(d, path=store.folder_path(d.get("folder_id"))), "offer_totals": offer_totals(d.get("offer"))}
+    events.log_read(
+        "jdrive",
+        "jdrive.open",
+        "doc",
+        doc_id,
+        {"sensitivity": d.get("sensitivity"), "kind": d.get("kind")},
+    )
+    return {
+        "doc": dict(d, path=store.folder_path(d.get("folder_id"))),
+        "offer_totals": offer_totals(d.get("offer")),
+    }
 
 
 # ---------------------------------------------------------------- writes
+
 
 @router.post("/api/drive/create")
 async def api_create(request: Request):
@@ -209,11 +292,30 @@ async def api_create(request: Request):
     _folder(fid)
     name = (b.get("name") or "").strip() or "Untitled document"
     new_id = store.new_id("doc")
-    doc = {"id": new_id, "name": name, "folder_id": fid, "sensitivity": "internal", "kind": "doc",
-           "owner": store.ME, "updated_at": store.now_iso(), "shared_with": [], "body": b.get("body") or "",
-           "account": None, "deal": None, "offer": None, "copied_from": None}
-    res = events.commit("jdrive", "jdrive.create", "doc", new_id, {"folder_id": fid, "name": name},
-                        {"folder_kind": folder_kind(fid)}, apply=lambda: store.add("docs", doc) and new_id)
+    doc = {
+        "id": new_id,
+        "name": name,
+        "folder_id": fid,
+        "sensitivity": "internal",
+        "kind": "doc",
+        "owner": store.ME,
+        "updated_at": store.now_iso(),
+        "shared_with": [],
+        "body": b.get("body") or "",
+        "account": None,
+        "deal": None,
+        "offer": None,
+        "copied_from": None,
+    }
+    res = events.commit(
+        "jdrive",
+        "jdrive.create",
+        "doc",
+        new_id,
+        {"folder_id": fid, "name": name},
+        {"folder_kind": folder_kind(fid)},
+        apply=lambda: store.add("docs", doc) and new_id,
+    )
     return ok(res, redirect=f"/drive/doc/{new_id}/edit", doc_id=new_id)
 
 
@@ -228,13 +330,29 @@ async def api_copy(request: Request):
 
     def apply():
         d = copy.deepcopy(src)
-        d.update({"id": new_id, "name": name, "folder_id": fid, "owner": store.ME, "updated_at": store.now_iso(),
-                  "shared_with": [], "copied_from": src["id"]})
+        d.update(
+            {
+                "id": new_id,
+                "name": name,
+                "folder_id": fid,
+                "owner": store.ME,
+                "updated_at": store.now_iso(),
+                "shared_with": [],
+                "copied_from": src["id"],
+            }
+        )
         store.add("docs", d)
         return new_id
-    res = events.commit("jdrive", "jdrive.copy", "doc", src["id"],
-                        {"doc_id": src["id"], "new_doc_id": new_id, "name": name, "folder_id": fid},
-                        {"sensitivity": src.get("sensitivity"), "folder_kind": folder_kind(fid)}, apply=apply)
+
+    res = events.commit(
+        "jdrive",
+        "jdrive.copy",
+        "doc",
+        src["id"],
+        {"doc_id": src["id"], "new_doc_id": new_id, "name": name, "folder_id": fid},
+        {"sensitivity": src.get("sensitivity"), "folder_kind": folder_kind(fid)},
+        apply=apply,
+    )
     return ok(res, redirect=f"/drive/doc/{new_id}", doc_id=new_id)
 
 
@@ -283,11 +401,22 @@ async def api_edit(request: Request):
         return d["id"]
 
     if is_offer:
-        res = events.commit("jdrive", "quote.save", "doc", d["id"], args,
-                            {"discount": events.discount_class(new_offer.get("discount_pct") or 0), "sensitivity": sens},
-                            apply=apply)
+        res = events.commit(
+            "jdrive",
+            "quote.save",
+            "doc",
+            d["id"],
+            args,
+            {
+                "discount": events.discount_class(new_offer.get("discount_pct") or 0),
+                "sensitivity": sens,
+            },
+            apply=apply,
+        )
     else:
-        res = events.commit("jdrive", "jdrive.edit", "doc", d["id"], args, {"sensitivity": sens}, apply=apply)
+        res = events.commit(
+            "jdrive", "jdrive.edit", "doc", d["id"], args, {"sensitivity": sens}, apply=apply
+        )
     return ok(res, redirect=f"/drive/doc/{d['id']}", doc_id=d["id"])
 
 
@@ -302,6 +431,7 @@ async def api_rename(request: Request):
     def apply():
         d["name"] = name
         d["updated_at"] = store.now_iso()
+
     res = events.commit("jdrive", "jdrive.rename", "doc", d["id"], {"name": name}, {}, apply=apply)
     return ok(res, redirect=f"/drive/doc/{d['id']}")
 
@@ -316,8 +446,16 @@ async def api_move(request: Request):
     def apply():
         d["folder_id"] = fid
         d["updated_at"] = store.now_iso()
-    res = events.commit("jdrive", "jdrive.move", "doc", d["id"], {"folder_id": fid},
-                        {"folder_kind": folder_kind(fid), "sensitivity": d.get("sensitivity")}, apply=apply)
+
+    res = events.commit(
+        "jdrive",
+        "jdrive.move",
+        "doc",
+        d["id"],
+        {"folder_id": fid},
+        {"folder_kind": folder_kind(fid), "sensitivity": d.get("sensitivity")},
+        apply=apply,
+    )
     return ok(res, redirect=f"/drive/doc/{d['id']}")
 
 
@@ -336,9 +474,17 @@ async def api_share(request: Request):
         sw = [s for s in d.setdefault("shared_with", []) if s.get("email") != email]
         sw.append({"email": email, "role": role})
         d["shared_with"] = sw
-    res = events.commit("jdrive", "jdrive.share", "doc", d["id"], {"email": email, "role": role},
-                        {"recipient": events.recipient_class(email), "sensitivity": d.get("sensitivity")},
-                        apply=apply, irreversible=True)
+
+    res = events.commit(
+        "jdrive",
+        "jdrive.share",
+        "doc",
+        d["id"],
+        {"email": email, "role": role},
+        {"recipient": events.recipient_class(email), "sensitivity": d.get("sensitivity")},
+        apply=apply,
+        irreversible=True,
+    )
     return ok(res, redirect=f"/drive/doc/{d['id']}")
 
 
@@ -350,7 +496,10 @@ async def api_unshare(request: Request):
 
     def apply():
         d["shared_with"] = [s for s in d.get("shared_with", []) if s.get("email") != email]
-    res = events.commit("jdrive", "jdrive.unshare", "doc", d["id"], {"email": email}, {}, apply=apply)
+
+    res = events.commit(
+        "jdrive", "jdrive.unshare", "doc", d["id"], {"email": email}, {}, apply=apply
+    )
     return ok(res, redirect=f"/drive/doc/{d['id']}")
 
 
@@ -359,6 +508,13 @@ async def api_delete(request: Request):
     b = await body(request)
     d = _doc(b.get("doc_id"))
     fid = d.get("folder_id")
-    res = events.commit("jdrive", "jdrive.delete", "doc", d["id"], {"name": d.get("name")},
-                        {"sensitivity": d.get("sensitivity")}, apply=lambda: store.remove("docs", d["id"]) and d["id"])
+    res = events.commit(
+        "jdrive",
+        "jdrive.delete",
+        "doc",
+        d["id"],
+        {"name": d.get("name")},
+        {"sensitivity": d.get("sensitivity")},
+        apply=lambda: store.remove("docs", d["id"]) and d["id"],
+    )
     return ok(res, redirect=f"/drive?folder={fid}")
