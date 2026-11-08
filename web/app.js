@@ -157,6 +157,31 @@ function showScenario() {
   $("#scenario-dek").textContent = `${S.boot.company.persona}'s AI agent at ${S.boot.company.name} does it. Every step is checked before it runs, and the app on the left shows what each step changes.`;
 }
 
+/* Picking another task works at any time: a run in progress (animating, paused for a person, or
+   waiting for Next step) is abandoned first, the way Reset world does. */
+async function switchTask(id) {
+  S.scenarioId = id;
+  store.set("am.scenario", id);
+  if (S.busy) {
+    abandonRun();
+    for (let i = 0; i < 200 && S.busy; i++) await sleep(50);
+  }
+  S.abandoned = false;
+  S.resumable = false;
+  S.upcoming = null;
+  S.done = {};
+  showScenario();
+  resetChain(true);
+  fitHome(true);
+  if (S.boot) navigateApp(S.boot.apps.mail);
+}
+
+function abandonRun() {
+  S.abandoned = true;
+  if (S.cancelPause) S.cancelPause();
+  if (S.nextWaiter) S.nextWaiter();
+}
+
 function setPace(p) {
   S.pace = p;
   store.set("am.pace", p);
@@ -183,16 +208,7 @@ function wireControls() {
     $("#mistakes").setAttribute("aria-checked", String(S.mistakes));
   });
   $("#run").addEventListener("click", () => (S.nextWaiter ? S.nextWaiter() : S.resumable ? continueRun() : startRun()));
-  $("#scenario").addEventListener("change", (e) => {
-    if (S.busy) return;
-    S.scenarioId = e.target.value;
-    store.set("am.scenario", S.scenarioId);
-    S.resumable = false;
-    S.done = {};
-    showScenario();
-    resetChain(true);
-    fitHome(true);
-  });
+  $("#scenario").addEventListener("change", (e) => switchTask(e.target.value));
   const paces = $$(".pace button");
   paces.forEach((b, i) => {
     b.addEventListener("click", () => setPace(b.dataset.pace));
@@ -244,7 +260,7 @@ function setBusy(on, label) {
   run.textContent = on ? label : S.resumable ? "Continue the run" : S.steps.length ? "Run again" : "Run the agent";
   $("#reset").disabled = on;
   $("#mistakes").disabled = on || S.mode === "live";
-  $("#scenario").disabled = on || S.mode === "live";
+  $("#scenario").disabled = S.mode === "live";
   $$(".seg.mode button").forEach((b) => (b.disabled = on));
 }
 
@@ -794,6 +810,7 @@ async function loop() {
       caption("open", up.kind === "write" ? `${what}. This is the page before it runs.` : what);
       if (up.page) await navigateApp(up.page, { reload: up.kind === "write" });
       await sleep(pace().open);
+      if (S.abandoned) { edge.remove(); node.remove(); return; }
       caption("check", what);
     } else {
       caption("check", "The agent is choosing its next step");
@@ -805,6 +822,7 @@ async function loop() {
       edge.remove(); node.remove();
       throw e;
     }
+    if (S.abandoned) { edge.remove(); node.remove(); return; }
     S.upcoming = res.upcoming || null;
     if (Array.isArray(res.changed)) S.changed = res.changed;
     if (!res.step) { edge.remove(); node.remove(); break; }
@@ -897,6 +915,11 @@ async function resume() {
   if (!cur?.run || !cur.steps?.length) return;
   S.mode = cur.run.live ? "live" : "demo";
   S.mistakes = !!cur.run.mistakes;
+  if (cur.run.scenario && (S.boot.scenarios || []).some((x) => x.id === cur.run.scenario)) {
+    S.scenarioId = cur.run.scenario;
+    $("#scenario").value = S.scenarioId;
+    showScenario();
+  }
   $("#mistakes").setAttribute("aria-checked", String(S.mistakes));
   $$(".seg.mode button").forEach((b) => { b.setAttribute("aria-checked", String(b.dataset.mode === S.mode)); b.tabIndex = b.dataset.mode === S.mode ? 0 : -1; });
   resetChain(false);

@@ -20,7 +20,7 @@ from pathlib import Path
 from typing import Annotated, Any
 
 from dotenv import load_dotenv
-from fastapi import FastAPI, File, HTTPException, UploadFile
+from fastapi import FastAPI, File, HTTPException, Request, UploadFile
 from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
@@ -58,6 +58,16 @@ async def lifespan(_app: FastAPI):
 
 app = FastAPI(title="Agent Monitor", lifespan=lifespan)
 session.install(app, STATE)  # state load/save + actor, around the monitor APIs and the workspace
+
+
+@app.middleware("http")
+async def revalidate_canvas(request: Request, call_next):
+    """The canvas files change with every deploy: make browsers revalidate them (ETag), so nobody
+    runs a stale app.js against a newer server."""
+    response = await call_next(request)
+    if request.url.path.startswith("/monitor"):
+        response.headers["Cache-Control"] = "no-cache"
+    return response
 
 
 class RunIn(BaseModel):
