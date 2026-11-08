@@ -18,12 +18,15 @@
     .doc-body th { background: #f6f6f6; }
     .doc-body code { background: #f3f3f3; padding: 0 3px; border-radius: 3px; }
     .doc-body pre { background: #f6f6f6; padding: 8px; border-radius: 4px; white-space: pre-wrap; }
+    /* Framed by the Agent Monitor canvas: it has its own app tabs, so hide this shell bar. */
+    html.embedded .workspace-shell { display: none !important; }
   </style>
+  <script>if (window.self !== window.top) document.documentElement.classList.add("embedded");</script>
   {% block head %}{% endblock %}
 </head>
 <body class="bg-white text-gray-900 min-h-screen flex flex-col">
   <!-- Workspace shell: one tab per app -->
-  <div class="flex items-center gap-1 bg-gray-200 px-2 pt-2 border-b border-gray-300">
+  <div class="workspace-shell flex items-center gap-1 bg-gray-200 px-2 pt-2 border-b border-gray-300">
     {% set tab = active_tab|default('mail') %}
     <a href="/mail" class="px-4 py-2 rounded-t-lg text-sm font-medium {{ 'bg-white text-gray-900' if tab=='mail' else 'text-gray-600 hover:bg-gray-100' }}">
       <span class="inline-block w-3 h-3 rounded-sm bg-red-500 mr-1 align-middle"></span>Jmail</a>

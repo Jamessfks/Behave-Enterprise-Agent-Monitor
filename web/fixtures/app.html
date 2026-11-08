@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Workspace app (fixture)</title>
+  <style>
+    /* Stand-in for the workspace apps in fixture mode (no server). The real apps keep their own look. */
+    :root { color-scheme: light dark; --bg: #ede8f5; --ink: #1e2650; --muted: #4f5a8a; --line: #adbbda; --card: #fff; }
+    @media (prefers-color-scheme: dark) { :root { --bg: #12172b; --ink: #ede8f5; --muted: #adbbda; --line: #2a3460; --card: #1b2240; } }
+    body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: var(--bg); color: var(--ink);
+      font: 17px/1.5 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; padding: 16px; box-sizing: border-box; }
+    .card { max-width: 30em; width: 100%; background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 24px;
+      box-shadow: 0 18px 40px -24px rgb(61 82 160 / 0.35); }
+    h1 { margin: 0 0 4px; font-size: 28px; font-weight: 600; line-height: 1.1; }
+    code { font-size: 15px; overflow-wrap: anywhere; color: var(--muted); }
+    p { margin: 10px 0 0; color: var(--muted); }
+    .lines { margin-top: 18px; display: grid; gap: 10px; }
+    .lines i { display: block; height: 12px; border-radius: 6px; background: var(--line); opacity: 0.6; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1 id="app">Workspace</h1>
+    <code id="path"></code>
+    <p>Fixture mode: start the server to see the real app here. The agent's step opens this page.</p>
+    <div class="lines" aria-hidden="true"><i style="width:90%"></i><i style="width:70%"></i><i style="width:82%"></i><i style="width:55%"></i></div>
+  </div>
+  <script>
+    const u = new URLSearchParams(location.search).get("u") || "/";
+    const app = u.startsWith("/mail") ? "Jmail" : u.startsWith("/drive") ? "Jdrive" : u.startsWith("/crm") ? "Habspot" : u.startsWith("/calendar") ? "Calendario" : "Workspace";
+    document.getElementById("app").textContent = app;
+    document.getElementById("path").textContent = u;
+  </script>
+</body>
+</html>

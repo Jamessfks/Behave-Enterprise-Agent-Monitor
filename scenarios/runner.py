@@ -95,9 +95,19 @@ def _settle_awaiting(sc: dict[str, Any]) -> None:
             "doc_id": replayed["object"]["id"],
             "id": replayed["object"]["id"],
         }
+    decided = next(
+        (
+            e
+            for e in reversed(events.EVENTS)
+            if e.get("action") in ("sentinel.approved", "sentinel.rejected")
+            and (e.get("args") or {}).get("approval_id") == awaiting["approval_id"]
+        ),
+        None,
+    )
+    reason = ((decided or {}).get("args") or {}).get("reason", "")
     for step in sc["steps"]:
         if step.get("approval_id") == awaiting["approval_id"]:
-            step["resolution"] = "approved" if replayed else "blocked"
+            step["resolution"] = {"decision": "allow" if replayed else "block", "reason": reason}
     sc["awaiting"] = None
 
 

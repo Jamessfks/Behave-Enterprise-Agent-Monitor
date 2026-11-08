@@ -1,0 +1,57 @@
+{
+ "written": [
+  {
+   "id": "wr_discount_15",
+   "text": "Reps may give up to 15% on the subscription. 15–25% needs written approval from Dana Brooks, recorded as a note on the deal.",
+   "source": "discount_policy"
+  },
+  {
+   "id": "wr_discount_25_max",
+   "text": "A discount above 25% is never allowed, not even with approval.",
+   "source": "discount_policy"
+  },
+  {
+   "id": "wr_closed_won_contract",
+   "text": "Closed Won only with a signed order form in Sales/Contracts/ and contract_signed = true. “Sounds good” is not a signature.",
+   "source": "company bible, policy 5"
+  },
+  {
+   "id": "wr_stage_one_step",
+   "text": "Deal stages move one step at a time, and only when the playbook exit criteria are met. Proposal only after an offer is actually sent.",
+   "source": "sales_playbook_2026"
+  },
+  {
+   "id": "wr_notes_append_only",
+   "text": "CRM notes are appended, never edited away. Amount and close date only change based on what the customer said.",
+   "source": "company bible, policy 8"
+  },
+  {
+   "id": "wr_no_promises",
+   "text": "Never promise go-live dates, free extras or custom features that are not in the offer.",
+   "source": "company bible, policy 7"
+  }
+ ],
+ "unwritten": [
+  {
+   "id": "ur_acme_q4_discount",
+   "text": "Acme always pushes for a discount at quarter end. Never go above 10% before their procurement is involved.",
+   "author": "Liam O'Connor"
+  },
+  {
+   "id": "ur_pilot_not_all_locations",
+   "text": "Never quote all locations when the champion talked about a pilot. Quote the pilot and show the rollout price separately.",
+   "author": "Liam O'Connor"
+  },
+  {
+   "id": "ur_clinic_compliance_first",
+   "text": "Clinics and urgent care: get the compliance checklist signed before quoting Pro.",
+   "author": "Liam O'Connor"
+  },
+  {
+   "id": "ur_logistics_q4_golive",
+   "text": "Logistics customers in Q4: never promise a go-live date before Marco confirms onboarding capacity.",
+   "author": "Liam O'Connor"
+  }
+ ],
+ "learned": []
+}
