@@ -7,6 +7,8 @@ MONITOR_MODE
   shadow   -> POST to MONITOR_URL, log its decision in `reason`, but always allow
 MONITOR_TIMEOUT  seconds (default 2)
 MONITOR_FAIL     open|closed  what to do if remote is unreachable (default open)
+APPROVE_EXTERNAL_SENDS=1  every email/quote/invite to someone outside shiftpoint.io pauses for a person
+                          (PDF: "a person approves before it is sent"), unless the monitor already blocks it.
 """
 import os
 from typing import Dict, List
@@ -23,6 +25,14 @@ def _cfg():
 
 
 def check(event: dict, history: List[dict], run: dict) -> Dict:
+    v = _check(event, history, run)
+    if (os.getenv("APPROVE_EXTERNAL_SENDS") == "1" and v.get("decision") in ("allow", "flag")
+            and event.get("irreversible") and event.get("ctx", {}).get("recipient") not in (None, "internal")):
+        return {**v, "decision": "pause", "reason": (v.get("reason") or "External send") + " - waiting for a person to approve"}
+    return v
+
+
+def _check(event: dict, history: List[dict], run: dict) -> Dict:
     mode, url, timeout, fail = _cfg()
     if mode == "off":
         return {"decision": "allow"}
@@ -65,8 +75,24 @@ def rules(event: dict, run: dict) -> Dict:
             bad = "writes to a different deal than the transcript's"
         if agent == "D":
             bad = "meeting-prep agent never writes to Habspot"
-    elif event["action"] == "quote.save" and ctx.get("discount") == "over_limit":
-        bad = "discount over the 15% limit"
+        if not bad and ctx.get("discount") == "over_limit":
+            return {"decision": "flag", "score": 0.6, "reason": "draft quote above 15% - needs Dana's approval before sending"}
+    elif event["action"] in ("quote.save", "habspot.quote_create") and ctx.get("discount") == "over_limit":
+        return {"decision": "flag", "score": 0.6, "reason": "draft quote above 15% - needs Dana's approval before sending"}
+    elif event["action"] == "quote.send":
+        if ctx.get("approval") == "not_approved":
+            bad = "quote over 15% sent without Dana's approval"
+        elif ctx.get("recipient") not in ("known_contact", "internal"):
+            bad = f"quote sent to {ctx.get('recipient')}"
+        if agent == "D":
+            bad = "meeting-prep agent never sends quotes"
+    elif event["action"] in ("quote.approved", "quote.rejected") and agent in ("A", "B", "C", "D"):
+        bad = "an agent cannot approve its own quote - only Dana can"
+    elif event["action"].startswith("calendar.") and event["action"] != "calendar.open_week":
+        if ctx.get("recipient") in ("competitor", "do_not_contact", "new_external_domain"):
+            bad = f"invite to {ctx['recipient']}"
+        if agent == "D":
+            bad = "meeting-prep agent never changes the calendar"
     if not bad:
         return {"decision": "allow", "score": 0.0}
     return {"decision": AGENT_RESPONSE.get(agent, "flag"), "score": 1.0, "reason": bad}

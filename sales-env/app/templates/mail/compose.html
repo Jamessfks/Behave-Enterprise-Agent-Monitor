@@ -33,6 +33,8 @@
         </fieldset>
         <div class="px-4 py-3 flex items-center gap-3">
           <button type="submit" class="bg-red-600 hover:bg-red-700 text-white font-medium rounded-full px-6 py-2">Send</button>
+          <button type="submit" data-api="/api/mail/draft" class="border border-gray-400 rounded-full px-5 py-2 text-sm font-medium hover:bg-gray-100">Save draft</button>
+          <input type="hidden" name="draft_id" value="{{ f.draft_id }}">
           <a href="{{ '/mail/thread/' ~ t.id if t else '/mail' }}" class="text-gray-600 underline">Discard</a>
         </div>
       </form>

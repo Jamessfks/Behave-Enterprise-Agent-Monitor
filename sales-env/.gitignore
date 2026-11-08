@@ -5,3 +5,4 @@ __pycache__/
 state/
 runs/*.jsonl
 .claude/
+rules/learned_rules.json

@@ -84,7 +84,7 @@
     btns.forEach(x => x.disabled = true);
     let r, j = {};
     try {
-      r = await fetch(f.dataset.api, { method: f.dataset.method || 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+      r = await fetch((e.submitter && e.submitter.dataset.api) || f.dataset.api, { method: f.dataset.method || 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
       try { j = await r.json(); } catch (_) {}
     } catch (err) { banner('error', String(err)); btns.forEach(x => x.disabled = false); return; }
     btns.forEach(x => x.disabled = false);

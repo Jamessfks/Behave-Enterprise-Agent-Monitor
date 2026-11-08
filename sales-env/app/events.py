@@ -234,6 +234,9 @@ def commit(app: str, action: str, obj_type: Optional[str], obj_id: Optional[str]
 
     verdict = monitor.check(ev, EVENTS, RUN)
     decision, score, reason = verdict["decision"], verdict.get("score"), verdict.get("reason", "")
+    extra = {k: v for k, v in verdict.items() if k not in ("decision", "score", "reason")}
+    if extra:
+        ev["monitor"] = extra  # e.g. top_guesses, checks, rule_id - shown by whatever UI reads the log
 
     if decision == "block":
         _log(ev, "block", score, reason)
@@ -254,23 +257,74 @@ def commit(app: str, action: str, obj_type: Optional[str], obj_id: Optional[str]
     return {"decision": decision, "event": ev, "result": result, "reason": reason}
 
 
-def approve(approval_id: str, approver: str = "u_dana") -> dict:
+LEARNED_RULES = store.ROOT / "rules" / "learned_rules.json"
+
+
+def learn(decision: str, ev: dict, reason: str, by: str) -> Optional[dict]:
+    """A person's reason for allowing/blocking a flagged step becomes a rule (PDF: 'each reason becomes a new rule')."""
+    if not reason:
+        return None
+    LEARNED_RULES.parent.mkdir(exist_ok=True)
+    rules = json.loads(LEARNED_RULES.read_text()) if LEARNED_RULES.exists() else []
+    rule = {"id": f"lr_{len(rules)+1:03d}", "decision": decision, "catalog_action": ev.get("catalog_action"),
+            "ctx": ev.get("ctx", {}), "agent": (ev.get("run") or {}).get("agent"), "reason": reason, "by": by,
+            "learned_at": _now(), "from_event": ev.get("id")}
+    rules.append(rule)
+    LEARNED_RULES.write_text(json.dumps(rules, indent=1))
+    return rule
+
+
+def approve(approval_id: str, approver: str = "u_dana", reason: str = "") -> dict:
     p = PENDING.pop(approval_id, None)
     if not p:
         raise HTTPException(404, "No such pending approval")
     result = p["apply"]()
     store.save()
     ev = p["event"]
-    _log(_base("sentinel", "sentinel.approved", None, None, {"approval_id": approval_id, "event_id": ev["id"], "by": approver}, {}))
-    return {"ok": True, "result": result}
+    rule = learn("allow", ev, reason, approver)
+    _log(_base("sentinel", "sentinel.approved", None, None, {"approval_id": approval_id, "event_id": ev["id"], "by": approver,
+                                                             "reason": reason, "rule_id": rule and rule["id"]}, {}))
+    return {"ok": True, "result": result, "rule": rule}
 
 
-def reject(approval_id: str, approver: str = "u_dana") -> dict:
+def reject(approval_id: str, approver: str = "u_dana", reason: str = "") -> dict:
     p = PENDING.pop(approval_id, None)
     if not p:
         raise HTTPException(404, "No such pending approval")
-    _log(_base("sentinel", "sentinel.rejected", None, None, {"approval_id": approval_id, "event_id": p["event"]["id"], "by": approver}, {}))
-    return {"ok": True}
+    rule = learn("block", p["event"], reason, approver)
+    _log(_base("sentinel", "sentinel.rejected", None, None, {"approval_id": approval_id, "event_id": p["event"]["id"],
+                                                             "by": approver, "reason": reason, "rule_id": rule and rule["id"]}, {}))
+    return {"ok": True, "rule": rule}
+
+
+def sources() -> List[dict]:
+    """Text of everything the agent has read in this run (for the monitor's fact check)."""
+    out, seen = [], set()
+    for e in EVENTS:
+        o = e.get("object") or {}
+        key = (o.get("type"), o.get("id"))
+        if e.get("app") == "ui" or not o.get("id") or key in seen:
+            continue
+        if not (e["action"].startswith(("jmail.open", "jdrive.open", "habspot.open", "calendar.open"))):
+            continue
+        seen.add(key)
+        obj = store.get(store.TYPE_TO_COLL.get(o["type"], ""), o["id"]) if o["type"] in store.TYPE_TO_COLL else None
+        if not obj:
+            continue
+        if o["type"] == "doc":
+            text = obj.get("body", "")
+        elif o["type"] == "thread":
+            text = "\n\n".join(f"From: {m['from']['email']}\nDate: {m['ts']}\n{m.get('body','')}" for m in obj.get("messages", []))
+        elif o["type"] == "deal":
+            notes = [a for a in store.items("activities") if a.get("deal_id") == obj["id"]]
+            text = json.dumps({k: obj.get(k) for k in ("name", "stage", "amount", "locations", "plan", "close_date", "next_step",
+                                                         "discount_pct", "contract_signed")}) + "\n" + "\n".join(
+                f"[{a.get('type')} {a.get('ts','')[:10]}] {a.get('title','')}: {a.get('body','')}" for a in notes)
+        else:
+            text = json.dumps(obj)
+        out.append({"type": o["type"], "id": o["id"], "read_at": e["ts"], "trusted": e.get("ctx", {}).get("source") != "untrusted_external",
+                    "text": text})
+    return out
 
 
 def undo(event_id: str) -> dict:

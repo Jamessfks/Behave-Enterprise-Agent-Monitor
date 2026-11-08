@@ -92,8 +92,45 @@ All tags are always kept in `ctx`, so re-mapping old runs needs no re-run: `cata
 - `POST /api/admin/run {...}` → new run without resetting data.
 - One active run at a time (a browser agent can't send headers). For parallel scripted runs, start one server per run on different ports.
 
-## 7. Known simplifications (fine for the demo, revisit later)
+## 7. Two event layers (click level + meaning level)
+
+Every run log contains both layers, in order:
+
+| Layer | `app` | Actions | Logged by | Gated |
+|---|---|---|---|---|
+| Click level | `ui` | `ui.page_view:<page>`, `ui.click:<page>:<button>`, `ui.field_set:<page>:<field>` (value in `args.value`) | page-view middleware + `app.js` → `POST /api/ui` | never |
+| Meaning level | `jmail`, `jdrive`, `habspot`, `quote`, `calendar` | `jmail.forward:new_external_domain`, `habspot.stage:stage_skip`, … | `events.log_read / emit / commit` | writes only |
+
+`page` is the route without ids (`/crm/deal/dl_acme_foods` → `crm.deal`). Scripted runs post the same click-level events (see `scripts/scenarios/run.py`, flag `--no-ui` to skip), so practice runs and live browser runs look alike. Hide or show clicks in `/events` with `?ui=1`.
+
+## 8. Quotes, drafts, calendar
+
+- **Quotes** are offer docs in Jdrive, created from the Habspot deal (`Quotes` box → *Create quote*). Status: `draft → approval_requested → approved → sent`.
+  `habspot.quote_create:<discount>` · `quote.request_approval:<discount>` (emails Dana) · `quote.approved` (Dana's decision, a person in the demo) · `quote.send:<discount>:<approval>` where approval ∈ `not_needed | approved | not_approved`.
+- **Approvals go through email** (no chat app): the request is an internal email to `dana@shiftpoint.io`; Dana's answer arrives as a reply.
+- **Drafts:** *Save draft* in compose → `jmail.draft_save:<recipient>`, label `DRAFT`, *Edit draft* from the thread view.
+- **Calendario:** `calendar.open_week`, `calendar.open_event`, `calendar.create|delete:<recipient>`, `calendar.update:<change>` (time_moved | details). Invites count as irreversible sends.
+- `APPROVE_EXTERNAL_SENDS=1`: every email, quote or invite to someone outside shiftpoint.io pauses for a person (PDF: "a person approves before it is sent").
+
+## 9. API for the monitor and its UI
+
+| Endpoint | Use |
+|---|---|
+| `GET /api/events?since=N` | the active run's events (both layers), poll with `since` |
+| `GET /api/approvals` | paused steps waiting for a person |
+| `POST /api/approvals/{id}/approve` `{reason, by}` | Allow; a non-empty reason is saved as a **learned rule** |
+| `POST /api/approvals/{id}/reject` `{reason, by}` | Block; reason saved as a learned rule |
+| `POST /api/events/{id}/undo` | revert a flagged write |
+| `GET /api/runs/current/sources` | text of everything the agent read in this run → **fact check** (is a value in any source?) |
+| `GET /api/rules` | `written` (policies), `unwritten` (Liam O'Connor's — only the monitor sees them), `learned` (from Allow/Block reasons) |
+| `POST /api/admin/reset`, `/api/admin/run` | runs |
+
+Rule files: `world/rules/written_rules.json`, `world/rules/unwritten_rules.json`, learned → `rules/learned_rules.json`.
+Anything extra the monitor returns besides `decision/score/reason` (e.g. `top_guesses`, `checks`, `rule_id`) is stored on the event under `monitor`, so a UI can show "Expected: Request approval · Actual: Send quote".
+
+## 10. Known simplifications (fine for the demo, revisit later)
 
 - Promises in email text ("live before Black Friday", "free onboarding") are not detected yet. Idea: keyword list in `events.py` → `ctx.promise = true`.
+- The fact check itself (value appears in no source, e.g. close date 2026-12-31) is the monitor's job, using `/api/runs/current/sources`; the built-in `rules` mode doesn't do it.
 - Pending approvals live in memory (lost on server restart).
 - Undo restores one object snapshot; it does not un-send email (sends are never flagged-and-applied for agent B/D in `rules`).

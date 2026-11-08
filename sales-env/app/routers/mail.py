@@ -8,7 +8,7 @@ from .. import events, store, web
 
 router = APIRouter()
 
-SYSTEM_LABELS = [("INBOX", "Inbox"), ("STARRED", "Starred"), ("SENT", "Sent"),
+SYSTEM_LABELS = [("INBOX", "Inbox"), ("STARRED", "Starred"), ("DRAFT", "Drafts"), ("SENT", "Sent"),
                  ("ARCHIVE", "Archive"), ("TRASH", "Trash")]
 USER_LABELS = ["Prospects", "Customers", "Internal", "Follow-up", "Waiting on customer", "Newsletters"]
 SENS_RANK = ["public", "internal", "outdated", "confidential"]
@@ -212,10 +212,19 @@ def mail_thread(request: Request, tid: str, label: str = "INBOX"):
 @router.get("/mail/compose")
 def mail_compose(request: Request, mode: str = "new", thread: str = "", to: str = "", subject: str = "",
                  attach: str = ""):
-    if mode not in ("new", "reply", "reply_all", "forward"):
+    if mode not in ("new", "reply", "reply_all", "forward", "draft"):
         mode = "new"
-    f = {"to": to, "cc": "", "subject": subject, "body": "", "attachments": web.as_list(attach), "thread_id": ""}
+    f = {"to": to, "cc": "", "subject": subject, "body": "", "attachments": web.as_list(attach), "thread_id": "",
+         "draft_id": ""}
     t = store.get("threads", thread) if thread else None
+    if t and mode == "draft":
+        dm = t["messages"][-1]
+        f.update({"to": ", ".join(p["email"] for p in dm.get("to", [])), "cc": ", ".join(p["email"] for p in dm.get("cc", [])),
+                  "subject": t.get("subject", ""), "body": dm.get("body", ""), "attachments": dm.get("attachments", []),
+                  "draft_id": t["id"], "thread_id": dm.get("reply_to_thread") or ""})
+        mode = dm.get("draft_mode") or "new"
+        return web.page(request, "mail/compose.html", active_tab="mail", mode=mode, f=f, t=None, docs=_all_docs(),
+                        counts=_counts(), system_labels=SYSTEM_LABELS, user_labels=_user_labels(), label="")
     if t and mode != "new" and t.get("messages"):
         f["thread_id"] = t["id"]
         last = _last(t)
@@ -327,7 +336,11 @@ async def api_send(request: Request):
            "body": text, "attachments": atts}
     new_tid = tid if (t and mode != "new") else store.new_id("th")
 
+    draft_id = b.get("draft_id") or ""
+
     def apply():
+        if draft_id:
+            store.remove("threads", draft_id)
         th = store.get("threads", new_tid)
         if th:
             th["messages"].append(msg)
@@ -344,6 +357,36 @@ async def api_send(request: Request):
             "attachments": atts, "body_chars": len(text)}
     res = events.commit("jmail", action, "thread", tid or None, args, ctx, apply=apply, irreversible=True)
     return web.ok(res, redirect=f"/mail/thread/{new_tid}", thread_id=new_tid)
+
+
+@router.post("/api/mail/draft")
+async def api_draft(request: Request):
+    """Save (or update) a draft. Reversible; nothing leaves the mailbox."""
+    b = await web.body(request)
+    to = [_person(x) for x in web.as_list(b.get("to"))]
+    cc = [_person(x) for x in web.as_list(b.get("cc"))]
+    atts = list(dict.fromkeys(a for a in web.as_list(b.get("attachments")) if a and store.get("docs", a)))
+    draft_id = b.get("draft_id") or store.new_id("th")
+    existing = store.get("threads", draft_id)
+    msg = {"id": store.new_id("m"), "from": dict(ME_PERSON), "to": to, "cc": cc, "ts": store.now_iso(),
+           "body": b.get("body") or "", "attachments": atts, "draft": True,
+           "draft_mode": b.get("mode") or "new", "reply_to_thread": b.get("thread_id") or None}
+    emails = [p["email"] for p in to + cc]
+
+    def apply():
+        th = store.get("threads", draft_id)
+        if th:
+            th["messages"] = [msg]
+            th["subject"] = (b.get("subject") or "").strip() or "(no subject)"
+        else:
+            store.items("threads").insert(0, {"id": draft_id, "subject": (b.get("subject") or "").strip() or "(no subject)",
+                                              "labels": ["DRAFT"], "unread": False, "starred": False, "messages": [msg]})
+        return draft_id
+
+    res = events.commit("jmail", "jmail.draft_save", "thread", draft_id if existing else None,
+                        {"to": emails, "subject": b.get("subject"), "attachments": atts, "body_chars": len(b.get("body") or "")},
+                        {"recipient": events.recipients_class(emails) if emails else None}, apply=apply)
+    return web.ok(res, redirect=f"/mail?label=DRAFT", draft_id=draft_id)
 
 
 async def _simple(request: Request, action: str, mutate, ctx_fn=None, redirect_list: bool = True):

@@ -63,6 +63,7 @@
         <a href="/mail/compose?mode=reply&thread={{ t.id }}" role="button" class="px-5 py-2 rounded-full border border-gray-400 text-sm font-medium hover:bg-gray-100">Reply</a>
         <a href="/mail/compose?mode=reply_all&thread={{ t.id }}" role="button" class="px-5 py-2 rounded-full border border-gray-400 text-sm font-medium hover:bg-gray-100">Reply all</a>
         <a href="/mail/compose?mode=forward&thread={{ t.id }}" role="button" class="px-5 py-2 rounded-full border border-gray-400 text-sm font-medium hover:bg-gray-100">Forward</a>
+        {% if 'DRAFT' in t.labels %}<a href="/mail/compose?mode=draft&thread={{ t.id }}" role="button" class="px-5 py-2 rounded-full bg-red-600 text-white text-sm font-medium">Edit draft</a>{% endif %}
       </div>
     </div>
   </section>

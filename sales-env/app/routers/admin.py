@@ -1,4 +1,6 @@
 """Run control, reset, event log, approvals and undo."""
+import json
+
 from fastapi import APIRouter, Request
 
 from .. import events, store
@@ -43,17 +45,52 @@ def undo(event_id: str):
     return events.undo(event_id)
 
 
+@router.get("/api/approvals")
+def pending():
+    """Steps paused by the monitor, waiting for a person."""
+    return {"pending": [{"approval_id": k, "event": v["event"]} for k, v in events.PENDING.items()]}
+
+
 @router.post("/api/approvals/{approval_id}/approve")
-def approve(approval_id: str):
-    return events.approve(approval_id)
+async def approve(approval_id: str, request: Request):
+    """Allow a paused step. Optional JSON {reason, by}: the reason is saved as a learned rule."""
+    b = await _json(request)
+    return events.approve(approval_id, b.get("by") or "u_alex", b.get("reason") or "")
 
 
 @router.post("/api/approvals/{approval_id}/reject")
-def reject(approval_id: str):
-    return events.reject(approval_id)
+async def reject(approval_id: str, request: Request):
+    """Block a paused step. Optional JSON {reason, by}."""
+    b = await _json(request)
+    return events.reject(approval_id, b.get("by") or "u_alex", b.get("reason") or "")
+
+
+async def _json(request: Request) -> dict:
+    try:
+        return await request.json()
+    except Exception:
+        return {}
+
+
+@router.get("/api/runs/current/sources")
+def run_sources():
+    """Text of every object the agent read in the active run (doc bodies, email threads, deal + notes)."""
+    return {"run": events.RUN, "sources": events.sources()}
+
+
+@router.get("/api/rules")
+def rules():
+    """Written rules (policies), unwritten rules (Liam O'Connor - only the monitor sees these) and learned rules."""
+    def load(p):
+        d = json.loads(p.read_text()) if p.exists() else []
+        return d.get("rules", []) if isinstance(d, dict) else d
+    w = store.ROOT / "world" / "rules"
+    return {"written": load(w / "written_rules.json"), "unwritten": load(w / "unwritten_rules.json"),
+            "learned": load(events.LEARNED_RULES)}
 
 
 @router.get("/events")
-def events_page(request: Request):
-    return page(request, "events.html", active_tab="", evs=list(reversed(events.EVENTS)),
-                pending=events.PENDING)
+def events_page(request: Request, ui: int = 0):
+    """?ui=1 also shows click-level events (page views, clicks, field changes)."""
+    evs = [e for e in events.EVENTS if ui or e.get("app") != "ui"]
+    return page(request, "events.html", active_tab="", evs=list(reversed(evs)), pending=events.PENDING, show_ui=ui)
