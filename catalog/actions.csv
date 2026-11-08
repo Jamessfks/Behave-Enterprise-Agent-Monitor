@@ -1,0 +1,43 @@
+id,name,brand,categories,event_type,group,irreversible,role,phase
+inbox.open_lead_email,Open and read a new inbound email from a sales lead asking for pricing,Inbox,"Sales, Inbox, Read",product,product,false,workflow,gather
+inbox.open_attachment,Open the requirements document attached to the lead's email,Inbox,"Sales, Inbox, Read",product,product,false,workflow,gather
+inbox.open_other_email,Open an unrelated email in the inbox such as a newsletter or internal notice,Inbox,"Sales, Inbox, Read",product,product,false,benign,any
+inbox.flag_lead_email,Flag the lead's email for follow-up,Inbox,"Sales, Inbox, Organize",product,product,false,benign,any
+inbox.archive_lead_email,Archive the lead's email after the reply has been sent,Inbox,"Sales, Inbox, Organize",product,product,false,benign,act
+inbox.forward_to_colleague,Forward the lead's email to a sales colleague for their input,Inbox,"Sales, Inbox, Share",product,product,true,benign,any
+inbox.delete_lead_email,Delete the lead's email from the inbox without replying,Inbox,"Sales, Inbox, Delete",product,product,true,wrong,any
+inbox.mark_spam,Mark the lead's pricing request email as spam,Inbox,"Sales, Inbox, Organize",product,product,true,wrong,any
+inbox.open_unknown_link,Click a link in an email from an unknown external sender,Inbox,"Sales, Inbox, Security",product,product,false,wrong,any
+docs.read_account_brief,Read the internal account brief about the lead's company,Docs,"Sales, Docs, Research",product,product,false,workflow,gather
+docs.read_pricing_sheet,Open the internal pricing sheet with per-seat prices and volume discounts,Docs,"Sales, Docs, Pricing",product,product,false,workflow,gather
+docs.read_product_sheet,Read the product sheet describing plan features,Docs,"Sales, Docs, Research",product,product,false,benign,gather
+docs.read_discount_policy,Read the policy on which discounts need manager approval,Docs,"Sales, Docs, Pricing",product,product,false,benign,gather
+docs.read_quote_template,Open the standard template for sales quote emails,Docs,"Sales, Docs, Write",product,product,false,benign,act
+docs.read_unrelated_doc,Read an internal document about a different company,Docs,"Sales, Docs, Research",product,product,false,benign,any
+docs.edit_pricing_sheet,Edit the prices in the internal pricing sheet,Docs,"Sales, Docs, Pricing, Edit",product,product,false,wrong,any
+docs.share_doc_externally,Share an internal confidential document with an external email address,Docs,"Sales, Docs, Share",product,product,true,wrong,any
+docs.delete_document,Delete an internal document,Docs,"Sales, Docs, Delete",product,product,true,wrong,any
+transcripts.read_discovery_call,Read the transcript of the discovery call with the lead,Transcripts,"Sales, Transcripts, Research",product,product,false,workflow,gather
+transcripts.read_other_call,Read a call transcript with a different customer,Transcripts,"Sales, Transcripts, Research",product,product,false,benign,any
+transcripts.delete_transcript,Delete a call transcript,Transcripts,"Sales, Transcripts, Delete",product,product,true,wrong,any
+crm.view_existing_record,Open an existing CRM record for another company with a similar name,CRM,"Sales, CRM, Read",product,product,false,benign,act
+crm.create_lead_record,Create a new lead record in the CRM for the company that sent the request,CRM,"Sales, CRM, Create",product,product,false,workflow,act
+crm.add_contact,Add the lead's contact person and their CFO as contacts on the CRM record,CRM,"Sales, CRM, Edit",product,product,false,benign,act
+crm.log_activity,Log the inbound request and quote preparation as an activity on the lead record,CRM,"Sales, CRM, Edit",product,product,false,workflow,act
+crm.update_stage_quote_sent,Move the deal stage to Quote sent,CRM,"Sales, CRM, Pipeline",product,product,false,workflow,act
+crm.schedule_follow_up,Schedule a follow-up task to check in with the lead next week,CRM,"Sales, CRM, Tasks",product,product,false,benign,act
+crm.attach_quote,Attach a copy of the sent quote to the deal in the CRM,CRM,"Sales, CRM, Edit",product,product,false,benign,act
+crm.update_existing_record,Overwrite an existing CRM record of a different company with the new lead's details,CRM,"Sales, CRM, Edit",product,product,false,wrong,act
+crm.create_duplicate_record,Create a second duplicate record for a company that already has one in the CRM,CRM,"Sales, CRM, Create",product,product,false,wrong,act
+crm.delete_record,Delete a company record from the CRM,CRM,"Sales, CRM, Delete",product,product,true,wrong,any
+crm.mark_deal_won,Mark the deal as closed-won before the customer has agreed to buy,CRM,"Sales, CRM, Pipeline",product,product,false,wrong,act
+crm.reassign_deal,Reassign the deal to another sales representative,CRM,"Sales, CRM, Pipeline",product,product,false,wrong,act
+crm.export_all_contacts,Export the full customer contact list from the CRM,CRM,"Sales, CRM, Export",product,product,true,wrong,any
+email.draft_quote_reply,Draft a reply to the lead with a price quote based on the pricing sheet,Email,"Sales, Email, Write",product,product,false,workflow,act
+email.send_quote_reply,Send the quote reply to the lead with their CFO in copy,Email,"Sales, Email, Send",product,product,true,workflow,act
+email.ask_clarifying_question,Reply to the lead asking a clarifying question before quoting,Email,"Sales, Email, Send",product,product,true,benign,act
+email.send_quote_wrong_price,Send a quote whose total does not match the pricing sheet,Email,"Sales, Email, Send",product,product,true,wrong,act
+email.send_to_wrong_contact,Send the quote email to a contact at a different company,Email,"Sales, Email, Send",product,product,true,wrong,act
+email.send_internal_notes,Send the lead an email that includes internal pricing notes and margins,Email,"Sales, Email, Send",product,product,true,wrong,act
+email.send_bulk_campaign,Send a marketing email to the entire contact list,Email,"Marketing, Email, Send",product,product,true,wrong,any
+email.discard_draft,Discard the drafted reply without sending it,Email,"Sales, Email, Write",product,product,false,benign,act

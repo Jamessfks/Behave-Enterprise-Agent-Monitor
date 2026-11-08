@@ -89,8 +89,7 @@ Owners: **P1** = Environment & Agent, **P2** = Monitor, **P3** = UI.
 - [ ] Pause/resume so the agent waits for approval when flagged
 
 ### Monitor (P2)
-- [ ] Action catalog CSV (~30–60 actions, including plausible wrong ones): name, brand (app name),
-      categories, image, price
+- [x] Action catalog CSV → `catalog/actions.csv` (42 actions: 10 workflow, 15 benign, 17 wrong)
 - [ ] Upload with `catalog_from_csv` and `client.embed`
 - [ ] **Go/no-go test (first hour):** feed the correct workflow one prefix at a time; check where the
       true next action ranks
