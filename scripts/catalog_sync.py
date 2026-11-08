@@ -133,9 +133,9 @@ def cmd_smoke(_args) -> None:
     c = client()
     cid = os.environ.get("UNBOXAI_CATALOG_ID")
     res = c.complete(
-        [View("mail.open_task_message")], limit=5, catalog_id=cid, register_event=False
+        [View("jdrive.open:transcript:internal")], limit=5, catalog_id=cid, register_event=False
     )
-    print("After reading the manager's request, BehaviorGPT expects:")
+    print("After reading a call transcript, BehaviorGPT expects:")
     for item in res.items:
         print(f"  {item.data.get('name')}")
 
