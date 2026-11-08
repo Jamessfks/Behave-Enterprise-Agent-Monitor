@@ -75,7 +75,7 @@ class BehaviorGPTRanker:
         cache: RankingCache | None = None,
     ):
         self.catalog_id = catalog_id or os.environ.get("UNBOXAI_CATALOG_ID", "")
-        self.cache = cache or RankingCache()
+        self.cache = cache if cache is not None else RankingCache()
         self._client = client
         self.n_actions = len(load_catalog())
         self.calls = 0

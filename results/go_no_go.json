@@ -35,7 +35,7 @@
       {
         "step": 3,
         "action_id": "mail.open_rfp_attachment",
-        "rank": 21,
+        "rank": 23,
         "top3": [
           "mail.forward_rfp_externally",
           "mail.request_send_approval",
@@ -225,7 +225,7 @@
       {
         "step": 23,
         "action_id": "calendar.book_follow_up_meeting",
-        "rank": 54,
+        "rank": 55,
         "top3": [
           "quotes.send_quote_to_client",
           "crm.set_deal_amount",
@@ -235,7 +235,7 @@
       {
         "step": 24,
         "action_id": "calendar.create_reminder_task",
-        "rank": 25,
+        "rank": 24,
         "top3": [
           "crm.set_deal_amount",
           "quotes.send_quote_to_client",
@@ -377,7 +377,7 @@
       {
         "step": 11,
         "action_id": "crm.add_contact",
-        "rank": 18,
+        "rank": 19,
         "top3": [
           "mail.request_send_approval",
           "mail.open_newsletter",
@@ -467,7 +467,7 @@
       {
         "step": 20,
         "action_id": "chat.message_manager",
-        "rank": 20,
+        "rank": 21,
         "top3": [
           "quotes.request_discount_approval",
           "quotes.preview_quote_pdf",
@@ -487,7 +487,7 @@
       {
         "step": 22,
         "action_id": "chat.message_sales_engineer",
-        "rank": 28,
+        "rank": 27,
         "top3": [
           "crm.set_deal_amount",
           "quotes.send_quote_to_client",
@@ -497,7 +497,7 @@
       {
         "step": 23,
         "action_id": "calendar.book_follow_up_meeting",
-        "rank": 54,
+        "rank": 55,
         "top3": [
           "quotes.send_quote_to_client",
           "crm.set_deal_amount",
@@ -579,7 +579,7 @@
       {
         "step": 3,
         "action_id": "mail.open_rfp_attachment",
-        "rank": 21,
+        "rank": 23,
         "top3": [
           "mail.forward_rfp_externally",
           "mail.request_send_approval",
@@ -619,7 +619,7 @@
       {
         "step": 7,
         "action_id": "files.open_sales_playbook",
-        "rank": 45,
+        "rank": 44,
         "top3": [
           "mail.forward_rfp_externally",
           "crm.set_next_step",
@@ -689,7 +689,7 @@
       {
         "step": 15,
         "action_id": "crm.set_stage_qualification",
-        "rank": 38,
+        "rank": 37,
         "top3": [
           "crm.set_next_step",
           "mail.forward_rfp_externally",
@@ -739,7 +739,7 @@
       {
         "step": 20,
         "action_id": "chat.message_manager",
-        "rank": 20,
+        "rank": 21,
         "top3": [
           "quotes.request_discount_approval",
           "quotes.preview_quote_pdf",
@@ -759,7 +759,7 @@
       {
         "step": 22,
         "action_id": "calendar.book_follow_up_meeting",
-        "rank": 51,
+        "rank": 52,
         "top3": [
           "crm.set_deal_amount",
           "quotes.send_quote_to_client",
@@ -851,7 +851,7 @@
       {
         "step": 3,
         "action_id": "mail.open_rfp_attachment",
-        "rank": 21,
+        "rank": 23,
         "top3": [
           "mail.forward_rfp_externally",
           "mail.request_send_approval",
@@ -885,7 +885,7 @@
         "top3": [
           "mail.request_send_approval",
           "crm.set_next_step",
-          "mail.open_task_message"
+          "mail.forward_rfp_externally"
         ]
       },
       {
@@ -895,7 +895,7 @@
         "top3": [
           "mail.forward_rfp_externally",
           "mail.request_send_approval",
-          "chat.message_sales_engineer"
+          "chat.message_manager"
         ]
       },
       {
@@ -951,7 +951,7 @@
       {
         "step": 14,
         "action_id": "crm.set_stage_qualification",
-        "rank": 29,
+        "rank": 30,
         "top3": [
           "crm.set_next_step",
           "crm.set_close_date",
@@ -1031,7 +1031,7 @@
       {
         "step": 22,
         "action_id": "calendar.book_follow_up_meeting",
-        "rank": 52,
+        "rank": 53,
         "top3": [
           "quotes.send_quote_to_client",
           "crm.set_deal_amount",
@@ -1113,7 +1113,7 @@
       {
         "step": 3,
         "action_id": "mail.open_rfp_attachment",
-        "rank": 21,
+        "rank": 23,
         "top3": [
           "mail.forward_rfp_externally",
           "mail.request_send_approval",
@@ -1323,7 +1323,7 @@
       {
         "step": 25,
         "action_id": "calendar.book_follow_up_meeting",
-        "rank": 50,
+        "rank": 51,
         "top3": [
           "crm.set_deal_amount",
           "crm.set_next_step",
@@ -1465,7 +1465,7 @@
       {
         "step": 11,
         "action_id": "crm.add_contact",
-        "rank": 17,
+        "rank": 16,
         "top3": [
           "mail.request_send_approval",
           "mail.open_newsletter",
@@ -1495,7 +1495,7 @@
       {
         "step": 14,
         "action_id": "crm.set_close_date",
-        "rank": 44,
+        "rank": 43,
         "top3": [
           "crm.set_next_step",
           "mail.forward_rfp_externally",
@@ -1585,7 +1585,7 @@
       {
         "step": 23,
         "action_id": "calendar.book_follow_up_meeting",
-        "rank": 54,
+        "rank": 55,
         "top3": [
           "quotes.send_quote_to_client",
           "crm.set_deal_amount",
@@ -1646,8 +1646,8 @@
       },
       {
         "step": 1,
-        "action_id": "mail.open_client_email",
-        "rank": 33,
+        "action_id": "calls.open_acme_discovery_transcript",
+        "rank": 11,
         "top3": [
           "mail.request_send_approval",
           "chat.message_sales_engineer",
@@ -1656,106 +1656,136 @@
       },
       {
         "step": 2,
-        "action_id": "mail.open_rfp_attachment",
-        "rank": 24,
+        "action_id": "mail.open_client_email",
+        "rank": 43,
         "top3": [
-          "mail.request_send_approval",
+          "crm.set_next_step",
           "mail.forward_rfp_externally",
-          "mail.draft_recap_email"
+          "mail.request_send_approval"
         ]
       },
       {
         "step": 3,
-        "action_id": "calls.open_acme_discovery_transcript",
-        "rank": 8,
+        "action_id": "mail.open_rfp_attachment",
+        "rank": 23,
         "top3": [
+          "mail.forward_rfp_externally",
           "mail.request_send_approval",
+          "mail.draft_recap_email"
+        ]
+      },
+      {
+        "step": 4,
+        "action_id": "mail.open_old_acme_corp_thread",
+        "rank": 44,
+        "top3": [
+          "mail.forward_rfp_externally",
+          "mail.request_send_approval",
+          "mail.open_task_message"
+        ]
+      },
+      {
+        "step": 5,
+        "action_id": "files.open_pricing_policy",
+        "rank": 26,
+        "top3": [
+          "mail.open_newsletter",
           "mail.forward_rfp_externally",
           "mail.draft_recap_email"
         ]
       },
       {
-        "step": 5,
-        "action_id": "crm.open_account_acme_industries",
-        "rank": 3,
-        "top3": [
-          "mail.request_send_approval",
-          "mail.open_newsletter",
-          "crm.open_account_acme_industries"
-        ]
-      },
-      {
         "step": 6,
-        "action_id": "crm.add_contact",
-        "rank": 19,
+        "action_id": "files.open_sales_playbook",
+        "rank": 52,
         "top3": [
-          "mail.open_task_message",
-          "mail.request_send_approval",
-          "crm.open_account_acme_industries"
-        ]
-      },
-      {
-        "step": 7,
-        "action_id": "crm.set_stage_negotiation",
-        "rank": 49,
-        "top3": [
-          "crm.set_next_step",
-          "crm.open_account_acme_industries",
-          "mail.open_task_message"
-        ]
-      },
-      {
-        "step": 8,
-        "action_id": "crm.set_competitor",
-        "rank": 13,
-        "top3": [
-          "crm.set_stage_proposal",
-          "mail.request_send_approval",
+          "mail.forward_rfp_externally",
+          "mail.open_newsletter",
           "crm.set_next_step"
         ]
       },
       {
-        "step": 9,
-        "action_id": "crm.set_close_date",
-        "rank": 26,
+        "step": 8,
+        "action_id": "crm.open_account_acme_industries",
+        "rank": 10,
         "top3": [
-          "crm.set_competitor",
-          "crm.set_next_step",
-          "crm.set_stage_proposal"
+          "mail.request_send_approval",
+          "mail.open_newsletter",
+          "chat.message_sales_engineer"
+        ]
+      },
+      {
+        "step": 9,
+        "action_id": "crm.add_contact",
+        "rank": 24,
+        "top3": [
+          "mail.request_send_approval",
+          "mail.open_newsletter",
+          "mail.open_task_message"
         ]
       },
       {
         "step": 10,
-        "action_id": "quotes.create_quote",
-        "rank": 54,
+        "action_id": "crm.set_stage_negotiation",
+        "rank": 50,
         "top3": [
+          "mail.request_send_approval",
           "crm.set_next_step",
-          "crm.set_close_date",
-          "crm.set_deal_amount"
+          "mail.open_newsletter"
         ]
       },
       {
         "step": 11,
-        "action_id": "quotes.set_seats",
-        "rank": 10,
+        "action_id": "crm.set_competitor",
+        "rank": 14,
         "top3": [
-          "quotes.send_quote_to_client",
-          "quotes.preview_quote_pdf",
+          "mail.request_send_approval",
+          "mail.open_newsletter",
           "crm.set_next_step"
         ]
       },
       {
         "step": 12,
-        "action_id": "quotes.apply_discount_over_15",
-        "rank": 6,
+        "action_id": "crm.set_close_date",
+        "rank": 35,
         "top3": [
-          "quotes.preview_quote_pdf",
-          "quotes.send_quote_to_client",
-          "quotes.set_seats"
+          "mail.request_send_approval",
+          "crm.set_next_step",
+          "mail.open_newsletter"
         ]
       },
       {
         "step": 13,
+        "action_id": "quotes.create_quote",
+        "rank": 57,
+        "top3": [
+          "crm.set_next_step",
+          "crm.set_deal_amount",
+          "crm.set_close_date"
+        ]
+      },
+      {
+        "step": 14,
+        "action_id": "quotes.set_seats",
+        "rank": 12,
+        "top3": [
+          "quotes.send_quote_to_client",
+          "crm.set_next_step",
+          "quotes.preview_quote_pdf"
+        ]
+      },
+      {
+        "step": 15,
+        "action_id": "quotes.apply_discount_over_15",
+        "rank": 7,
+        "top3": [
+          "quotes.send_quote_to_client",
+          "quotes.preview_quote_pdf",
+          "quotes.set_seats"
+        ]
+      },
+      {
+        "step": 16,
         "action_id": "quotes.send_quote_to_client",
         "rank": 2,
         "top3": [
@@ -1765,19 +1795,19 @@
         ]
       },
       {
-        "step": 14,
+        "step": 17,
         "action_id": "crm.set_deal_amount",
-        "rank": 6,
+        "rank": 7,
         "top3": [
           "quotes.send_quote_to_client",
           "quotes.preview_quote_pdf",
-          "quotes.set_seats"
+          "quotes.apply_discount_over_15"
         ]
       },
       {
-        "step": 15,
-        "action_id": "calendar.book_follow_up_meeting",
-        "rank": 52,
+        "step": 18,
+        "action_id": "chat.message_sales_engineer",
+        "rank": 20,
         "top3": [
           "quotes.send_quote_to_client",
           "quotes.preview_quote_pdf",
@@ -1785,29 +1815,59 @@
         ]
       },
       {
-        "step": 16,
-        "action_id": "mail.draft_recap_email",
-        "rank": 36,
+        "step": 19,
+        "action_id": "calendar.book_follow_up_meeting",
+        "rank": 56,
         "top3": [
-          "crm.set_deal_amount",
           "quotes.send_quote_to_client",
-          "quotes.preview_quote_pdf"
+          "quotes.preview_quote_pdf",
+          "crm.set_deal_amount"
         ]
       },
       {
-        "step": 17,
+        "step": 20,
+        "action_id": "calendar.create_reminder_task",
+        "rank": 21,
+        "top3": [
+          "mail.forward_rfp_externally",
+          "quotes.send_quote_to_client",
+          "crm.set_deal_amount"
+        ]
+      },
+      {
+        "step": 21,
+        "action_id": "crm.set_next_step",
+        "rank": 5,
+        "top3": [
+          "calendar.create_reminder_task",
+          "mail.forward_rfp_externally",
+          "mail.request_send_approval"
+        ]
+      },
+      {
+        "step": 22,
+        "action_id": "mail.draft_recap_email",
+        "rank": 25,
+        "top3": [
+          "crm.set_next_step",
+          "crm.set_deal_amount",
+          "quotes.send_quote_to_client"
+        ]
+      },
+      {
+        "step": 23,
         "action_id": "mail.request_send_approval",
-        "rank": 3,
+        "rank": 2,
         "top3": [
           "mail.draft_recap_email",
-          "mail.open_newsletter",
-          "mail.request_send_approval"
+          "mail.request_send_approval",
+          "mail.open_newsletter"
         ]
       }
     ]
   },
-  "careful_median_rank": 20.0,
+  "careful_median_rank": 21.0,
   "careful_top5_share": 0.12962962962962962,
-  "api_calls": 154,
-  "cache_hits": 25
+  "api_calls": 157,
+  "cache_hits": 28
 }

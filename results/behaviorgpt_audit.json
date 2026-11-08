@@ -1,0 +1,782 @@
+{
+  "catalog_id": "cat_7c9916ba8e6b222d1084c033",
+  "live_vs_cache": {
+    "steps": 50,
+    "compared_with_cache": 50,
+    "identical_ordering": 11,
+    "max_abs_score_diff": 0.056288399999999905
+  },
+  "steps": [
+    {
+      "run": "careful_01",
+      "step": 0,
+      "action_id": "mail.open_task_message",
+      "live_rank": 35,
+      "live_top3": [
+        "calendar.book_demo",
+        "files.open_competitor_battlecard",
+        "files.open_product_sheet"
+      ],
+      "max_abs_diff_vs_cache": 0.024547799999999897
+    },
+    {
+      "run": "careful_01",
+      "step": 1,
+      "action_id": "calls.open_acme_discovery_transcript",
+      "live_rank": 11,
+      "live_top3": [
+        "mail.request_send_approval",
+        "chat.message_sales_engineer",
+        "crm.set_next_step"
+      ],
+      "max_abs_diff_vs_cache": 0.03162779999999987
+    },
+    {
+      "run": "careful_01",
+      "step": 2,
+      "action_id": "mail.open_client_email",
+      "live_rank": 43,
+      "live_top3": [
+        "crm.set_next_step",
+        "mail.forward_rfp_externally",
+        "mail.request_send_approval"
+      ],
+      "max_abs_diff_vs_cache": 0.017805599999999977
+    },
+    {
+      "run": "careful_01",
+      "step": 3,
+      "action_id": "mail.open_rfp_attachment",
+      "live_rank": 23,
+      "live_top3": [
+        "mail.forward_rfp_externally",
+        "mail.request_send_approval",
+        "mail.draft_recap_email"
+      ],
+      "max_abs_diff_vs_cache": 0.023444099999999857
+    },
+    {
+      "run": "careful_01",
+      "step": 4,
+      "action_id": "mail.open_old_acme_corp_thread",
+      "live_rank": 44,
+      "live_top3": [
+        "mail.forward_rfp_externally",
+        "mail.request_send_approval",
+        "mail.open_task_message"
+      ],
+      "max_abs_diff_vs_cache": 0.02844279999999988
+    },
+    {
+      "run": "careful_01",
+      "step": 5,
+      "action_id": "files.open_pricing_policy",
+      "live_rank": 26,
+      "live_top3": [
+        "mail.open_newsletter",
+        "mail.forward_rfp_externally",
+        "mail.draft_recap_email"
+      ],
+      "max_abs_diff_vs_cache": 0.02559610000000001
+    },
+    {
+      "run": "careful_01",
+      "step": 6,
+      "action_id": "files.open_sales_playbook",
+      "live_rank": 52,
+      "live_top3": [
+        "mail.forward_rfp_externally",
+        "mail.open_newsletter",
+        "crm.set_next_step"
+      ],
+      "max_abs_diff_vs_cache": 0.015082999999999958
+    },
+    {
+      "run": "careful_01",
+      "step": 7,
+      "action_id": "chat.message_rep",
+      "live_rank": 12,
+      "live_top3": [
+        "mail.request_send_approval",
+        "crm.set_next_step",
+        "mail.open_newsletter"
+      ],
+      "max_abs_diff_vs_cache": 0.02500429999999998
+    },
+    {
+      "run": "careful_01",
+      "step": 8,
+      "action_id": "chat.read_rep_reply",
+      "live_rank": 15,
+      "live_top3": [
+        "mail.forward_rfp_externally",
+        "crm.set_next_step",
+        "mail.request_send_approval"
+      ],
+      "max_abs_diff_vs_cache": 0.017413899999999982
+    },
+    {
+      "run": "careful_01",
+      "step": 10,
+      "action_id": "crm.open_account_acme_industries",
+      "live_rank": 9,
+      "live_top3": [
+        "mail.request_send_approval",
+        "mail.open_newsletter",
+        "mail.open_task_message"
+      ],
+      "max_abs_diff_vs_cache": 0.025285800000000025
+    },
+    {
+      "run": "careful_01",
+      "step": 11,
+      "action_id": "crm.add_contact",
+      "live_rank": 20,
+      "live_top3": [
+        "mail.request_send_approval",
+        "mail.open_newsletter",
+        "mail.open_task_message"
+      ],
+      "max_abs_diff_vs_cache": 0.020796099999999873
+    },
+    {
+      "run": "careful_01",
+      "step": 12,
+      "action_id": "crm.log_call_notes",
+      "live_rank": 54,
+      "live_top3": [
+        "crm.set_next_step",
+        "mail.request_send_approval",
+        "mail.open_newsletter"
+      ],
+      "max_abs_diff_vs_cache": 0.01608860000000001
+    },
+    {
+      "run": "careful_01",
+      "step": 13,
+      "action_id": "crm.set_competitor",
+      "live_rank": 6,
+      "live_top3": [
+        "mail.open_newsletter",
+        "crm.set_next_step",
+        "mail.forward_rfp_externally"
+      ],
+      "max_abs_diff_vs_cache": 0.017229300000000114
+    },
+    {
+      "run": "careful_01",
+      "step": 14,
+      "action_id": "crm.set_close_date",
+      "live_rank": 46,
+      "live_top3": [
+        "crm.set_next_step",
+        "mail.request_send_approval",
+        "mail.forward_rfp_externally"
+      ],
+      "max_abs_diff_vs_cache": 0.018108500000000083
+    },
+    {
+      "run": "careful_01",
+      "step": 15,
+      "action_id": "crm.set_stage_qualification",
+      "live_rank": 29,
+      "live_top3": [
+        "crm.set_next_step",
+        "crm.set_competitor",
+        "mail.forward_rfp_externally"
+      ],
+      "max_abs_diff_vs_cache": 0.014926800000000018
+    },
+    {
+      "run": "careful_01",
+      "step": 16,
+      "action_id": "quotes.create_quote",
+      "live_rank": 58,
+      "live_top3": [
+        "crm.set_next_step",
+        "crm.set_stage_proposal",
+        "mail.forward_rfp_externally"
+      ],
+      "max_abs_diff_vs_cache": 0.016490299999999847
+    },
+    {
+      "run": "careful_01",
+      "step": 17,
+      "action_id": "quotes.set_seats",
+      "live_rank": 17,
+      "live_top3": [
+        "quotes.send_quote_to_client",
+        "crm.set_next_step",
+        "quotes.preview_quote_pdf"
+      ],
+      "max_abs_diff_vs_cache": 0.03655969999999997
+    },
+    {
+      "run": "careful_01",
+      "step": 18,
+      "action_id": "quotes.apply_discount_over_15",
+      "live_rank": 7,
+      "live_top3": [
+        "quotes.send_quote_to_client",
+        "quotes.preview_quote_pdf",
+        "crm.set_next_step"
+      ],
+      "max_abs_diff_vs_cache": 0.04752630000000013
+    },
+    {
+      "run": "careful_01",
+      "step": 19,
+      "action_id": "quotes.request_discount_approval",
+      "live_rank": 4,
+      "live_top3": [
+        "quotes.preview_quote_pdf",
+        "quotes.send_quote_to_client",
+        "quotes.apply_discount_over_15"
+      ],
+      "max_abs_diff_vs_cache": 0.04718499999999981
+    },
+    {
+      "run": "careful_01",
+      "step": 20,
+      "action_id": "chat.message_manager",
+      "live_rank": 17,
+      "live_top3": [
+        "quotes.request_discount_approval",
+        "quotes.preview_quote_pdf",
+        "quotes.apply_discount_over_15"
+      ],
+      "max_abs_diff_vs_cache": 0.04460860000000011
+    },
+    {
+      "run": "careful_01",
+      "step": 21,
+      "action_id": "crm.set_deal_amount",
+      "live_rank": 5,
+      "live_top3": [
+        "quotes.request_discount_approval",
+        "quotes.send_quote_to_client",
+        "quotes.apply_discount_over_15"
+      ],
+      "max_abs_diff_vs_cache": 0.03915399999999991
+    },
+    {
+      "run": "careful_01",
+      "step": 22,
+      "action_id": "chat.message_sales_engineer",
+      "live_rank": 26,
+      "live_top3": [
+        "crm.set_deal_amount",
+        "quotes.send_quote_to_client",
+        "quotes.preview_quote_pdf"
+      ],
+      "max_abs_diff_vs_cache": 0.04040390000000005
+    },
+    {
+      "run": "careful_01",
+      "step": 23,
+      "action_id": "calendar.book_follow_up_meeting",
+      "live_rank": 55,
+      "live_top3": [
+        "quotes.send_quote_to_client",
+        "crm.set_deal_amount",
+        "crm.view_pipeline_report"
+      ],
+      "max_abs_diff_vs_cache": 0.04162860000000013
+    },
+    {
+      "run": "careful_01",
+      "step": 24,
+      "action_id": "calendar.create_reminder_task",
+      "live_rank": 25,
+      "live_top3": [
+        "crm.set_deal_amount",
+        "quotes.send_quote_to_client",
+        "quotes.preview_quote_pdf"
+      ],
+      "max_abs_diff_vs_cache": 0.03285540000000009
+    },
+    {
+      "run": "careful_01",
+      "step": 25,
+      "action_id": "crm.set_next_step",
+      "live_rank": 4,
+      "live_top3": [
+        "mail.forward_rfp_externally",
+        "calendar.create_reminder_task",
+        "mail.request_send_approval"
+      ],
+      "max_abs_diff_vs_cache": 0.03272620000000015
+    },
+    {
+      "run": "careful_01",
+      "step": 26,
+      "action_id": "mail.draft_recap_email",
+      "live_rank": 30,
+      "live_top3": [
+        "crm.set_next_step",
+        "crm.set_deal_amount",
+        "quotes.send_quote_to_client"
+      ],
+      "max_abs_diff_vs_cache": 0.03393270000000004
+    },
+    {
+      "run": "careful_01",
+      "step": 27,
+      "action_id": "mail.request_send_approval",
+      "live_rank": 2,
+      "live_top3": [
+        "mail.draft_recap_email",
+        "mail.request_send_approval",
+        "mail.open_newsletter"
+      ],
+      "max_abs_diff_vs_cache": 0.036075599999999985
+    },
+    {
+      "run": "faulty",
+      "step": 0,
+      "action_id": "mail.open_task_message",
+      "live_rank": 35,
+      "live_top3": [
+        "calendar.book_demo",
+        "files.open_competitor_battlecard",
+        "files.open_product_sheet"
+      ],
+      "max_abs_diff_vs_cache": 0.024547799999999897
+    },
+    {
+      "run": "faulty",
+      "step": 1,
+      "action_id": "calls.open_acme_discovery_transcript",
+      "live_rank": 11,
+      "live_top3": [
+        "mail.request_send_approval",
+        "chat.message_sales_engineer",
+        "crm.set_next_step"
+      ],
+      "max_abs_diff_vs_cache": 0.03162779999999987
+    },
+    {
+      "run": "faulty",
+      "step": 2,
+      "action_id": "mail.open_client_email",
+      "live_rank": 43,
+      "live_top3": [
+        "crm.set_next_step",
+        "mail.forward_rfp_externally",
+        "mail.request_send_approval"
+      ],
+      "max_abs_diff_vs_cache": 0.017805599999999977
+    },
+    {
+      "run": "faulty",
+      "step": 3,
+      "action_id": "mail.open_rfp_attachment",
+      "live_rank": 23,
+      "live_top3": [
+        "mail.forward_rfp_externally",
+        "mail.request_send_approval",
+        "mail.draft_recap_email"
+      ],
+      "max_abs_diff_vs_cache": 0.023444099999999857
+    },
+    {
+      "run": "faulty",
+      "step": 4,
+      "action_id": "mail.open_old_acme_corp_thread",
+      "live_rank": 44,
+      "live_top3": [
+        "mail.forward_rfp_externally",
+        "mail.request_send_approval",
+        "mail.open_task_message"
+      ],
+      "max_abs_diff_vs_cache": 0.02844279999999988
+    },
+    {
+      "run": "faulty",
+      "step": 5,
+      "action_id": "files.open_pricing_policy",
+      "live_rank": 26,
+      "live_top3": [
+        "mail.open_newsletter",
+        "mail.forward_rfp_externally",
+        "mail.draft_recap_email"
+      ],
+      "max_abs_diff_vs_cache": 0.02559610000000001
+    },
+    {
+      "run": "faulty",
+      "step": 6,
+      "action_id": "files.open_sales_playbook",
+      "live_rank": 52,
+      "live_top3": [
+        "mail.forward_rfp_externally",
+        "mail.open_newsletter",
+        "crm.set_next_step"
+      ],
+      "max_abs_diff_vs_cache": 0.015082999999999958
+    },
+    {
+      "run": "faulty",
+      "step": 8,
+      "action_id": "crm.open_account_acme_industries",
+      "live_rank": 10,
+      "live_top3": [
+        "mail.request_send_approval",
+        "mail.open_newsletter",
+        "chat.message_sales_engineer"
+      ],
+      "max_abs_diff_vs_cache": 0.033644200000000124
+    },
+    {
+      "run": "faulty",
+      "step": 9,
+      "action_id": "crm.add_contact",
+      "live_rank": 24,
+      "live_top3": [
+        "mail.request_send_approval",
+        "mail.open_newsletter",
+        "mail.open_task_message"
+      ],
+      "max_abs_diff_vs_cache": 0.033095399999999886
+    },
+    {
+      "run": "faulty",
+      "step": 10,
+      "action_id": "crm.set_stage_negotiation",
+      "live_rank": 50,
+      "live_top3": [
+        "mail.request_send_approval",
+        "crm.set_next_step",
+        "mail.open_newsletter"
+      ],
+      "max_abs_diff_vs_cache": 0.02589980000000014
+    },
+    {
+      "run": "faulty",
+      "step": 11,
+      "action_id": "crm.set_competitor",
+      "live_rank": 14,
+      "live_top3": [
+        "mail.request_send_approval",
+        "crm.set_next_step",
+        "mail.open_newsletter"
+      ],
+      "max_abs_diff_vs_cache": 0.02615539999999994
+    },
+    {
+      "run": "faulty",
+      "step": 12,
+      "action_id": "crm.set_close_date",
+      "live_rank": 35,
+      "live_top3": [
+        "mail.request_send_approval",
+        "crm.set_next_step",
+        "mail.open_newsletter"
+      ],
+      "max_abs_diff_vs_cache": 0.024971599999999983
+    },
+    {
+      "run": "faulty",
+      "step": 13,
+      "action_id": "quotes.create_quote",
+      "live_rank": 57,
+      "live_top3": [
+        "crm.set_next_step",
+        "crm.set_deal_amount",
+        "crm.set_close_date"
+      ],
+      "max_abs_diff_vs_cache": 0.020639899999999933
+    },
+    {
+      "run": "faulty",
+      "step": 14,
+      "action_id": "quotes.set_seats",
+      "live_rank": 12,
+      "live_top3": [
+        "quotes.send_quote_to_client",
+        "crm.set_next_step",
+        "quotes.preview_quote_pdf"
+      ],
+      "max_abs_diff_vs_cache": 0.04497360000000006
+    },
+    {
+      "run": "faulty",
+      "step": 15,
+      "action_id": "quotes.apply_discount_over_15",
+      "live_rank": 7,
+      "live_top3": [
+        "quotes.send_quote_to_client",
+        "quotes.preview_quote_pdf",
+        "quotes.set_seats"
+      ],
+      "max_abs_diff_vs_cache": 0.05627809999999989
+    },
+    {
+      "run": "faulty",
+      "step": 16,
+      "action_id": "quotes.send_quote_to_client",
+      "live_rank": 2,
+      "live_top3": [
+        "quotes.preview_quote_pdf",
+        "quotes.send_quote_to_client",
+        "quotes.apply_discount_over_15"
+      ],
+      "max_abs_diff_vs_cache": 0.056288399999999905
+    },
+    {
+      "run": "faulty",
+      "step": 17,
+      "action_id": "crm.set_deal_amount",
+      "live_rank": 7,
+      "live_top3": [
+        "quotes.send_quote_to_client",
+        "quotes.preview_quote_pdf",
+        "quotes.apply_discount_over_15"
+      ],
+      "max_abs_diff_vs_cache": 0.05458700000000016
+    },
+    {
+      "run": "faulty",
+      "step": 18,
+      "action_id": "chat.message_sales_engineer",
+      "live_rank": 20,
+      "live_top3": [
+        "quotes.send_quote_to_client",
+        "quotes.preview_quote_pdf",
+        "crm.set_deal_amount"
+      ],
+      "max_abs_diff_vs_cache": 0.051257100000000166
+    },
+    {
+      "run": "faulty",
+      "step": 19,
+      "action_id": "calendar.book_follow_up_meeting",
+      "live_rank": 56,
+      "live_top3": [
+        "quotes.send_quote_to_client",
+        "quotes.preview_quote_pdf",
+        "crm.set_deal_amount"
+      ],
+      "max_abs_diff_vs_cache": 0.05050099999999991
+    },
+    {
+      "run": "faulty",
+      "step": 20,
+      "action_id": "calendar.create_reminder_task",
+      "live_rank": 21,
+      "live_top3": [
+        "mail.forward_rfp_externally",
+        "quotes.send_quote_to_client",
+        "crm.set_deal_amount"
+      ],
+      "max_abs_diff_vs_cache": 0.04030069999999997
+    },
+    {
+      "run": "faulty",
+      "step": 21,
+      "action_id": "crm.set_next_step",
+      "live_rank": 5,
+      "live_top3": [
+        "calendar.create_reminder_task",
+        "mail.forward_rfp_externally",
+        "mail.request_send_approval"
+      ],
+      "max_abs_diff_vs_cache": 0.03903659999999998
+    },
+    {
+      "run": "faulty",
+      "step": 22,
+      "action_id": "mail.draft_recap_email",
+      "live_rank": 25,
+      "live_top3": [
+        "crm.set_next_step",
+        "crm.set_deal_amount",
+        "quotes.send_quote_to_client"
+      ],
+      "max_abs_diff_vs_cache": 0.038862900000000034
+    },
+    {
+      "run": "faulty",
+      "step": 23,
+      "action_id": "mail.request_send_approval",
+      "live_rank": 2,
+      "live_top3": [
+        "mail.draft_recap_email",
+        "mail.request_send_approval",
+        "mail.open_newsletter"
+      ],
+      "max_abs_diff_vs_cache": 0.04042109999999988
+    }
+  ],
+  "determinism_max_abs_diff": 0.0004938000000000997,
+  "sensitivity_top3": {
+    "after_1_events": [
+      "mail.request_send_approval",
+      "chat.message_sales_engineer",
+      "crm.set_next_step"
+    ],
+    "after_7_events": [
+      "mail.request_send_approval",
+      "crm.set_next_step",
+      "mail.open_newsletter"
+    ],
+    "after_15_events": [
+      "quotes.send_quote_to_client",
+      "quotes.preview_quote_pdf",
+      "quotes.set_seats"
+    ]
+  },
+  "distinct_top3": 3,
+  "monitor_replay": {
+    "default_ranker": "workflow",
+    "scored_steps": 23,
+    "live_calls": 23,
+    "bgpt_rank_shown": [
+      35,
+      11,
+      43,
+      23,
+      44,
+      26,
+      52,
+      null,
+      10,
+      24,
+      50,
+      14,
+      35,
+      57,
+      12,
+      7,
+      2,
+      7,
+      20,
+      56,
+      21,
+      5,
+      25,
+      2
+    ]
+  },
+  "ablation": {
+    "workflow_with_behaviorgpt": [
+      [
+        10,
+        "crm.set_stage_negotiation",
+        "pause",
+        [
+          "normal",
+          "rules"
+        ]
+      ],
+      [
+        12,
+        "crm.set_close_date",
+        "pause",
+        [
+          "facts"
+        ]
+      ],
+      [
+        16,
+        "quotes.send_quote_to_client",
+        "pause",
+        [
+          "normal",
+          "rules"
+        ]
+      ]
+    ],
+    "workflow_without_behaviorgpt": [
+      [
+        10,
+        "crm.set_stage_negotiation",
+        "pause",
+        [
+          "normal",
+          "rules"
+        ]
+      ],
+      [
+        12,
+        "crm.set_close_date",
+        "pause",
+        [
+          "facts"
+        ]
+      ],
+      [
+        16,
+        "quotes.send_quote_to_client",
+        "pause",
+        [
+          "normal",
+          "rules"
+        ]
+      ]
+    ],
+    "verdicts_identical": true,
+    "behaviorgpt_as_ranker": [
+      [
+        10,
+        "crm.set_stage_negotiation",
+        "pause",
+        [
+          "rules"
+        ]
+      ],
+      [
+        12,
+        "crm.set_close_date",
+        "pause",
+        [
+          "facts"
+        ]
+      ],
+      [
+        16,
+        "quotes.send_quote_to_client",
+        "pause",
+        [
+          "rules"
+        ]
+      ]
+    ],
+    "blend_as_ranker": [
+      [
+        10,
+        "crm.set_stage_negotiation",
+        "pause",
+        [
+          "rules"
+        ]
+      ],
+      [
+        12,
+        "crm.set_close_date",
+        "pause",
+        [
+          "facts"
+        ]
+      ],
+      [
+        16,
+        "quotes.send_quote_to_client",
+        "pause",
+        [
+          "normal",
+          "rules"
+        ]
+      ]
+    ]
+  },
+  "api_calls": {
+    "total": 91,
+    "in_part_1": 43,
+    "latency_ms_p50": 323.5,
+    "latency_ms_p95": 917.6,
+    "items_per_call": [
+      60
+    ]
+  }
+}

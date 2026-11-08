@@ -7,7 +7,7 @@ Each entry says what was chosen and why. Newest first.
 ### The step model: BehaviorGPT didn't pass go/no-go on its own
 
 - `results/go_no_go.json`: on the six careful runs, BehaviorGPT ranks the true next action at a
-  **median of #20 of 60** (top-5 only 13% of the time; random is about #30). With a task-describing
+  **median of #21 of 60** (top-5 only 13% of the time; random is about #30; re-measured live 2026-11-08, see `results/behaviorgpt_audit.json`). With a task-describing
   `Search` prefix it gets slightly better (#17), but it also ranks the faulty run's steps *better*.
   It rates "send the quote to the client" as the **#2** most likely step after applying a discount,
   which makes sense for a consumer model (view → buy). So it misses mistake 1.

@@ -141,3 +141,11 @@ def test_context_validation():
     bad = default_context()
     bad["unwritten_rules"].append({"text": "x", "kind": "nonsense"})
     assert validate_context(bad)
+
+
+def test_an_empty_cache_is_used_not_swapped_for_the_committed_one(tmp_path):
+    """Regression: RankingCache has __len__, so `cache or default` dropped an empty cache."""
+    from monitor.rankers import BehaviorGPTRanker, RankingCache
+
+    fresh = RankingCache(tmp_path / "fresh.json")
+    assert BehaviorGPTRanker(catalog_id="cat_x", cache=fresh).cache is fresh
