@@ -149,3 +149,22 @@ def test_an_empty_cache_is_used_not_swapped_for_the_committed_one(tmp_path):
 
     fresh = RankingCache(tmp_path / "fresh.json")
     assert BehaviorGPTRanker(catalog_id="cat_x", cache=fresh).cache is fresh
+
+
+def test_default_verdicts_do_not_depend_on_behaviorgpt(monkeypatch):
+    """BehaviorGPT is evidence, not a decider: with it down, the default pauses are the same."""
+    from behaviorgpt import UnboxAIError
+
+    from monitor.rankers import BehaviorGPTRanker
+
+    run = load_run(RUNS / "faulty.jsonl")
+    with_bgpt = [(i, r["failed"]) for i, r in play(run)]
+
+    def down(self, history):
+        raise UnboxAIError("BehaviorGPT unavailable", status_code=503)
+
+    monkeypatch.setattr(BehaviorGPTRanker, "rank", down)
+    monkeypatch.setattr(BehaviorGPTRanker, "cached", lambda self, history: True)
+    without = play(run)
+    assert [(i, r["failed"]) for i, r in without] == with_bgpt
+    assert all(r["checks"]["normal"]["behaviorgpt"]["rank"] is None for _, r in without)

@@ -1,6 +1,6 @@
 # The demo workflow: after the sales call
 
-**Status: built (2026-11-09).** It follows the Agent Monitor spec (docs/prompts/build-mvp.md) and
+**Status: built (2026-11-08).** It follows the Agent Monitor spec (docs/prompts/build-mvp.md) and
 replaces the earlier Northwind draft. Every company, person and email address is fictional.
 
 ## Scenario

@@ -1,5 +1,11 @@
 # Sentinel — project brief
 
+> **Status (2026-11-08):** this is the original brief. The build follows the Agent Monitor spec
+> ([prompts/build-mvp.md](prompts/build-mvp.md)), and one claim below changed: BehaviorGPT failed
+> the go/no-go test on this workflow, so it **doesn't decide pauses**. A model learned from the
+> company's approved runs does, and BehaviorGPT's live rank is shown on every step as evidence.
+> See [decisions.md](decisions.md).
+
 **Working title:** Sentinel, a behavioral oversight layer for autonomous sales agents.
 
 ## Overview

@@ -2,7 +2,20 @@
 
 Each entry says what was chosen and why. Newest first.
 
-## 2026-11-09: MVP build (docs/prompts/build-mvp.md)
+## 2026-11-08: BehaviorGPT stays as evidence
+
+- **Decision (you):** BehaviorGPT doesn't get a vote. The company-workflow model decides pauses;
+  BehaviorGPT ranks every step live and the UI labels that rank "as evidence".
+- **Why:** `scripts/audit_behaviorgpt.py` (91 live calls, `results/behaviorgpt_audit.json`)
+  showed the calls are real (about 0.3 s each, also from the Vercel deploy). It also showed that
+  with BehaviorGPT switched off the default verdicts are identical, and that as the decider it
+  would let "send the quote" through (#2 of 60).
+- **Enforced by:** `test_default_verdicts_do_not_depend_on_behaviorgpt`.
+- **Fixed along the way:** an empty `RankingCache` counted as false, so `BehaviorGPTRanker` fell
+  back to the committed cache. The cache had also drifted from live output (true-step rank
+  shift: median 0, max 2), so it was rebuilt from 157 live calls.
+
+## 2026-11-08: MVP build (docs/prompts/build-mvp.md)
 
 ### The step model: BehaviorGPT didn't pass go/no-go on its own
 

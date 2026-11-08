@@ -98,11 +98,11 @@ function rankerNote() {
   const g = S.boot.go_no_go;
   let t;
   if (S.ranker === "workflow") {
-    t = `Learned from this company's approved runs. In calibration it caught ${r.caught.length} of ${r.caught.length + r.missed.length} behavior mistakes with ${r.false_alarms.length} false alarms. BehaviorGPT's own rank is shown on every step.`;
+    t = `Decides when to pause. Learned from this company's approved runs: in calibration it caught ${r.caught.length} of ${r.caught.length + r.missed.length} behavior mistakes with ${r.false_alarms.length} false alarms. BehaviorGPT also ranks every step; its rank is shown as evidence and doesn't change any decision.`;
   } else if (S.ranker === "behaviorgpt") {
-    t = `BehaviorGPT zero-shot. It ranked the correct next step at a median of #${g.careful_median_rank} of ${g.catalog_size} and caught ${r.caught.length} of ${r.caught.length + r.missed.length} behavior mistakes in calibration.`;
+    t = `For comparison: BehaviorGPT decides on its own. It ranked the correct next step at a median of #${g.careful_median_rank} of ${g.catalog_size} and caught ${r.caught.length} of ${r.caught.length + r.missed.length} behavior mistakes in calibration.`;
   } else {
-    t = `BehaviorGPT's ranking combined with the company's workflow. Caught ${r.caught.length}, missed ${r.missed.length}, ${r.false_alarms.length} false alarms in calibration.`;
+    t = `For comparison: BehaviorGPT's ranking combined with the company's workflow. Caught ${r.caught.length}, missed ${r.missed.length}, ${r.false_alarms.length} false alarms in calibration.`;
   }
   $("#ranker-note").textContent = t;
 }
@@ -217,7 +217,8 @@ function ledgerRow(ev, res) {
     bar = `<div class="bar-exp" role="img" aria-label="How expected: rank ${n.rank} of ${N}"><i style="width:${(exp * 100).toFixed(0)}%"></i></div>`;
     rank = `#${n.rank}/${N}`;
     const guess = n.expected.slice(0, 2).map((x) => esc(x.name)).join("; ");
-    const bg = n.behaviorgpt.rank ? `BehaviorGPT ranked it #${n.behaviorgpt.rank} of ${n.behaviorgpt.of}; its top guess: ${esc(n.behaviorgpt.top[0]?.name ?? "n/a")}.` : "BehaviorGPT: not available for this step.";
+    const role = res.ranker === "workflow" ? "BehaviorGPT, as evidence" : "BehaviorGPT";
+    const bg = n.behaviorgpt.rank ? `${role}: ranked it #${n.behaviorgpt.rank} of ${n.behaviorgpt.of}; its top guess: ${esc(n.behaviorgpt.top[0]?.name ?? "n/a")}.` : `${role}: not available for this step.`;
     more = `<details${flag ? " open" : ""}><summary>${flag ? "Why it stopped" : "What was expected"}</summary><p>Expected next: ${guess}.</p><p>${bg}</p></details>`;
   } else {
     bar = '<span></span>';
@@ -432,7 +433,7 @@ function openStep(ev, res) {
       <dt>Risk</dt><dd>${Math.round(n.risk * 100)}% of the pause barrier</dd>
       <dt>Expected</dt><dd>${n.expected.map((x) => esc(x.name)).join("<br>")}</dd>
       ${n.missing.length ? `<dt>Usually after</dt><dd>${n.missing.map(esc).join("<br>")}</dd>` : ""}
-      <dt>BehaviorGPT</dt><dd>${n.behaviorgpt.rank ? `rank ${n.behaviorgpt.rank} of ${n.behaviorgpt.of}; top guesses: ${n.behaviorgpt.top.map((x) => esc(x.name)).join("; ")}` : "not available for this step"}</dd></dl></section>`;
+      <dt>BehaviorGPT</dt><dd>${n.behaviorgpt.rank ? `rank ${n.behaviorgpt.rank} of ${n.behaviorgpt.of}; top guesses: ${n.behaviorgpt.top.map((x) => esc(x.name)).join("; ")}` : "not available for this step"}${res.ranker === "workflow" ? "<br><span class=\"note\">Shown as evidence. It doesn't change the decision.</span>" : ""}</dd></dl></section>`;
   }
   if (r.violations.length || r.precedents.length) {
     html += `<section><h3>Rules</h3><ul class="rules">${r.violations.map((v) => `<li><span class="who">${esc(v.author ? `${v.author}, unwritten` : v.source || "Policy")}</span>${esc(v.text)}</li>`).join("")}${r.precedents.map((v) => `<li><span class="who">Your rule</span>${esc(v.text)}</li>`).join("")}</ul></section>`;

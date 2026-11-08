@@ -3,9 +3,11 @@
 AI agents are starting to do routine work in the same business software people use. Agent Monitor
 checks every step an agent takes **before it counts**:
 
-1. **Is this step normal?** A step model scores how likely the step is, given everything before
-   it. BehaviorGPT (Unbox AI) and a model learned from the company's own approved runs are
-   available, and BehaviorGPT's rank is shown on every step.
+1. **Is this step normal?** A model learned from the company's own approved runs scores how
+   likely the step is, given everything before it, and decides when to pause. BehaviorGPT
+   (Unbox AI) also ranks every step live. Its rank is shown as **evidence** and doesn't change
+   any decision: on this workflow it ranked the correct next step at a median of #21 of 60, and
+   it rates "send the quote" as the #2 most likely step (`results/behaviorgpt_audit.json`).
 2. **Is this fact true?** Every value the agent typed must appear in a source it opened.
 3. **Is this allowed?** Written policies, a senior rep's unwritten rules, and rules people taught
    it.

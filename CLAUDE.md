@@ -1,7 +1,9 @@
 # Agent Monitor (sudai2)
 
-Hackathon MVP: every step an AI sales agent takes is checked before it counts (step model incl.
-BehaviorGPT, fact check, rules check); a person allows or blocks paused steps. Stateless FastAPI
+Hackathon MVP: every step an AI sales agent takes is checked before it counts (step model learned
+from approved runs, fact check, rules check); a person allows or blocks paused steps. BehaviorGPT
+ranks every step live but is **evidence only**: it never changes a verdict (decided 2026-11-08,
+enforced by `test_default_verdicts_do_not_depend_on_behaviorgpt`). Stateless FastAPI
 (`server.py`) + plain JS canvas (`web/`), deployable on Vercel. See README.md to run it.
 
 ## Read first
