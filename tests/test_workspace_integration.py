@@ -30,7 +30,9 @@ def play(c, mistakes, decide=lambda step: ("approve", "ok")):
             steps.append(n["step"])
             if n["step"]["decision"] == "pause":
                 action, reason = decide(n["step"])
-                c.post(f"/api/approvals/{n['step']['approval_id']}/{action}", json={"reason": reason})
+                c.post(
+                    f"/api/approvals/{n['step']['approval_id']}/{action}", json={"reason": reason}
+                )
         if n.get("done"):
             return steps, n["changed"]
 
@@ -81,7 +83,9 @@ def test_blocking_every_pause_leaves_the_deal_as_seeded(client):
             assert d.get("amount") == seed.get("amount")
     sent = client.get("/api/mail/threads", params={"label": "SENT"}).json()
     if any(s["catalog_action"].startswith("quote.send") for s in paused):
-        assert not any("Your Shiftpoint quote" in (t.get("subject") or "") for t in sent.get("threads", sent))
+        assert not any(
+            "Your Shiftpoint quote" in (t.get("subject") or "") for t in sent.get("threads", sent)
+        )
 
 
 def test_approval_replays_the_original_request(client, monkeypatch):
@@ -91,7 +95,9 @@ def test_approval_replays_the_original_request(client, monkeypatch):
     send = next(s for s in steps if (s["catalog_action"] or "").startswith("quote.send"))
     assert send["decision"] == "pause"
     sent = client.get("/api/mail/threads", params={"label": "SENT"}).json()
-    assert any("Your Shiftpoint quote" in (t.get("subject") or "") for t in sent.get("threads", sent))
+    assert any(
+        "Your Shiftpoint quote" in (t.get("subject") or "") for t in sent.get("threads", sent)
+    )
     assert events.LEARNED and events.LEARNED[-1]["reason"] == "Dana approved by phone"
 
 
@@ -107,12 +113,16 @@ def test_no_disk_writes_during_a_run(client, monkeypatch):
     real_open = builtins.open
 
     def guarded(file, mode="r", *a, **k):
-        if any(m in mode for m in "wax+") and not str(file).startswith(("/dev/", "/private/var", "/tmp")):
+        if any(m in mode for m in "wax+") and not str(file).startswith(
+            ("/dev/", "/private/var", "/tmp")
+        ):
             raise AssertionError(f"disk write to {file}")
         return real_open(file, mode, *a, **k)
 
     monkeypatch.setattr(builtins, "open", guarded)
-    monkeypatch.setattr(Path, "write_text", lambda *a, **k: (_ for _ in ()).throw(AssertionError("write_text")))
+    monkeypatch.setattr(
+        Path, "write_text", lambda *a, **k: (_ for _ in ()).throw(AssertionError("write_text"))
+    )
     monkeypatch.setattr(io, "open", guarded)
     play(client, mistakes=True, decide=lambda s: ("reject", ""))
     assert store.CHANGED["v"] in (True, False)
@@ -124,3 +134,63 @@ def test_people_browsing_dont_change_the_run(client):
     client.get("/drive/doc/doc_transcript_t1_acme_foods")
     client.get("/api/crm/deal/dl_acme_foods")
     assert len(events.EVENTS) == n
+
+
+@pytest.mark.parametrize("mistakes", [False, True])
+def test_every_page_the_demo_shows_renders_the_real_app(client, mistakes):
+    """The canvas's left panel frames these pages; they must be the real apps, frameable."""
+    c = client
+    c.post("/api/runs", json={"scenario": "acme_after_call", "mistakes": mistakes})
+    pages = set()
+    while True:
+        n = c.post("/api/runs/current/next").json()
+        s = n.get("step")
+        if s and s.get("page"):
+            pages.add(s["page"])
+        if s and s["decision"] == "pause":
+            c.post(f"/api/approvals/{s['approval_id']}/approve", json={"reason": "check pages"})
+        if n.get("done"):
+            break
+    pages |= {x["url"] for x in n["changed"]}
+    assert "/crm/search?q=Acme" in pages
+    for p in sorted(pages):
+        r = c.get(p)
+        assert r.status_code == 200, p
+        assert "text/html" in r.headers["content-type"], p
+        assert "x-frame-options" not in r.headers, p
+    search = c.get("/crm/search?q=Acme").text
+    assert "Acme Foods" in search and "Acme Food Group" in search
+
+
+def test_all_workspace_app_pages_reachable_from_the_nav_render(client):
+    import re
+
+    seen, frontier = (
+        set(),
+        [
+            "/mail",
+            "/drive",
+            "/crm",
+            "/crm/deals",
+            "/crm/contacts",
+            "/crm/companies",
+            "/calendar",
+            "/events",
+        ],
+    )
+    for _depth in range(2):
+        nxt = []
+        for p in frontier:
+            if p in seen:
+                continue
+            seen.add(p)
+            r = client.get(p)
+            assert r.status_code == 200, p
+            if "text/html" in r.headers.get("content-type", ""):
+                nxt += [
+                    h
+                    for h in re.findall(r'href="(/[^"#]*)"', r.text)
+                    if not h.startswith(("/static", "/api", "/monitor"))
+                ]
+        frontier = nxt
+    assert len(seen) > 100
