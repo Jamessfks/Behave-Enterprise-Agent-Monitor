@@ -40,7 +40,8 @@ whole catalog in one call. Then no tail sampling is needed and the softmax is ex
 - `Search` sets context and isn't scored.
 - **The first touch of an item is scored.** Later events on an already-touched item are "funnel"
   steps and aren't scored, because the model ranks seen items low on purpose.
-- Orders aren't scored. They are where you hold for review if risk is high.
+- Upstream doesn't score orders. Sentinel has no order type: send/delete are scored `view`s,
+  gated before they execute (see `docs/event-schema.md`).
 
 **Implication for the action catalog:** make actions specific and semantic (action × object) so
 that a correct run touches each catalog item about once. Generic UI verbs ("click", "type")

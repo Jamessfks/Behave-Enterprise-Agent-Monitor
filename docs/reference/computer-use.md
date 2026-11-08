@@ -40,10 +40,14 @@ at the first failure and answer the rest with `is_error: true` and
 
 ```python
 for _ in range(max_iterations):
-    resp = client.messages.create(model="claude-opus-5-5", max_tokens=4096,
-                                  messages=messages, tools=[{"type": "computer_toolset_20260801"}])
+    resp = client.messages.create(
+        model="claude-opus-5-5",
+        max_tokens=4096,
+        messages=messages,
+        tools=[{"type": "computer_toolset_20260801"}],
+    )
     messages.append({"role": "assistant", "content": resp.content})
-    results = run_tool_calls(resp)          # ← Sentinel hook goes here
+    results = run_tool_calls(resp)  # ← Sentinel hook goes here
     if not results:
         break
     messages.append({"role": "user", "content": results})

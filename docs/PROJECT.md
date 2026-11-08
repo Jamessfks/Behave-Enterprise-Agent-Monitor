@@ -70,12 +70,12 @@ Owners: **P1** = Environment & Agent, **P2** = Monitor, **P3** = UI.
 
 ## Phase 0: Align (everyone, ~20 min)
 
-- [ ] Pick ONE sales workflow and write its correct steps (e.g. inbound lead email → look up the
-      company in internal docs → create CRM record → draft and send a reply with a quote)
-- [ ] Agree on the shared event format: `step`, `type` (search / view / order), `action_id`,
-      `timestamp`, `details`
-- [ ] Choose the stack, deploy target, and computer-use agent
-- [ ] Get the Unbox API key (portal.unboxai.com) and confirm `pip install behaviorgpt` works
+- [x] Pick ONE sales workflow and write its correct steps → [workflow.md](workflow.md)
+- [x] Agree on the shared event format: `step`, `type` (search / view), `action_id`,
+      `timestamp`, `details` → [event-schema.md](event-schema.md)
+- [x] Choose the stack, deploy target, and computer-use agent → [decisions.md](decisions.md)
+- [x] Confirm `pip install behaviorgpt` works (v0.10.0, `uv sync`)
+- [ ] Get the Unbox API key (portal.unboxai.com) into your local `.env`: **needs a team member**
 
 ## Phase 1: Build in parallel
 

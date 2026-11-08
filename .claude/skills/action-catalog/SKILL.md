@@ -47,7 +47,8 @@ After adding or renaming an action, also update:
 
 ```python
 from behaviorgpt import catalog_from_csv
-path = catalog_from_csv("catalog/actions.csv")   # writes catalog/actions.parquet, runs schema check
+
+path = catalog_from_csv("catalog/actions.csv")  # writes catalog/actions.parquet, runs schema check
 ```
 
 Before converting, check: ids unique, no empty `id`/`name`, every id used in the environment
@@ -56,11 +57,16 @@ exists in the CSV (`grep -rhoE '"(inbox|docs|transcripts|crm|email)\.[a-z_]+"'` 
 ## Upload (sends data to Unbox; confirm with the user first)
 
 ```python
-from dotenv import load_dotenv; load_dotenv()
+from dotenv import load_dotenv
+
+load_dotenv()
 from behaviorgpt import UnboxAIClient
+
 client = UnboxAIClient(market="us")
-job = client.embed("catalog/actions.parquet", wait=True, timeout=1800.0)   # minutes; run in background
-print(job.catalog_id)   # → put in .env as UNBOXAI_CATALOG_ID
+job = client.embed(
+    "catalog/actions.parquet", wait=True, timeout=1800.0
+)  # minutes; run in background
+print(job.catalog_id)  # → put in .env as UNBOXAI_CATALOG_ID
 ```
 
 For a few new or changed rows on an existing catalog, build a parquet of just those rows and use
@@ -72,6 +78,7 @@ On `UnboxAIError`, the message has the server's reason (`client.job_status(job.j
 
 ```python
 from behaviorgpt import Search, View
+
 print(client.complete([Search("new inbound lead")], limit=5).names)
 print(client.complete([View("inbox.open_lead_email")], limit=5).names)
 ```

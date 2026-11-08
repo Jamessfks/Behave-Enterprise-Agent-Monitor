@@ -14,6 +14,7 @@ export UNBOXAI_API_KEY=...     # free key from portal.unboxai.com; keep it in .e
 
 ```python
 from behaviorgpt import UnboxAIClient, Search, View, Order
+
 client = UnboxAIClient(market="us", default_catalog_id="cat_...")  # or UNBOXAI_CATALOG_ID
 ```
 
@@ -24,8 +25,8 @@ client and reuse it for the server's lifetime.
 
 ```python
 res = client.complete(history, limit=10, catalog_id=..., filters=None, register_event=False)
-res.items   # ranked; each has .id, .score (raw ranking score, NOT a probability), .data (catalog row)
-res.names   # convenience list of names
+res.items  # ranked; each has .id, .score (raw ranking score, NOT a probability), .data (catalog row)
+res.names  # convenience list of names
 ```
 
 It answers: given this history (oldest first), which catalog item is acted on next?
@@ -41,8 +42,8 @@ It answers: given this history (oldest first), which catalog item is acted on ne
 | SDK | Meaning in a store | Sentinel mapping (proposed) |
 |---|---|---|
 | `Search("query")` | a query | the agent searched (inbox search, doc search, CRM lookup), with the query text |
-| `View(item_id)` | any sign of interest in an item | the agent performed catalog action `item_id` |
-| `Order([item_id, ...])` | a finished purchase | an irreversible commit (email sent, record saved) |
+| `View(item_id)` | any sign of interest in an item | the agent performed catalog action `item_id` (every action, including send/delete) |
+| `Order([item_id, ...])` | a finished purchase | **not used**; see `docs/event-schema.md` (irreversible actions are `View` + `details.irreversible`) |
 
 Also exported: `AddToCart`, `RemoveFromCart`, `ExternalItem` (an item described by name/image
 that isn't in the catalog), `User` (market, gender, age group, timezone; all optional).
@@ -75,9 +76,10 @@ Convert and upload:
 
 ```python
 from behaviorgpt import catalog_from_csv
-path = catalog_from_csv("catalog/actions.csv")          # writes catalog/actions.parquet, validates
-job = client.embed(path, wait=True, timeout=1800.0)     # takes minutes; file name = catalog name
-print(job.catalog_id)                                   # cat_...
+
+path = catalog_from_csv("catalog/actions.csv")  # writes catalog/actions.parquet, validates
+job = client.embed(path, wait=True, timeout=1800.0)  # takes minutes; file name = catalog name
+print(job.catalog_id)  # cat_...
 ```
 
 Limits: 100,000 items per catalog and **2 catalogs per API key**. Re-uploading the same file name

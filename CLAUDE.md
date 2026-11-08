@@ -7,7 +7,15 @@ BehaviorGPT-based scoring pauses the agent when the run stops looking normal.
 ## Read first
 
 - [docs/PROJECT.md](docs/PROJECT.md): brief, architecture, phased task list
+- [docs/workflow.md](docs/workflow.md): the one demo workflow, its correct steps and injected mistakes
 - [docs/event-schema.md](docs/event-schema.md): the shared event format (env → monitor → UI)
+- [docs/decisions.md](docs/decisions.md): stack, deployment, agent, and open items
+
+## Commands
+
+- `uv sync`: install (Python 3.12, `behaviorgpt` 0.10.0)
+- `uv run pytest -q`, `uv run ruff check .`, `uv run ruff format --check .`: run before committing
+- `uv run python scripts/make_scripted_runs.py`: regenerate `runs/*.jsonl` from the workflow
 - [docs/reference/behaviorgpt.md](docs/reference/behaviorgpt.md): BehaviorGPT SDK, catalog format, limits
 - [docs/reference/anomaly-method.md](docs/reference/anomaly-method.md): scoring method (Unbox's anomaly detector, adapted)
 - [docs/reference/computer-use.md](docs/reference/computer-use.md): Claude computer-use toolset and agent loop

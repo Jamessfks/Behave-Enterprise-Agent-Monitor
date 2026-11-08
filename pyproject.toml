@@ -1,0 +1,25 @@
+[project]
+name = "sentinel"
+version = "0.1.0"
+description = "Behavioral oversight layer for computer-use agents"
+requires-python = ">=3.11"
+dependencies = [
+    "behaviorgpt>=0.10.0",
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.30",
+    "python-dotenv>=1.0",
+    "numpy>=1.26",
+    "anthropic>=0.70",
+]
+
+[dependency-groups]
+dev = ["pytest>=8", "ruff>=0.6"]
+
+[tool.uv]
+package = false
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+
+[tool.ruff]
+line-length = 100

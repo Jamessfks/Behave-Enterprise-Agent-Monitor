@@ -18,7 +18,7 @@ next? This decides whether the monitor uses BehaviorGPT or the fallback transiti
 
 1. For each run, for each step i with `type == "view"` whose `action_id` hasn't appeared earlier:
    - history = events[:i] converted to SDK events (`search` → `Search(query)`, `view` →
-     `View(action_id)`, `order` → `Order([action_id])`)
+     `View(action_id)`; use `monitor.events.to_sdk`)
    - `res = client.complete(history, limit=<catalog size>, register_event=False)`
    - record the rank (1-based) of `action_id` in `res.items`, and the top 3 names
 2. Also run the **mistake run**: its wrong step should rank low.

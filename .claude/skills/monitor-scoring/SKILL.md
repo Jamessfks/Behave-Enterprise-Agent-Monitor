@@ -13,7 +13,7 @@ attribute it rather than re-deriving it.
 ## Pipeline per event (keep this shape)
 
 ```
-event ─► plan(): context | scored | funnel | order
+event ─► plan(): context | scored | funnel
 scored ─► ranker.rank(history) → {action_id: score} for the whole catalog
        ─► p = softmax(score/τ) mixed with ε=0.02 uniform; surprisal, entropy
        ─► u = clip((surprisal − entropy − loc) / scale, −3, 6)
@@ -25,8 +25,8 @@ risk ≥ 1 ─► flagged: pause agent, emit alert with top-u steps + expected a
   `limit=len(catalog)`, so the softmax is exact for a small catalog) and `TransitionRanker` (the
   no-go fallback). Nothing downstream may know which one is in use.
 - Scored = the first touch of an `action_id` in the run. Repeats are `funnel`, searches are
-  `context`, and `order` events aren't scored but are where an irreversible action gets held when
-  risk is already high.
+  `context`. Events with `details.irreversible` are scored like any other, and the environment also
+  calls `/gate` before executing them, so they're held when risk is already high.
 - Monitor output must match "Monitor output per step" in `docs/event-schema.md`.
 
 ## Calibration (`monitor/calibrate.py` → `monitor/calibration.json`)
@@ -47,7 +47,7 @@ fire.
 
 For the 1–3 steps with the largest positive u: the action name, p and rank, the top-3 expected
 actions with p, and rule reasons from simple checks, such as:
-- an `order` action (send/save) before any lookup action in the run
+- an irreversible action (send/delete) before any lookup action in the run
 - an action on an entity that differs from the entity in the triggering email (from
   `details.entity`; this covers the "right steps, wrong client" blind spot)
 - a destructive action (`*.delete_*`)
