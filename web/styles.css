@@ -26,7 +26,7 @@
   --accent: var(--cornflower);
   --focus: #5470d6;          /* cornflower, deepened for 3.7:1 on mist */
   --dot: var(--peri);
-  --edge: var(--peri-slate);
+  --edge: var(--indigo);    /* 6:1 on mist: arrows read as structure */
   --logo-line: var(--indigo);
   --logo-accent: var(--cornflower);
   --pause: #9a5208;
@@ -205,7 +205,7 @@ body.resizing { cursor: col-resize; user-select: none; }
 }
 .tool.text { font-size: 17px; padding: 0 12px; font-weight: 500; }
 .tool:hover { background: var(--fill); }
-.tool[aria-pressed="true"] { background: linear-gradient(180deg, var(--primary-hi), var(--primary)); color: var(--on-primary); font-weight: 600; }
+.tool[aria-pressed="true"] { background: var(--mist); color: var(--indigo); font-weight: 600; box-shadow: inset 0 0 0 2px var(--indigo); }
 .zoom-level { min-width: 3.6em; text-align: center; font-size: 17px; color: var(--muted); }
 .show-app-btn { display: none; }
 
@@ -250,14 +250,14 @@ body.resizing { cursor: col-resize; user-select: none; }
 .chip.state.s-allow { background: var(--primary); color: var(--on-primary); }
 
 .node.trigger { border: 1.5px solid var(--peri-slate); }
-.node.ghost-step { opacity: 0.6; border: 1.5px dashed var(--peri); background: rgb(255 255 255 / 0.25); box-shadow: none; }
-.node.ghost-step .title { color: var(--muted); font-weight: 400; }
+.node.ghost-step { opacity: 1; border: 1.5px dashed var(--peri-slate); background: rgb(255 255 255 / 0.45); box-shadow: none; }
+.node.ghost-step .title, .node.ghost-step .head { color: var(--muted); font-weight: 400; }
 .node.ghost-step .glyph { background: transparent; }
 .node.pending .title { color: var(--muted); font-weight: 400; font-style: italic; }
 .node.running { border-color: var(--cornflower); box-shadow: 0 0 0 6px var(--ring-live), var(--shadow-lift); }
-.node.paused { border: 2px solid var(--pause); background: var(--pause-bg); }
+.node.paused { border: 2px solid var(--indigo); background: var(--mist); }
 .node.flagged { border-color: var(--pause); border-left-width: 6px; }
-.node.blocked { border: 2px solid var(--block); background: var(--block-bg); }
+.node.blocked { border: 2px solid var(--block); background: var(--surface); }
 .node.blocked .title { text-decoration: line-through; text-decoration-color: var(--block); text-decoration-thickness: 2px; }
 .node.blocked .glyph { background: var(--block-bg); color: var(--block); box-shadow: inset 0 0 0 1.5px var(--block); }
 .node.allowed { border-color: var(--peri-slate); }
@@ -269,38 +269,38 @@ body.resizing { cursor: col-resize; user-select: none; }
 .node.trigger label.title { cursor: text; }
 
 /* The edges: the one loud thing. A cornflower current runs down the edge being checked. */
-.edge { height: 78px; display: flex; justify-content: center; }
-.edge svg { width: 56px; height: 78px; overflow: visible; }
+.edge { height: 104px; display: flex; justify-content: center; }
+.edge svg { width: 72px; height: 104px; overflow: visible; }
 .edge .base { stroke: var(--edge); stroke-width: 3; stroke-linecap: round; }
 .edge .head { fill: var(--edge); }
 .edge .current, .edge .spark, .edge .arc { opacity: 0; }
-.edge.passed .base { stroke: var(--peri-slate); }
-.edge.passed .head { fill: var(--peri-slate); }
+.edge.passed .base { stroke: var(--indigo); }
+.edge.passed .head { fill: var(--indigo); }
 .edge.running .base { stroke: var(--ring-live); stroke-width: 5; }
 .edge.running .head { fill: var(--cornflower); }
 .edge.running .current {
-  opacity: 1; stroke: var(--cornflower); stroke-width: 3.6; stroke-dasharray: 2 9; stroke-linecap: round;
+  opacity: 1; stroke: var(--cornflower); stroke-width: 6; stroke-dasharray: 3 12; stroke-linecap: round;
   filter: url(#glow); animation: flow 280ms linear infinite;
 }
 .edge.running .arc { stroke: var(--cornflower); stroke-width: 2.2; fill: none; stroke-linejoin: round; filter: url(#glow); animation: crackle 240ms steps(2) infinite; }
 .edge.running .spark { opacity: 1; fill: #c9d6fa; filter: url(#glow); animation: spark 620ms ease-in infinite; }
-.edge.paused .base { stroke: var(--pause); stroke-dasharray: 3 5; }
-.edge.paused .head { fill: var(--pause); }
+.edge.paused .base { stroke: var(--indigo); stroke-dasharray: 4 6; }
+.edge.paused .head { fill: var(--indigo); }
 .edge.blocked .base { stroke: var(--block); stroke-dasharray: 2 6; }
 .edge.blocked .head { fill: var(--block); }
-.edge.ghost .base { stroke: var(--peri); stroke-dasharray: 3 6; }
-.edge.ghost .head { fill: var(--peri); }
+.edge.ghost .base { stroke: var(--muted); stroke-dasharray: 3 6; }
+.edge.ghost .head { fill: var(--muted); }
 @keyframes flow { to { stroke-dashoffset: -11; } }
-@keyframes spark { from { transform: translateY(-2px); opacity: 1; } to { transform: translateY(42px); opacity: 0.2; } }
+@keyframes spark { from { transform: translateY(-2px); opacity: 1; } to { transform: translateY(44px); opacity: 0.2; } }
 @keyframes crackle { 0% { opacity: 0.95; } 50% { opacity: 0.1; } 100% { opacity: 0.7; } }
 
 /* Inline pause card, attached to its node */
 .node.paused:has(+ .pause-card) { border-radius: var(--r-xl) var(--r-xl) 0 0; }
 .pause-card {
-  margin: -2px 0 0; border: 2px solid var(--pause); border-top: 0; background: var(--surface); box-shadow: var(--shadow-lift);
+  margin: -2px 0 0; border: 2px solid var(--indigo); border-top: 0; background: var(--surface); box-shadow: var(--shadow-lift);
   border-radius: 0 0 var(--r-xl) var(--r-xl); padding: 16px 22px 22px; display: grid; gap: 10px; cursor: auto; list-style: none;
 }
-.pause-card:focus-visible { outline-offset: 4px; }
+.pause-card:focus-visible { outline: none; box-shadow: 0 0 0 4px var(--focus), var(--shadow-lift); }
 .pause-card h3 {
   font-size: 24px; font-weight: 600; font-stretch: 112%; color: var(--pause);
   display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 2px 12px;
@@ -331,7 +331,7 @@ body.resizing { cursor: col-resize; user-select: none; }
   margin: 30px 0 0; padding: 26px 26px 24px; border-radius: var(--r-xl); background: var(--block-bg-grad); border: 1px solid var(--peri-slate);
   box-shadow: var(--shadow-lift); display: grid; gap: 12px; cursor: auto; container-type: inline-size;
 }
-.summary h3 { font-size: clamp(32px, 7cqi, 46px); }
+.summary h3 { font-size: clamp(44px, 11cqi, 84px); font-weight: 200; font-stretch: 125%; line-height: 0.95; letter-spacing: -0.02em; text-wrap: balance; }
 .summary h4 { font-size: 21px; margin-top: 10px; }
 .summary .dek { color: var(--muted); }
 .table-wrap { overflow-x: auto; }
@@ -439,14 +439,18 @@ mark { background: rgb(112 145 230 / 0.28); color: inherit; border-radius: 3px; 
   .ledger { max-height: 40vh; }
 }
 @media (max-width: 600px) {
-  .bar { padding: 10px 16px; }
-  .brand h1 { font-size: 23px; }
-  .mark { height: 38px; }
-  .controls { width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-  .seg { grid-column: 1 / -1; }
+  .bar { padding: 8px 16px; gap: 6px; }
+  .brand h1 { font-size: 21px; }
+  .brand .sub { display: none; }
+  .mark { height: 30px; }
+  .controls { width: 100%; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+  .seg { grid-column: 1 / 3; }
+  .switch { grid-column: 3; font-size: 15px; }
+  .learned-chip { grid-column: 1 / -1; justify-self: start; }
+  .monitor { position: sticky; bottom: 0; z-index: 3; }
   .seg button { flex: 1; }
   .switch { justify-self: start; gap: 8px; }
-  .controls button.ghost, .controls button.primary { padding: 8px 8px; font-size: 16px; white-space: nowrap; }
+  .controls button.ghost, .controls button.primary { padding: 8px 6px; font-size: 15px; white-space: nowrap; min-height: 44px; }
   #run { min-width: 0; }
   .tools { padding: 6px 8px; gap: 2px; }
   .monitor-head { flex-wrap: nowrap; gap: 10px; }
@@ -463,3 +467,10 @@ mark { background: rgb(112 145 230 / 0.28); color: inherit; border-radius: 3px; 
   .edge.running .arc { animation: none; opacity: 0.6; }
   .node, .switch .track, .switch .thumb { transition: none; }
 }
+
+/* Rules learned from earlier Allow/Block reasons survive Reset world (that's the learning);
+   this chip makes them visible and clearable. */
+.learned-chip { display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; border-radius: 999px;
+  background: var(--mist); color: var(--indigo); border: 1.5px solid var(--indigo); font-size: 16px; font-weight: 600; }
+.learned-chip button { all: unset; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; font-weight: 500; }
+.learned-chip button:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; border-radius: 4px; }

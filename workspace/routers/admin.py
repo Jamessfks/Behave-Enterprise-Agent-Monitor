@@ -82,6 +82,15 @@ def run_sources():
     return {"run": events.RUN, "sources": events.sources()}
 
 
+@router.post("/api/rules/learned/clear")
+def clear_learned():
+    """Forget the rules learned from Allow/Block reasons (they otherwise survive world resets)."""
+    n = len(events.LEARNED)
+    events.LEARNED.clear()
+    store.save()
+    return {"ok": True, "cleared": n}
+
+
 @router.get("/api/rules")
 def rules():
     """Written rules (policies), unwritten rules (Liam O'Connor - only the monitor sees these) and learned rules."""

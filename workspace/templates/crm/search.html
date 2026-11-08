@@ -6,16 +6,16 @@
   <h1 class="text-2xl font-semibold mb-4">Search results for "{{ q }}"</h1>
   <h2 class="text-sm font-semibold uppercase text-gray-600 mt-4 mb-2">Contacts ({{ res.contacts|length }})</h2>
   {% for c in res.contacts %}{% set co = store.get('companies', c.company_id) %}
-  <div class="bg-white border rounded p-2 mb-1 text-sm"><a class="text-[#0091ae] font-medium" href="/crm/contact/{{ c.id }}">{{ contact_name(c) }}</a>
+  <div class="bg-white border rounded p-2 mb-1 text-sm"><a class="text-[#007a93] font-medium" href="/crm/contact/{{ c.id }}">{{ contact_name(c) }}</a>
     <span class="text-gray-500">· {{ c.email }}{% if co %} · {{ co.name }}{% endif %}</span> {% if c.status in ('do_not_contact','unsubscribed') %}{{ status_badge(c.status) }}{% endif %}</div>
   {% else %}<div class="text-sm text-gray-500">No contacts.</div>{% endfor %}
   <h2 class="text-sm font-semibold uppercase text-gray-600 mt-4 mb-2">Companies ({{ res.companies|length }})</h2>
   {% for co in res.companies %}
-  <div class="bg-white border rounded p-2 mb-1 text-sm"><a class="text-[#0091ae] font-medium" href="/crm/company/{{ co.id }}">{{ co.name }}</a> <span class="text-gray-500">· {{ co.domain }}</span></div>
+  <div class="bg-white border rounded p-2 mb-1 text-sm"><a class="text-[#007a93] font-medium" href="/crm/company/{{ co.id }}">{{ co.name }}</a> <span class="text-gray-500">· {{ co.domain }}</span></div>
   {% else %}<div class="text-sm text-gray-500">No companies.</div>{% endfor %}
   <h2 class="text-sm font-semibold uppercase text-gray-600 mt-4 mb-2">Deals ({{ res.deals|length }})</h2>
   {% for d in res.deals %}
-  <div class="bg-white border rounded p-2 mb-1 text-sm"><a class="text-[#0091ae] font-medium" href="/crm/deal/{{ d.id }}">{{ d.name }}</a> <span class="text-gray-500">· {{ money(d.amount) }}</span> {{ stage_badge(d.stage) }}</div>
+  <div class="bg-white border rounded p-2 mb-1 text-sm"><a class="text-[#007a93] font-medium" href="/crm/deal/{{ d.id }}">{{ d.name }}</a> <span class="text-gray-500">· {{ money(d.amount) }}</span> {{ stage_badge(d.stage) }}</div>
   {% else %}<div class="text-sm text-gray-500">No deals.</div>{% endfor %}
 </div>
 {% endblock %}

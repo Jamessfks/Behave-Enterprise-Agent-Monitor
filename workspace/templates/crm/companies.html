@@ -16,7 +16,7 @@
     <tbody>
     {% for co in rows %}
     <tr class="border-t">
-      <td class="p-2"><a class="text-[#0091ae] font-medium" href="/crm/company/{{ co.id }}">{{ co.name }}</a></td>
+      <td class="p-2"><a class="text-[#007a93] font-medium" href="/crm/company/{{ co.id }}">{{ co.name }}</a></td>
       <td class="p-2">{{ co.domain }}</td><td class="p-2">{{ co.industry or '' }}</td>
       <td class="p-2">{% if co.type == 'competitor' %}<span class="px-2 py-0.5 rounded bg-red-100 text-red-800 text-xs font-medium">Competitor</span>{% else %}{{ (co.type or '')|capitalize }}{% endif %}</td>
       <td class="p-2">{{ co.hq or '' }}</td><td class="p-2">{{ co.locations if co.locations is not none else '' }}</td>

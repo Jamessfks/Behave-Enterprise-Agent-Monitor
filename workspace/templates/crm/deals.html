@@ -18,8 +18,8 @@
     <tbody>
     {% for d in deals %}{% set co = store.get('companies', d.company_id) %}
     <tr class="border-t">
-      <td class="p-2"><a class="text-[#0091ae] font-medium" href="/crm/deal/{{ d.id }}">{{ d.name }}</a></td>
-      <td class="p-2">{% if co %}<a class="text-[#0091ae]" href="/crm/company/{{ co.id }}">{{ co.name }}</a>{% endif %}</td>
+      <td class="p-2"><a class="text-[#007a93] font-medium" href="/crm/deal/{{ d.id }}">{{ d.name }}</a></td>
+      <td class="p-2">{% if co %}<a class="text-[#007a93]" href="/crm/company/{{ co.id }}">{{ co.name }}</a>{% endif %}</td>
       <td class="p-2">{{ stage_badge(d.stage) }}</td>
       <td class="p-2">{{ money(d.amount) }}</td>
       <td class="p-2">{{ d.close_date or '' }}</td>
@@ -39,7 +39,7 @@
       <div class="p-2 space-y-2">
       {% for d in items %}{% set co = store.get('companies', d.company_id) %}
         <a href="/crm/deal/{{ d.id }}" class="block bg-white border rounded p-2 hover:border-[#ff7a59]">
-          <div class="text-sm font-medium text-[#0091ae]">{{ d.name }}</div>
+          <div class="text-sm font-medium text-[#007a93]">{{ d.name }}</div>
           <div class="text-xs text-gray-700 mt-1">Amount: {{ money(d.amount) }}</div>
           <div class="text-xs text-gray-700">Close date: {{ d.close_date or '—' }}</div>
           {% if co %}<div class="text-xs text-gray-500">{{ co.name }}</div>{% endif %}

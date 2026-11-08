@@ -13,7 +13,7 @@
   <input type="hidden" name="{{ field }}" value="{{ value }}">
   <label class="block text-sm font-semibold mb-1" for="note-body">Log note</label>
   <textarea id="note-body" name="body" rows="3" required class="w-full border rounded p-2 text-sm" placeholder="Start typing to leave a note..."></textarea>
-  <button type="submit" class="mt-2 px-3 py-1.5 rounded bg-[#ff7a59] text-white text-sm font-medium">Log note</button>
+  <button type="submit" class="mt-2 px-3 py-1.5 rounded bg-[#ff7a59] text-[#1e2650] text-sm font-medium">Log note</button>
 </form>
 {% endmacro %}
 {% macro task_form(field, value) %}
@@ -49,10 +49,10 @@
   {% endif %}
   {% if a.type == 'note' %}
   <details class="mt-1">
-    <summary class="text-xs text-[#0091ae] cursor-pointer">Edit note</summary>
+    <summary class="text-xs text-[#007a93] cursor-pointer">Edit note</summary>
     <form data-api="/api/crm/note/{{ a.id }}/edit" class="mt-1">
       <textarea name="body" rows="3" class="w-full border rounded p-2 text-sm" aria-label="Edit note text">{{ a.body }}</textarea>
-      <button type="submit" class="mt-1 px-3 py-1 rounded bg-[#ff7a59] text-white text-xs font-medium">Save note</button>
+      <button type="submit" class="mt-1 px-3 py-1 rounded bg-[#ff7a59] text-[#1e2650] text-xs font-medium">Save note</button>
     </form>
   </details>
   {% endif %}

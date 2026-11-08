@@ -42,6 +42,7 @@ async function fixtureApi(path, body) {
   if (path === "/api/bootstrap") return fxFile("bootstrap.json");
   if (path === "/api/rules") return { ...(await fxFile("rules.json")), learned: FX.learned };
   if (path === "/api/admin/reset") { FX.run = null; FX.approvals = {}; return { ok: true }; }
+  if (path === "/api/rules/learned/clear") { FX.learned = []; return { ok: true }; }
   if (path === "/api/runs/current") return { run: null, steps: [], changed: [], done: true };
   if (path === "/api/runs") {
     if (body.instruction) throw new Error("Live mode needs the server; fixture mode only replays the demo task.");
@@ -113,6 +114,7 @@ async function init() {
   wireMonitor();
   try {
     S.boot = await api("/api/bootstrap");
+    refreshLearned();
   } catch (e) {
     $("#chain").innerHTML = `<li class="note status err">Couldn't reach the server: ${esc(e.message)}. Start it with <code>uv run uvicorn server:app</code>, or open this page with <code>?fixture=1</code>.</li>`;
     return;
@@ -623,7 +625,7 @@ function pauseCard(node, st) {
     const by = (ck.failed || []).map((f) => CAUGHT_BY[f] || f).join(", ");
     card.innerHTML = `<h3 id="pause-h-${i}">Paused before it ran${by ? `<span class="by">Caught by: ${esc(by)}</span>` : ""}</h3>
       ${ck.headline ? `<p class="lede">${esc(ck.headline)}</p>` : ""}
-      <ul>${(ck.reasons || []).filter((r) => r !== ck.headline).map((r) => `<li>${esc(r)}</li>`).join("")}</ul>
+      <ul>${(ck.reasons || []).filter((r) => r !== ck.headline && !people.some((v) => r.includes(v.text))).map((r) => `<li>${esc(r)}</li>`).join("")}</ul>
       ${people.map((v) => `<blockquote class="quote"><p>${esc(v.text)}</p><footer>${esc(v.author)}, team know-how</footer></blockquote>`).join("")}
       <label for="why-${i}">Allow needs a reason, which becomes a rule. Block needs none.</label>
       <textarea id="why-${i}" rows="2" placeholder="For example: Alex confirmed this with Dana by phone"></textarea>
@@ -658,6 +660,7 @@ function pauseCard(node, st) {
       if (S.busy) { $("#run").textContent = "Running…"; $("#reset").disabled = true; }
       if (hadFocus) viewport.focus({ preventScroll: true });
       resolve({ decision, reason });
+      refreshLearned();
     };
     allow.addEventListener("click", () => decide("allow"));
     card.querySelector("[data-block]").addEventListener("click", () => decide("block"));
@@ -816,7 +819,23 @@ const DECISION_TEXT = {
   decided: () => "Decided earlier",
 };
 
+/* Rules learned from earlier Allow/Block reasons survive Reset world; show and clear them. */
+async function refreshLearned() {
+  const chip = $("#learned-chip");
+  if (!chip) return;
+  let n = 0;
+  try { n = ((await api("/api/rules"))?.learned || []).length; } catch { n = 0; }
+  chip.hidden = n === 0;
+  if (!n) return;
+  chip.innerHTML = `${n} learned rule${n === 1 ? "" : "s"} <button type="button">Clear</button>`;
+  chip.querySelector("button").addEventListener("click", async () => {
+    await api("/api/rules/learned/clear", {});
+    refreshLearned();
+  });
+}
+
 function finish() {
+  refreshLearned();
   const key = S.mode === "live" ? "live" : S.mistakes ? "mistakes" : "careful";
   S.done[key] = { steps: S.steps.length, records: S.records.slice() };
   const pauses = S.records.filter((r) => r.pause);

@@ -194,3 +194,13 @@ def test_all_workspace_app_pages_reachable_from_the_nav_render(client):
                 ]
         frontier = nxt
     assert len(seen) > 100
+
+
+def test_learned_rules_survive_reset_and_can_be_cleared(client):
+    client.post("/api/rules/learned/clear", json={})
+    play(client, mistakes=True, decide=lambda s: ("approve", "Client confirmed by phone"))
+    assert len(client.get("/api/rules").json()["learned"]) >= 1
+    client.post("/api/admin/reset", json={})
+    assert len(client.get("/api/rules").json()["learned"]) >= 1  # the learning survives a reset
+    assert client.post("/api/rules/learned/clear", json={}).json()["ok"] is True
+    assert client.get("/api/rules").json()["learned"] == []

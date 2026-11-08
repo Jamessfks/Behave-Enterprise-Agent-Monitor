@@ -2,7 +2,7 @@
 {% from "crm/_macros.html" import status_badge, note_form, timeline, prop, stage_badge with context %}
 {% block crm_title %}{{ co.name }}{% endblock %}
 {% block crm %}
-<div class="px-6 py-3 text-sm"><a href="/crm/companies" class="text-[#0091ae]">&larr; Companies</a></div>
+<div class="px-6 py-3 text-sm"><a href="/crm/companies" class="text-[#007a93]">&larr; Companies</a></div>
 <div class="grid grid-cols-12 gap-4 px-6 pb-6">
   <section class="col-span-3 bg-white border rounded p-4">
     <h1 class="text-xl font-semibold">{{ co.name }}</h1>
@@ -27,7 +27,7 @@
     <div class="bg-white border rounded p-4">
       <h2 class="text-sm font-semibold mb-2">Contacts ({{ contacts|length }})</h2>
       {% for c in contacts %}
-      <div class="mb-2"><a class="text-[#0091ae] text-sm font-medium" href="/crm/contact/{{ c.id }}">{{ contact_name(c) }}</a>
+      <div class="mb-2"><a class="text-[#007a93] text-sm font-medium" href="/crm/contact/{{ c.id }}">{{ contact_name(c) }}</a>
         <div class="text-xs text-gray-500">{{ c.title }}</div>
         {% if c.status in ('do_not_contact', 'unsubscribed') %}{{ status_badge(c.status) }}{% endif %}</div>
       {% else %}<div class="text-sm text-gray-500">None</div>{% endfor %}
@@ -35,7 +35,7 @@
     <div class="bg-white border rounded p-4">
       <h2 class="text-sm font-semibold mb-2">Deals ({{ deals|length }})</h2>
       {% for d in deals %}
-      <div class="mb-2"><a class="text-[#0091ae] text-sm font-medium" href="/crm/deal/{{ d.id }}">{{ d.name }}</a>
+      <div class="mb-2"><a class="text-[#007a93] text-sm font-medium" href="/crm/deal/{{ d.id }}">{{ d.name }}</a>
         <div class="text-xs text-gray-500">{{ money(d.amount) }} · {{ stage_badge(d.stage) }}</div></div>
       {% else %}<div class="text-sm text-gray-500">None</div>{% endfor %}
     </div>

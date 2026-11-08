@@ -17,9 +17,9 @@
     <tbody>
     {% for c in rows %}{% set co = store.get('companies', c.company_id) %}
     <tr class="border-t">
-      <td class="p-2"><a class="text-[#0091ae] font-medium" href="/crm/contact/{{ c.id }}">{{ contact_name(c) }}</a></td>
+      <td class="p-2"><a class="text-[#007a93] font-medium" href="/crm/contact/{{ c.id }}">{{ contact_name(c) }}</a></td>
       <td class="p-2">{{ c.email }}</td>
-      <td class="p-2">{% if co %}<a class="text-[#0091ae]" href="/crm/company/{{ co.id }}">{{ co.name }}</a>{% endif %}</td>
+      <td class="p-2">{% if co %}<a class="text-[#007a93]" href="/crm/company/{{ co.id }}">{{ co.name }}</a>{% endif %}</td>
       <td class="p-2">{{ c.title or '' }}</td>
       <td class="p-2">{{ status_badge(c.status) }}</td>
       <td class="p-2">{{ fmt_dt(c.last_contacted_at) }}</td>
