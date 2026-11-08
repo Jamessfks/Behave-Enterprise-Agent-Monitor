@@ -14,7 +14,14 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
 const motionQuery = matchMedia("(prefers-reduced-motion: reduce)");
 const reduced = () => motionQuery.matches;
-const stepMs = () => (reduced() ? 250 : 650);
+/* Pace of a run. Each step plays in three beats: open the app page (the "before"), check, then
+   show what changed (the "after"). Step by step waits for "Next step" after each one. */
+const PACES = {
+  step: { open: 1200, check: 1100, after: 2400, read: 1800 },
+  slow: { open: 1300, check: 1200, after: 2800, read: 2100 },
+  fast: { open: 250, check: 350, after: 650, read: 400 },
+};
+const pace = () => PACES[S.pace] || PACES.slow;
 const store = {
   get(k) { try { return localStorage.getItem(k); } catch { return null; } },
   set(k, v) { try { localStorage.setItem(k, v); } catch { /* storage blocked: keep defaults */ } },
@@ -105,6 +112,10 @@ const S = {
   latency: [],
   done: {},              // mistakes | careful | live -> { steps, records }
   appUrl: "",
+  pace: ["step", "slow", "fast"].includes(store.get("am.pace")) ? store.get("am.pace") : "slow",
+  scenarioId: null,
+  upcoming: null,       // the next step, before it runs (from the server)
+  nextWaiter: null,     // step by step: resolves when the person presses Next step
 };
 
 /* ---------- boot ---------- */
@@ -120,8 +131,8 @@ async function init() {
     return;
   }
   const b = S.boot;
-  $("#scenario-title").textContent = b.scenario.title;
-  $("#scenario-dek").textContent = `${b.company.persona}'s AI agent at ${b.company.name} does the follow-up. Every step is checked before it runs.`;
+  fillScenarios();
+  showScenario();
   if (FIXTURE) $("#persona").textContent = "Fixture mode: canned responses, no server";
   rankerNote();
   wireControls();
@@ -131,8 +142,30 @@ async function init() {
   if (!FIXTURE) resume().catch(() => {});
 }
 
+const scenario = () => (S.boot.scenarios || []).find((x) => x.id === S.scenarioId) || S.boot.scenario;
+
+function fillScenarios() {
+  const list = S.boot.scenarios?.length ? S.boot.scenarios : [S.boot.scenario];
+  $("#scenario").innerHTML = list.map((x) => `<option value="${esc(x.id)}">${esc(x.short && x.short !== x.title ? `${x.short}: ${x.account}` : x.title)}</option>`).join("");
+  const saved = store.get("am.scenario");
+  S.scenarioId = list.some((x) => x.id === saved) ? saved : S.boot.scenario.id;
+  $("#scenario").value = S.scenarioId;
+}
+
+function showScenario() {
+  $("#scenario-title").textContent = scenario().title;
+  $("#scenario-dek").textContent = `${S.boot.company.persona}'s AI agent at ${S.boot.company.name} does it. Every step is checked before it runs, and the app on the left shows what each step changes.`;
+}
+
+function setPace(p) {
+  S.pace = p;
+  store.set("am.pace", p);
+  $$(".pace button").forEach((b) => { const on = b.dataset.pace === p; b.setAttribute("aria-checked", String(on)); b.tabIndex = on ? 0 : -1; });
+  if (p !== "step" && S.nextWaiter) S.nextWaiter();
+}
+
 function wireControls() {
-  const segs = $$(".seg button");
+  const segs = $$(".seg.mode button");
   segs.forEach((b, i) => {
     b.addEventListener("click", () => pickMode(b.dataset.mode));
     b.addEventListener("keydown", (e) => {
@@ -149,7 +182,31 @@ function wireControls() {
     S.mistakes = !S.mistakes;
     $("#mistakes").setAttribute("aria-checked", String(S.mistakes));
   });
-  $("#run").addEventListener("click", () => (S.resumable ? continueRun() : startRun()));
+  $("#run").addEventListener("click", () => (S.nextWaiter ? S.nextWaiter() : S.resumable ? continueRun() : startRun()));
+  $("#scenario").addEventListener("change", (e) => {
+    if (S.busy) return;
+    S.scenarioId = e.target.value;
+    store.set("am.scenario", S.scenarioId);
+    S.resumable = false;
+    S.done = {};
+    showScenario();
+    resetChain(true);
+    fitHome(true);
+  });
+  const paces = $$(".pace button");
+  paces.forEach((b, i) => {
+    b.addEventListener("click", () => setPace(b.dataset.pace));
+    b.addEventListener("keydown", (e) => {
+      const d = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[e.key];
+      if (!d) return;
+      e.preventDefault();
+      const next = paces[(i + d + paces.length) % paces.length];
+      setPace(next.dataset.pace);
+      next.focus();
+    });
+  });
+  setPace(S.pace);
+  $("#app-note").addEventListener("click", (e) => { if (e.target.closest("[data-hide]")) note(null); });
   $("#reset").addEventListener("click", resetWorld);
   $("#setup").addEventListener("click", openSetup);
   $("#drawer").addEventListener("click", (e) => { if (e.target.id === "drawer" || e.target.closest("[data-close]")) closeDrawer(); });
@@ -159,7 +216,7 @@ function wireControls() {
 function pickMode(mode) {
   if (S.busy) return;
   S.mode = mode;
-  $$(".seg button").forEach((b) => {
+  $$(".seg.mode button").forEach((b) => {
     b.setAttribute("aria-checked", String(b.dataset.mode === mode));
     b.tabIndex = b.dataset.mode === mode ? 0 : -1;
   });
@@ -187,16 +244,23 @@ function setBusy(on, label) {
   run.textContent = on ? label : S.resumable ? "Continue the run" : S.steps.length ? "Run again" : "Run the agent";
   $("#reset").disabled = on;
   $("#mistakes").disabled = on || S.mode === "live";
-  $$(".seg button").forEach((b) => (b.disabled = on));
+  $("#scenario").disabled = on || S.mode === "live";
+  $$(".seg.mode button").forEach((b) => (b.disabled = on));
 }
 
 /* ---------- app pane (left) ---------- */
 const APP_OF = (url) => (url.startsWith("/mail") ? "mail" : url.startsWith("/drive") ? "drive" : url.startsWith("/crm") ? "crm" : url.startsWith("/calendar") ? "calendar" : "");
 
-function navigateApp(url) {
-  if (!url) return;
+function navigateApp(url, { reload = true } = {}) {
+  if (!url) return Promise.resolve();
   S.appUrl = url;
   const src = pageSrc(url), f = $("#app-frame");
+  if (f.dataset.src === src && !reload) return Promise.resolve();
+  const loaded = new Promise((resolve) => {
+    const done = () => { f.removeEventListener("load", done); clearTimeout(t); resolve(); };
+    const t = setTimeout(done, 5000);
+    f.addEventListener("load", done);
+  });
   if (f.dataset.src === src) {
     try { f.contentWindow.location.reload(); } catch { f.src = src; }
   } else {
@@ -207,6 +271,7 @@ function navigateApp(url) {
   $("#app-open").href = src;
   const app = APP_OF(url);
   $$(".app-tabs button").forEach((b) => (b.dataset.app === app ? b.setAttribute("aria-current", "page") : b.removeAttribute("aria-current")));
+  return loaded;
 }
 const reloadApp = () => navigateApp(S.appUrl);
 
@@ -448,6 +513,7 @@ function wireCanvas() {
 /* ---------- chain ---------- */
 function resetChain(idle) {
   S.steps = []; S.records = []; S.changed = []; S.risks = []; S.latency = [];
+  if (idle) { $("#app-caption").hidden = true; note(null); }
   $("#chain").innerHTML = "";
   $("#ledger").innerHTML = "";
   $("#summary").hidden = true;
@@ -480,10 +546,10 @@ function triggerNode() {
       ? "A Claude agent works in the workspace apps. Every step it takes is checked before it runs."
       : "Live mode needs an Anthropic API key on the server (ANTHROPIC_API_KEY). The demo task runs without one.";
     li.innerHTML = `${glyph("Trigger")}<div class="head">Live request</div><label class="title" for="instruction">Ask the agent anything, the way a colleague would</label>
-      <div class="live-input"><textarea id="instruction" rows="4" ${b.live_available ? "" : "disabled"} aria-describedby="live-note">${esc(b.scenario.request)}</textarea>
+      <div class="live-input"><textarea id="instruction" rows="4" ${b.live_available ? "" : "disabled"} aria-describedby="live-note">${esc(scenario().request)}</textarea>
       <p id="live-note" class="note">${esc(note)}</p></div>`;
   } else {
-    li.innerHTML = `${glyph("Trigger")}<div class="head">Trigger</div><div class="title">Request from ${esc(b.company.persona)}</div><div class="meta request">“${esc(b.scenario.request)}”</div>`;
+    li.innerHTML = `${glyph("Trigger")}<div class="head">Trigger</div><div class="title">Request from ${esc(b.company.persona)}</div><div class="meta request">“${esc(scenario().request)}”</div>`;
   }
   return li;
 }
@@ -496,14 +562,14 @@ function metaLine(st) {
   return parts.join("; ") || st.app;
 }
 
-function pendingStep() {
+function pendingStep(up) {
   const edge = document.createElement("li");
   edge.className = "edge running";
   edge.setAttribute("aria-hidden", "true");
   edge.innerHTML = EDGE;
   const node = document.createElement("li");
   node.className = "node running pending";
-  node.innerHTML = `${glyph("Pending")}<div class="head">Step ${S.steps.length + 1}</div><div class="title">Checking the next step…</div><div class="checks"><span class="chip">checking</span></div>`;
+  node.innerHTML = `${glyph(up?.app || "Pending")}<div class="head">Step ${S.steps.length + 1}${up?.app ? ` · ${esc(up.app)}` : ""}</div><div class="title">${esc(up?.label || "Choosing the next step…")}</div><div class="checks"><span class="chip">${up ? "about to run" : "thinking"}</span></div>`;
   $("#chain").append(edge, node);
   follow(node);
   return { edge, node };
@@ -644,8 +710,9 @@ function pauseCard(node, st) {
       controls.forEach((x) => (x.disabled = true));
       status.className = "status";
       status.textContent = decision === "allow" ? "Allowing…" : "Blocking…";
+      let out;
       try {
-        await api(`/api/approvals/${encodeURIComponent(st.approval_id)}/${decision === "allow" ? "approve" : "reject"}`, { reason });
+        out = await api(`/api/approvals/${encodeURIComponent(st.approval_id)}/${decision === "allow" ? "approve" : "reject"}`, { reason });
       } catch (e) {
         status.className = "status err";
         status.textContent = `Couldn't save the decision: ${e.message}`;
@@ -659,7 +726,7 @@ function pauseCard(node, st) {
       S.cancelPause = null;
       if (S.busy) { $("#run").textContent = "Running…"; $("#reset").disabled = true; }
       if (hadFocus) viewport.focus({ preventScroll: true });
-      resolve({ decision, reason });
+      resolve({ decision, reason, changes: out?.changes || [] });
       refreshLearned();
     };
     allow.addEventListener("click", () => decide("allow"));
@@ -690,7 +757,7 @@ async function startRun() {
   const live = S.mode === "live";
   const instruction = live ? $("#instruction")?.value.trim() : "";
   if (live && !instruction) { $("#instruction")?.focus(); return; }
-  const body = live ? { instruction } : { scenario: S.boot.scenario.id, mistakes: S.mistakes };
+  const body = live ? { instruction } : { scenario: S.scenarioId, mistakes: S.mistakes };
   resetChain(false);
   if (live) { const t = $("#instruction"); t.value = instruction; t.disabled = true; }
   setBusy(true, live ? "Agent working…" : "Running…");
@@ -698,7 +765,8 @@ async function startRun() {
   try {
     const r = await api("/api/runs", body);
     S.run = { ...r.run, total: r.steps_total };
-    navigateApp(S.boot.apps.mail);
+    S.upcoming = r.upcoming || null;
+    if (!S.upcoming) navigateApp(S.boot.apps.mail);
     await loop();
   } catch (e) {
     $("#chain").insertAdjacentHTML("beforeend", `<li class="note status err">Stopped: ${esc(e.message)}</li>`);
@@ -718,20 +786,54 @@ async function continueRun() {
 
 async function loop() {
   for (let guard = 0; guard < 200; guard++) {
-    const { edge, node } = pendingStep();
+    const up = S.upcoming;
+    const { edge, node } = pendingStep(up);
+    if (up) {
+      const what = `Step ${up.index + 1}: ${up.label}`;
+      note(null);
+      caption("open", up.kind === "write" ? `${what}. This is the page before it runs.` : what);
+      if (up.page) await navigateApp(up.page, { reload: up.kind === "write" });
+      await sleep(pace().open);
+      caption("check", what);
+    } else {
+      caption("check", "The agent is choosing its next step");
+    }
     let res;
     try {
-      [res] = await Promise.all([api("/api/runs/current/next", {}), sleep(stepMs())]);
+      [res] = await Promise.all([api("/api/runs/current/next", {}), sleep(pace().check)]);
     } catch (e) {
       edge.remove(); node.remove();
       throw e;
     }
+    S.upcoming = res.upcoming || null;
     if (Array.isArray(res.changed)) S.changed = res.changed;
-    if (res.done || !res.step) { edge.remove(); node.remove(); break; }
+    if (!res.step) { edge.remove(); node.remove(); break; }
     await showStep(res.step, edge, node, true);
     if (S.abandoned) return;
+    if (res.done) break;
+    if (S.pace === "step") {
+      await waitForNext();
+      if (S.abandoned) return;
+    }
   }
   finish();
+}
+
+/* Step by step: the Run button becomes "Next step" until it's pressed. */
+function waitForNext() {
+  return new Promise((resolve) => {
+    const run = $("#run");
+    run.disabled = false;
+    run.textContent = "Next step";
+    $("#reset").disabled = false;
+    S.nextWaiter = () => {
+      S.nextWaiter = null;
+      run.textContent = "Running…";
+      run.disabled = true;
+      $("#reset").disabled = true;
+      resolve();
+    };
+  });
 }
 
 /* Draw one step; for a live pause, wait for the person's decision. */
@@ -741,15 +843,52 @@ async function showStep(st, edge, node, live) {
   S.steps.push({ step: st, node, edge });
   ledgerRow(st);
   track(st);
-  if (st.page) navigateApp(st.page);
+  diffList(node, st);
   follow(node);
-  if (st.decision === "pause" && live) {
+  if (!live) return;
+  const page = st.page || st.changes?.[0]?.url || "";
+  const what = `Step ${st.index + 1}: ${stepTitle(st)}`;
+  if (st.decision === "pause") {
+    caption("paused", `${what}. Nothing in ${st.app} changes unless you allow it.`);
+    note(noteHtml(st, "paused"));
     const d = await pauseCard(node, st);
     if (d.decision === "abandoned") return;
     decided(node, edge, st, d);
-    reloadApp();
+    if (d.decision === "allow") {
+      st.changes = d.changes;
+      diffList(node, st);
+      await afterBeat(st, page, "changed", `${what}. Allowed, so it ran.`);
+    } else {
+      caption("blocked", `${what}. Blocked, so ${st.app} is unchanged.`);
+      note(noteHtml(st, "blocked"));
+      await sleep(pace().read);
+    }
     follow(node);
+    return;
   }
+  if (st.decision === "block") {
+    caption("blocked", `${what}. Blocked by a hard rule, so ${st.app} is unchanged.`);
+    note(noteHtml(st, "blocked"));
+    await sleep(pace().after);
+    return;
+  }
+  if (st.decision === "error" || st.decision === "skipped") {
+    caption("error", `${what}. ${st.check?.headline || "It didn't run."}`);
+    note(null);
+    await sleep(pace().read);
+    return;
+  }
+  const phase = st.decision === "flag" ? "flagged" : st.changes?.length ? "changed" : "read";
+  await afterBeat(st, page, phase, st.decision === "flag" ? `${what}. It ran, but it's flagged: ${st.check?.headline || "worth a look"}` : what);
+}
+
+/* Show the page after the step ran, point at what changed (or what the agent read), and dwell. */
+async function afterBeat(st, page, phase, text) {
+  if (page) await navigateApp(page, { reload: !!st.changes?.length || phase === "changed" });
+  caption(phase, text);
+  note(noteHtml(st, phase));
+  markFrame(st.changes, st.look_for);
+  await sleep(st.changes?.length ? pace().after : pace().read);
 }
 
 /* After a page reload: redraw the server's current run, and pick up a pending pause. */
@@ -759,9 +898,10 @@ async function resume() {
   S.mode = cur.run.live ? "live" : "demo";
   S.mistakes = !!cur.run.mistakes;
   $("#mistakes").setAttribute("aria-checked", String(S.mistakes));
-  $$(".seg button").forEach((b) => { b.setAttribute("aria-checked", String(b.dataset.mode === S.mode)); b.tabIndex = b.dataset.mode === S.mode ? 0 : -1; });
+  $$(".seg.mode button").forEach((b) => { b.setAttribute("aria-checked", String(b.dataset.mode === S.mode)); b.tabIndex = b.dataset.mode === S.mode ? 0 : -1; });
   resetChain(false);
   S.changed = cur.changed || [];
+  S.upcoming = cur.upcoming || null;
   const last = cur.steps.length - 1;
   for (const [k, st] of cur.steps.entries()) {
     const edge = document.createElement("li"), node = document.createElement("li");
@@ -792,8 +932,9 @@ async function resume() {
 }
 
 async function resetWorld() {
-  if (S.busy && !S.cancelPause) return;
+  if (S.busy && !S.cancelPause && !S.nextWaiter) return;
   if (S.cancelPause) { S.abandoned = true; S.cancelPause(); }
+  if (S.nextWaiter) { S.abandoned = true; S.nextWaiter(); }
   $("#reset").disabled = true;
   try {
     await api("/api/admin/reset", {});
@@ -836,6 +977,8 @@ async function refreshLearned() {
 
 function finish() {
   refreshLearned();
+  caption("done", "Run finished. Pick anything under What changed to open it here.");
+  note(null);
   const key = S.mode === "live" ? "live" : S.mistakes ? "mistakes" : "careful";
   S.done[key] = { steps: S.steps.length, records: S.records.slice() };
   const pauses = S.records.filter((r) => r.pause);
@@ -864,10 +1007,172 @@ function finish() {
   box.innerHTML = html;
   box.hidden = false;
   box.querySelectorAll("[data-url]").forEach((b) => b.addEventListener("click", () => {
-    navigateApp(b.dataset.url);
+    navigateApp(b.dataset.url).then(() => markFrame(stepChanges().filter((c) => c.url === b.dataset.url || b.dataset.url.startsWith(c.url)), []));
     if (matchMedia("(max-width: 900px)").matches) showAppPane(true);
   }));
   requestAnimationFrame(() => follow(box));
+}
+
+/* ---------- the live app: caption, change panel, highlights ---------- */
+const PHASE = {
+  open: "Opening the page", check: "Checking before it runs", read: "Read", changed: "Changed",
+  flagged: "Flagged, it ran", paused: "Paused, nothing changed yet", blocked: "Blocked, nothing changed",
+  error: "Didn't run", done: "Finished",
+};
+const CHANGE_WORD = { created: "New", updated: "Updated", sent: "Sent", drafted: "Draft saved", deleted: "Deleted" };
+
+function caption(phase, text) {
+  const c = $("#app-caption");
+  c.hidden = false;
+  c.dataset.phase = phase;
+  $("#app-phase").textContent = PHASE[phase] || phase;
+  $("#app-cap-text").textContent = text;
+}
+
+function note(html) {
+  const n = $("#app-note");
+  n.hidden = !html;
+  n.innerHTML = html ? `${html}<button class="ghost small note-x" data-hide>Hide</button>` : "";
+}
+
+function fieldRows(fields, max = 6) {
+  return fields.slice(0, max).map((f) => `<div class="fr"><dt>${esc(f.label)}</dt><dd>${f.before ? `<s>${esc(f.before)}</s><span class="arrow" aria-label="changed to"> → </span>` : ""}<b>${esc(f.after ?? "removed")}</b></dd></div>`).join("");
+}
+
+function noteHtml(st, phase) {
+  const ch = st.changes || [];
+  if (phase === "paused") return `<h3>Paused before it ran</h3><p>Nothing in ${esc(st.app)} has changed. Allow it or block it on the right.</p>`;
+  if (phase === "blocked") return `<h3>Blocked</h3><p>The step never ran, so ${esc(st.app)} looks exactly as before.</p>`;
+  if (ch.length) {
+    return `<h3>What changed in ${esc([...new Set(ch.map((c) => c.app))].join(" and "))}</h3>` + ch.map((c) =>
+      `<section class="chg"><p class="chg-what"><span class="tag">${esc(CHANGE_WORD[c.kind] || c.kind)}</span>${esc(c.what)}</p><dl>${fieldRows(c.fields)}</dl></section>`).join("");
+  }
+  if (st.look_for?.length) {
+    return `<h3>What the agent took from this page</h3><ul class="facts">${st.look_for.map((x) => `<li>“${esc(x)}”</li>`).join("")}</ul>`;
+  }
+  if (phase === "flagged") return `<h3>Flagged</h3><p>${esc(st.check?.headline || "It ran; worth a look.")}</p>`;
+  return "";
+}
+
+/* The canvas node keeps a short before/after list; each item reopens that change in the app. */
+function diffList(node, st) {
+  node.querySelector(".diff")?.remove();
+  const ch = st.changes || [];
+  if (!ch.length) return;
+  const ul = document.createElement("ul");
+  ul.className = "diff";
+  ch.slice(0, 3).forEach((c, k) => {
+    const f = c.fields.find((x) => x.before) || c.fields[0];
+    const li = document.createElement("li");
+    li.innerHTML = `<button class="linkish" data-k="${k}"><span class="app-name">${esc(c.app)}</span><span class="lbl">${esc(CHANGE_WORD[c.kind] || c.kind)}: ${esc(clip(c.kind === "updated" && f ? `${f.label} ${f.before ?? "—"} → ${f.after ?? "—"}` : c.what.replace(/^[^:]+: /, ""), 90))}</span></button>`;
+    li.querySelector("button").addEventListener("click", async (e) => {
+      e.stopPropagation();
+      await navigateApp(c.url);
+      caption("changed", `Step ${st.index + 1}: ${stepTitle(st)}`);
+      note(noteHtml({ ...st, changes: [c] }, "changed"));
+      markFrame([c], []);
+      if (matchMedia("(max-width: 900px)").matches) showAppPane(true);
+    });
+    ul.append(li);
+  });
+  node.querySelector(".checks").before(ul);
+}
+
+const clip = (t, n) => (t.length > n ? `${t.slice(0, n - 1).trimEnd()}…` : t);
+const stepChanges = () => S.steps.flatMap((x) => x.step.changes || []);
+
+const FRAME_CSS = `
+.am-hl { outline: 3px solid #3d52a0 !important; outline-offset: 3px; border-radius: 6px; box-shadow: 0 0 0 10px rgb(112 145 230 / 0.22) !important; animation: am-pulse 1.4s ease-out 2; }
+@keyframes am-pulse { from { box-shadow: 0 0 0 0 rgb(112 145 230 / 0.6); } to { box-shadow: 0 0 0 10px rgb(112 145 230 / 0.22); } }
+.am-badge { position: absolute; z-index: 60; background: #3d52a0; color: #fff; font: 600 13px/1.25 system-ui, -apple-system, sans-serif; padding: 4px 10px; border-radius: 999px; white-space: nowrap; max-width: 420px; overflow: hidden; text-overflow: ellipsis; box-shadow: 0 6px 14px rgb(30 38 80 / 0.3); pointer-events: none; }
+mark.am-fact { background: #dfe5f8; color: inherit; box-shadow: 0 0 0 2px #7091e6; border-radius: 3px; padding: 0 2px; }
+@media (prefers-reduced-motion: reduce) { .am-hl { animation: none; } }`;
+
+function frameDoc() {
+  try { return $("#app-frame").contentDocument; } catch { return null; }
+}
+
+/* Point at what changed inside the app page (template markers from workspace/changes.py), and
+   mark the passages the agent read for. Same-origin iframe, so plain DOM. */
+function markFrame(changes, lookFor) {
+  const d = frameDoc();
+  if (!d?.body || FIXTURE) return;
+  if (!d.getElementById("am-style")) {
+    const st = d.createElement("style");
+    st.id = "am-style";
+    st.textContent = FRAME_CSS;
+    d.head.append(st);
+  }
+  d.querySelectorAll(".am-hl").forEach((e) => e.classList.remove("am-hl"));
+  d.querySelectorAll(".am-badge").forEach((e) => e.remove());
+  let first = null;
+  for (const c of changes || []) {
+    let hit = false;
+    for (const sel of c.focus || []) {
+      let els = [];
+      try { els = [...d.querySelectorAll(sel)]; } catch { /* odd id: skip */ }
+      const el = els.find((x) => x.getClientRects().length);
+      if (!el) continue;
+      el.classList.add("am-hl");
+      badge(d, el, badgeText(c, sel));
+      first ??= el;
+      hit = true;
+      if (c.kind !== "updated") break;  // one spot per new thing; every changed field for an update
+    }
+    if (!hit) continue;
+  }
+  for (const text of lookFor || []) {
+    const m = wrapText(d, text);
+    first ??= m;
+  }
+  first?.scrollIntoView({ block: "center", behavior: reduced() ? "auto" : "smooth" });
+}
+
+function badgeText(c, sel) {
+  const key = sel.match(/data-field="([^"]+)"/)?.[1];
+  const f = c.kind === "updated" && (c.fields.find((x) => key && x.label.toLowerCase().replace(/ /g, "_") === key) || (c.fields.length === 1 ? c.fields[0] : null));
+  if (f) return `${f.before ?? "—"} → ${f.after ?? "—"}`;
+  return { created: "New", sent: "Just sent", drafted: "Draft saved", updated: "Updated", deleted: "Deleted" }[c.kind] || c.kind;
+}
+
+function badge(d, el, text) {
+  const b = d.createElement("span");
+  b.className = "am-badge";
+  b.textContent = text;
+  const win = d.defaultView;
+  const clips = win.getComputedStyle(el).overflow !== "visible" || el.tagName === "TR" || el.tagName === "TD";
+  if (clips && el.offsetParent) {
+    // The element clips its children (e.g. a calendar block): put the badge beside it instead.
+    b.style.top = `${el.offsetTop - 16}px`;
+    b.style.left = `${el.offsetLeft + 4}px`;
+    if (win.getComputedStyle(el.offsetParent).position === "static") el.offsetParent.style.position = "relative";
+    el.offsetParent.append(b);
+  } else {
+    if (win.getComputedStyle(el).position === "static") el.style.position = "relative";
+    b.style.top = "-14px";
+    b.style.right = "8px";
+    el.append(b);
+  }
+}
+
+function wrapText(d, needle) {
+  if (!needle) return null;
+  const walk = d.createTreeWalker(d.body, NodeFilter.SHOW_TEXT, {
+    acceptNode: (n) => (n.parentElement?.closest("script, style, mark.am-fact") ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT),
+  });
+  const low = needle.toLowerCase();
+  for (let n = walk.nextNode(); n; n = walk.nextNode()) {
+    const i = n.nodeValue.toLowerCase().indexOf(low);
+    if (i < 0) continue;
+    const r = d.createRange();
+    r.setStart(n, i);
+    r.setEnd(n, i + needle.length);
+    const m = d.createElement("mark");
+    m.className = "am-fact";
+    r.surroundContents(m);
+    return m;
+  }
+  return null;
 }
 
 /* ---------- drawers ---------- */
@@ -942,7 +1247,7 @@ async function openSetup() {
   $("#drawer-body").innerHTML = `
     <section>
       <h3>${esc(b.company.name)}</h3>
-      <p>The agent works as ${esc(b.company.persona)}, on ${esc(b.scenario.account)}. It reads the written rules in the company's documents. The unwritten rules stay with the monitor only.</p>
+      <p>The agent works as ${esc(b.company.persona)}, on ${esc(scenario().account)}. It reads the written rules in the company's documents. The unwritten rules stay with the monitor only.</p>
     </section>
     <section><h3>Written rules</h3><ul class="rules">${list(r.written || [], (x) => x.source || "Company policy", (x) => x.text)}</ul></section>
     <section><h3>Unwritten rules</h3><ul class="rules">${list(r.unwritten || [], (x) => `${x.author}, team know-how`, (x) => x.text)}</ul></section>

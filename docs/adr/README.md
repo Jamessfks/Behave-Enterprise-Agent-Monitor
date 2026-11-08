@@ -17,3 +17,4 @@ edit the old one's text.
 | [0009](0009-scenarios-execute-against-the-workspace.md) | Demo runs execute against the real workspace, step by step | Accepted |
 | [0010](0010-one-agent-with-a-mistakes-switch.md) | One agent with a "Plant mistakes" switch | Accepted |
 | [0011](0011-canvas-ui.md) | Split-screen canvas: live app plus a pannable workflow | Accepted |
+| [0012](0012-step-changes-and-paced-playback.md) | Each step says what it changed; the next step is known before it runs | Accepted |

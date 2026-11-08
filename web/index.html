@@ -37,10 +37,11 @@
       </div>
     </div>
     <nav class="controls" aria-label="Run controls">
-      <div class="seg" role="radiogroup" aria-label="What the agent does">
+      <div class="seg mode" role="radiogroup" aria-label="What the agent does">
         <button role="radio" aria-checked="true" tabindex="0" data-mode="demo">Demo task</button>
         <button role="radio" aria-checked="false" tabindex="-1" data-mode="live">Live</button>
       </div>
+      <label class="task-pick" id="task-pick"><span>Task</span><select id="scenario" aria-label="Demo task"></select></label>
       <button id="mistakes" class="switch" role="switch" aria-checked="true">
         <span class="track" aria-hidden="true"><span class="thumb"></span></span>
         <span>Plant mistakes</span>
@@ -67,7 +68,14 @@
         <span class="path" id="app-path" aria-live="polite"></span>
         <a id="app-open" href="#" target="_blank" rel="noopener">Open in a new tab</a>
       </div>
-      <iframe id="app-frame" title="Workspace app the agent is using"></iframe>
+      <div class="app-caption" id="app-caption" aria-live="polite" hidden>
+        <span class="phase" id="app-phase"></span>
+        <span class="cap-text" id="app-cap-text"></span>
+      </div>
+      <div class="frame-wrap">
+        <iframe id="app-frame" title="Workspace app the agent is using"></iframe>
+        <aside class="app-note" id="app-note" aria-label="What this step changed" hidden></aside>
+      </div>
     </section>
 
     <div class="divider" id="divider" role="separator" aria-orientation="vertical" aria-label="Resize the app and the workflow" tabindex="0" aria-valuemin="25" aria-valuemax="75" aria-valuenow="46"></div>
@@ -78,6 +86,11 @@
         <span class="zoom-level" id="zoom-level" aria-live="polite">100%</span>
         <button class="tool" id="zoom-in" aria-label="Zoom in">+</button>
         <button class="tool text" id="fit">Fit</button>
+        <div class="seg pace" role="radiogroup" aria-label="Pace of the run">
+          <button role="radio" aria-checked="false" tabindex="-1" data-pace="step">Step by step</button>
+          <button role="radio" aria-checked="true" tabindex="0" data-pace="slow">Slow</button>
+          <button role="radio" aria-checked="false" tabindex="-1" data-pace="fast">Fast</button>
+        </div>
         <button class="tool text" id="follow" aria-pressed="true">Follow<span class="wide"> the agent</span></button>
         <button class="tool text show-app-btn" id="show-app" aria-expanded="false" aria-controls="app-pane">Show the app</button>
       </div>
@@ -105,7 +118,7 @@
             <p id="ranker-note" class="note"></p>
             <p class="foot" id="latency"></p>
           </div>
-          <ol id="ledger" class="ledger" aria-label="Every step"></ol>
+          <ol id="ledger" class="ledger" aria-label="Every step" tabindex="0"></ol>
         </div>
       </aside>
     </section>

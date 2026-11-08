@@ -118,7 +118,7 @@ Every run log contains both layers, in order:
 |---|---|
 | `GET /api/events?since=N` | the active run's events (both layers), poll with `since` |
 | `GET /api/approvals` | paused steps waiting for a person |
-| `POST /api/approvals/{id}/approve` `{reason, by}` | Allow; a non-empty reason is saved as a **learned rule** |
+| `POST /api/approvals/{id}/approve` `{reason, by}` | Allow; a non-empty reason is saved as a **learned rule**. Returns `changes`: what the replayed write changed (`workspace/changes.py`, ADR 0012) |
 | `POST /api/approvals/{id}/reject` `{reason, by}` | Block; reason saved as a learned rule |
 | `POST /api/events/{id}/undo` | revert a flagged write |
 | `GET /api/runs/current/sources` | text of everything the agent read in this run → **fact check** (is a value in any source?) |
@@ -126,6 +126,8 @@ Every run log contains both layers, in order:
 | `POST /api/admin/reset`, `/api/admin/run` | runs |
 
 Rule files: `world/rules/written_rules.json`, `world/rules/unwritten_rules.json`, learned → `rules/learned_rules.json`.
+The `sentinel.approved` event's `args` hold `approval_id`, `event_id`, `by`, `reason`, `rule_id` and, optionally, `changes`: a list of `{app, kind, type, id, what, url, focus, fields: [{label, before, after}]}`, the same shape as a step view's `changes`. `sentinel.rejected` has no `changes` (nothing was applied).
+
 Anything extra the monitor returns besides `decision/score/reason` (e.g. `top_guesses`, `checks`, `rule_id`) is stored on the event under `monitor`, so a UI can show "Expected: Request approval · Actual: Send quote".
 
 ## 10. Known simplifications (fine for the demo, revisit later)

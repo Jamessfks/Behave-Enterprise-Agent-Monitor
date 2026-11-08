@@ -17,7 +17,7 @@ from typing import Any
 
 from fastapi import HTTPException
 
-from . import catalog, monitor, store
+from . import catalog, changes, monitor, store
 
 STAGES = ["new", "discovery", "demo", "proposal", "negotiation", "closed_won", "closed_lost"]
 OPEN_STAGES = STAGES[:5]
@@ -445,10 +445,12 @@ async def approve(approval_id: str, approver: str = "u_dana", reason: str = "") 
     token = APPROVED.set(
         {"approval_id": approval_id, "catalog_action": ev["catalog_action"], "reason": reason}
     )
+    snap = changes.capture()
     try:
         result = await _REPLAY["fn"](p["request"])
     finally:
         APPROVED.reset(token)
+    diff = changes.diff(snap, store.DATA)
     rule = learn("allow", ev, reason, approver)
     _log(
         _base(
@@ -462,11 +464,12 @@ async def approve(approval_id: str, approver: str = "u_dana", reason: str = "") 
                 "by": approver,
                 "reason": reason,
                 "rule_id": rule and rule["id"],
+                "changes": diff,
             },
             {},
         )
     )
-    return {"ok": True, "result": result, "rule": rule}
+    return {"ok": True, "result": result, "rule": rule, "changes": diff}
 
 
 async def reject(approval_id: str, approver: str = "u_dana", reason: str = "") -> dict:

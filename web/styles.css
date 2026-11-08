@@ -166,7 +166,62 @@ button.danger:hover:not(:disabled) { background: var(--block-bg); }
 }
 .address .path { color: var(--muted); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .address a { color: var(--ink); white-space: nowrap; text-decoration-color: var(--cornflower); text-underline-offset: 3px; }
+.frame-wrap { position: relative; flex: 1; min-height: 0; display: flex; }
 #app-frame { flex: 1; width: 100%; border: 0; background: #fff; min-height: 0; }
+
+/* What the agent is doing on this page, in one line: the beat (before, checking, after) and the step */
+.app-caption {
+  display: flex; align-items: baseline; gap: 12px; padding: 10px 14px; margin: 0 12px 8px; border-radius: var(--r-md);
+  background: var(--surface); box-shadow: var(--shadow); color: var(--ink-strong); font-size: 17px; line-height: 1.35;
+}
+.app-caption[hidden] { display: none; }
+.app-caption .phase {
+  flex: none; font-weight: 700; font-stretch: 112%; padding: 2px 10px; border-radius: 999px; background: var(--mist); color: var(--indigo);
+  box-shadow: inset 0 0 0 1.5px var(--cornflower); white-space: nowrap; font-size: 15px;
+}
+.app-caption[data-phase="check"] .phase { background: var(--indigo); color: var(--on-primary); box-shadow: none; }
+.app-caption[data-phase="changed"] .phase, .app-caption[data-phase="done"] .phase { background: var(--indigo); color: var(--on-primary); box-shadow: none; }
+.app-caption[data-phase="paused"] .phase, .app-caption[data-phase="flagged"] .phase { background: var(--pause-bg); color: var(--pause); box-shadow: inset 0 0 0 1.5px var(--pause); }
+.app-caption[data-phase="blocked"] .phase, .app-caption[data-phase="error"] .phase { background: var(--block-bg); color: var(--block); box-shadow: inset 0 0 0 1.5px var(--block); }
+.app-caption[data-phase="check"] .phase::after { content: ""; display: inline-block; width: 0.5em; animation: dots 1.2s steps(4) infinite; overflow: hidden; vertical-align: bottom; }
+@keyframes dots { from { width: 0; } to { width: 1.2em; } }
+@media (prefers-reduced-motion: reduce) { .app-caption .phase::after { animation: none; } }
+.cap-text { min-width: 0; }
+
+/* Before and after, docked over the bottom of the app */
+.app-note {
+  position: absolute; left: 14px; right: 14px; bottom: 14px; max-height: 46%; overflow: auto; z-index: 2;
+  background: var(--surface); border-radius: var(--r-md); padding: 14px 18px 12px; color: var(--ink);
+  box-shadow: 0 0 0 1px var(--line), 0 24px 48px -16px rgb(30 38 80 / 0.45); font-size: 16px;
+}
+.app-note[hidden] { display: none; }
+.app-note h3 { margin: 0 70px 8px 0; font-size: 19px; font-weight: 700; font-stretch: 112%; color: var(--ink-strong); }
+.app-note p { margin: 0 0 6px; }
+.app-note .note-x { position: absolute; top: 10px; right: 10px; }
+.app-note .chg + .chg { border-top: 1px solid var(--line); margin-top: 8px; padding-top: 8px; }
+.chg-what { font-weight: 600; color: var(--ink-strong); display: flex; gap: 10px; align-items: baseline; }
+.chg-what .tag { flex: none; font-size: 13px; font-weight: 700; padding: 1px 8px; border-radius: 999px; background: var(--indigo); color: var(--on-primary); }
+.app-note dl { margin: 4px 0 0; display: grid; gap: 3px; }
+.app-note .fr { display: grid; grid-template-columns: 7.5em minmax(0, 1fr); gap: 10px; }
+.app-note dt { color: var(--muted); }
+.app-note dd { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.app-note s { color: var(--muted); text-decoration-color: var(--block); }
+.app-note .arrow { color: var(--indigo); font-weight: 700; }
+.app-note .facts { margin: 0; padding-left: 1.1em; display: grid; gap: 3px; }
+
+/* A step's changes on its canvas node */
+.diff { list-style: none; margin: 8px 0 2px; padding: 8px 0 0; border-top: 1px dashed var(--line-strong); display: grid; gap: 2px; position: relative; z-index: 2; }
+.diff .linkish { font-size: 16px; display: flex; flex-wrap: nowrap; width: 100%; box-sizing: border-box; }
+.diff .app-name { min-width: 5.5em; flex: none; }
+.diff .lbl { flex: 1; min-width: 0; }
+
+.task-pick { display: inline-flex; align-items: center; gap: 8px; color: var(--muted); font-weight: 500; }
+.task-pick select {
+  font: inherit; color: var(--ink-strong); font-weight: 600; background: var(--surface); border: 1px solid var(--line-strong);
+  border-radius: var(--r-sm); padding: 7px 10px; min-height: 40px; max-width: 22em;
+}
+.task-pick select:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.tools .pace button { min-height: 32px; padding: 4px 12px; font-size: 16px; }
 body.resizing #app-frame { pointer-events: none; }
 body.resizing { cursor: col-resize; user-select: none; }
 
@@ -372,14 +427,21 @@ body.resizing { cursor: col-resize; user-select: none; }
 .monitor-head h2 { font-size: 22px; font-weight: 300; font-stretch: 125%; letter-spacing: -0.02em; }
 svg.risk { width: clamp(120px, 22vw, 280px); height: 44px; display: block; background: var(--surface-2); border-radius: var(--r-sm); flex: 0 1 auto; min-width: 60px; box-shadow: inset 0 0 0 1px var(--line); }
 .risk-now { color: var(--ink-strong); margin-right: auto; font-weight: 600; }
-.monitor-body { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: 18px; margin: 10px 0 4px; max-height: 24vh; }
-.monitor-left { display: grid; gap: 6px; align-content: start; overflow: auto; }
+/* A definite height with a 0-min row, so each column scrolls inside it (a max-height alone let the
+   row grow to fit every step and the rest was cut off). */
+.monitor-body {
+  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); grid-template-rows: minmax(0, 1fr);
+  gap: 18px; margin: 10px 0 4px; height: clamp(180px, 27vh, 340px);
+}
+.monitor-body[hidden] { display: none; }
+.monitor-left { display: grid; gap: 6px; align-content: start; overflow: auto; min-height: 0; overscroll-behavior: contain; }
 .risk .barrier { stroke: var(--pause); stroke-dasharray: 4 4; stroke-width: 1.5; vector-effect: non-scaling-stroke; }
 .risk .baseline { stroke: var(--peri-slate); stroke-width: 1; opacity: 0.6; vector-effect: non-scaling-stroke; }
 .risk .line { fill: none; stroke: var(--primary); stroke-width: 2.8; vector-effect: non-scaling-stroke; }
 .risk .flag { stroke: var(--pause); stroke-width: 2; vector-effect: non-scaling-stroke; }
 .foot { font-size: 16px; color: var(--muted); }
-.ledger { list-style: none; margin: 0; padding: 0; display: grid; gap: 1px; align-content: start; overflow: auto; }
+.ledger { list-style: none; margin: 0; padding: 0 6px 0 0; display: grid; gap: 1px; align-content: start; overflow-y: auto; min-height: 0; overscroll-behavior: contain; scrollbar-gutter: stable; }
+.ledger:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; border-radius: var(--r-sm); }
 .row { padding: 5px 8px; border-radius: var(--r-sm); display: grid; grid-template-columns: 26px minmax(0, 1fr) 64px 3em; gap: 2px 10px; align-items: center; font-size: 16px; }
 .row .n { color: var(--muted); }
 .row .what { font-weight: 600; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--ink-strong); }
@@ -435,7 +497,7 @@ mark { background: rgb(112 145 230 / 0.28); color: inherit; border-radius: 3px; 
   .viewport { flex: none; height: 64dvh; min-height: 420px; }
   .show-app-btn { display: inline-block; }
   .monitor { padding: 8px 16px 16px; }
-  .monitor-body { grid-template-columns: minmax(0, 1fr); max-height: none; }
+  .monitor-body { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto; height: auto; }
   .ledger { max-height: 40vh; }
 }
 @media (max-width: 600px) {

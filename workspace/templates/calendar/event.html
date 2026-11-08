@@ -8,8 +8,8 @@
   <div class="flex items-start gap-4">
     <span class="mt-2 w-4 h-4 rounded {{ 'bg-[#039be5]' if e.account else 'bg-[#33b679]' }}"></span>
     <div class="flex-1">
-      <h1 class="text-2xl text-gray-900">{{ e.title }}</h1>
-      <div class="text-sm text-gray-700 mt-1">{{ when }}</div>
+      <h1 class="text-2xl text-gray-900" data-field="title">{{ e.title }}</h1>
+      <div class="text-sm text-gray-700 mt-1" data-field="start">{{ when }}</div>
     </div>
   </div>
   <div class="flex gap-2 mt-5 ml-8">
@@ -19,15 +19,15 @@
     </form>
   </div>
   <dl class="mt-6 ml-8 space-y-4 text-sm">
-    <div><dt class="text-gray-500">Location</dt><dd>{{ e.location or '—' }}</dd></div>
-    <div><dt class="text-gray-500">Guests ({{ e.attendees|length }})</dt>
+    <div data-field="location"><dt class="text-gray-500">Location</dt><dd>{{ e.location or '—' }}</dd></div>
+    <div data-field="attendees"><dt class="text-gray-500">Guests ({{ e.attendees|length }})</dt>
       <dd><ul class="mt-1 space-y-1">{% for a in e.attendees %}
         <li class="flex items-center gap-2"><span class="w-7 h-7 rounded-full bg-gray-200 flex items-center justify-center text-[11px] font-semibold">{{ a.name[:1] }}</span>
           <span>{{ a.name }}</span> <span class="text-gray-500">&lt;{{ a.email }}&gt;</span>{% if a.email == e.organizer %} <span class="text-xs text-gray-500">· Organizer</span>{% endif %}</li>
       {% endfor %}</ul></dd></div>
     {% if deal %}<div><dt class="text-gray-500">Deal</dt><dd><a class="text-[#1a73e8] hover:underline" href="/crm/deal/{{ deal.id }}">{{ deal.name }}</a></dd></div>
     {% elif e.deal %}<div><dt class="text-gray-500">Deal</dt><dd>{{ e.deal }}</dd></div>{% endif %}
-    <div><dt class="text-gray-500">Description</dt><dd class="whitespace-pre-wrap">{{ e.description or '—' }}</dd></div>
+    <div data-field="description"><dt class="text-gray-500">Description</dt><dd class="whitespace-pre-wrap">{{ e.description or '—' }}</dd></div>
   </dl>
 </div>
 {% endblock %}

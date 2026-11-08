@@ -22,7 +22,7 @@
     <td class="text-gray-500">-</td><td class="text-gray-500">-</td></tr>
   {% endfor %}
   {% for d in docs %}
-  <tr class="border-b hover:bg-gray-50">
+  <tr class="border-b hover:bg-gray-50" data-doc-id="{{ d.id }}">
     <td class="py-2"><a href="/drive/doc/{{ d.id }}" class="flex items-center gap-2 text-gray-900">
       <span class="inline-block w-3 h-4 rounded-sm {{ 'bg-green-600' if d.kind=='sheet' else ('bg-yellow-500' if d.kind=='offer' else 'bg-blue-500') }}"></span>
       <span>{{ d.name }}</span> {{ badge(d.sensitivity) }}</a></td>

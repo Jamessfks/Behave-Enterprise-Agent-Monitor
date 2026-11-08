@@ -17,7 +17,7 @@ from typing import Any
 
 from fastapi import FastAPI
 
-from workspace import dispatch, events, store
+from workspace import events, store
 
 MODEL = "claude-opus-5-5"
 MAX_TURNS = 40
@@ -314,7 +314,7 @@ async def next_step(app: FastAPI, client: Any = None) -> dict[str, Any]:
 
     method, path, body, query = _route(name, args)
     before = len(events.EVENTS)
-    status, out = await dispatch.call(app, method, path, body, query)
+    status, out, diff = await runner.call_with_changes(app, method, path, body, query)
     ev = runner._step_event(events.EVENTS[before:])
     spec = {"label": f"{name.replace('_', ' ').capitalize()}", "method": method}
     view = runner.step_view(
@@ -325,6 +325,9 @@ async def next_step(app: FastAPI, client: Any = None) -> dict[str, Any]:
         lv["awaiting"] = {"approval_id": approval_id, "tool_use_id": block["id"]}
         view["approval_id"] = approval_id
     else:
+        view["changes"] = diff
+        if not view["page"] and diff:
+            view["page"] = diff[0]["url"]
         text = (
             json.dumps(out)[:4000] if status < 300 else f"Error {status}: {json.dumps(out)[:1000]}"
         )
