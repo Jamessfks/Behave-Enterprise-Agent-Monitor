@@ -1,0 +1,36 @@
+{% extends "drive/_layout.html" %}
+{% from "drive/_macros.html" import badge %}
+{% block dtitle %}Edit {{ doc.name }}{% endblock %}
+{% block main %}
+<div class="max-w-4xl">
+  <div class="text-sm text-gray-500 mb-1">{{ folder_path(doc.folder_id) }}</div>
+  <h1 class="text-xl mb-3 flex items-center gap-3">Editing: {{ doc.name }} {{ badge(doc.sensitivity) }}</h1>
+  <form data-api="/api/drive/edit" class="space-y-3 text-sm">
+    <input type="hidden" name="doc_id" value="{{ doc.id }}">
+    <label class="block">Name<input type="text" name="name" value="{{ doc.name }}" required class="mt-1 block w-full border rounded px-2 py-1.5"></label>
+    {% if doc.kind == 'offer' %}{% set o = doc.offer or {} %}
+    <fieldset class="border-2 border-yellow-300 bg-yellow-50 rounded-lg p-4 grid grid-cols-2 gap-3">
+      <legend class="px-1 font-semibold">Offer details</legend>
+      <label class="flex flex-col">Account<select name="account" class="border rounded px-2 py-1.5 bg-white">
+        <option value="">(none)</option>
+        {% for a in accounts %}<option value="{{ a }}" {% if a == o.account %}selected{% endif %}>{{ account_name(a) }} ({{ a }})</option>{% endfor %}</select></label>
+      <label class="flex flex-col">Plan<select name="plan" class="border rounded px-2 py-1.5 bg-white">
+        <option value="core" {% if o.plan != 'pro' %}selected{% endif %}>Core ($1,800/location/yr)</option>
+        <option value="pro" {% if o.plan == 'pro' %}selected{% endif %}>Pro ($2,640/location/yr)</option></select></label>
+      <label class="flex flex-col">Locations<input type="number" min="0" name="locations" value="{{ o.locations or 0 }}" class="border rounded px-2 py-1.5"></label>
+      <label class="flex flex-col">Discount %<input type="number" min="0" max="100" step="any" name="discount_pct" value="{{ o.discount_pct or 0 }}" class="border rounded px-2 py-1.5"></label>
+      <label class="flex items-center gap-2"><input type="hidden" name="onboarding" value="false"><input type="checkbox" name="onboarding" value="true" {% if o.onboarding %}checked{% endif %}> Onboarding ($3,000 one-time)</label>
+      <label class="flex items-center gap-2"><input type="hidden" name="payroll_addon" value="false"><input type="checkbox" name="payroll_addon" value="true" {% if o.payroll_addon %}checked{% endif %}> Payroll add-on ($2,000/yr, Core only)</label>
+      <label class="flex flex-col">Valid until<input type="date" name="valid_until" value="{{ o.valid_until or '' }}" class="border rounded px-2 py-1.5"></label>
+      <label class="flex flex-col col-span-2">Notes<textarea name="notes" rows="2" class="border rounded px-2 py-1.5">{{ o.notes or '' }}</textarea></label>
+      {% if totals %}<div class="col-span-2 text-gray-600">Current saved total (first year): <strong>{{ money(totals.first_year_total) }}</strong></div>{% endif %}
+    </fieldset>
+    {% endif %}
+    <label class="block">Body (Markdown)<textarea name="body" rows="24" class="mt-1 block w-full border rounded px-3 py-2 font-mono text-sm">{{ doc.body or '' }}</textarea></label>
+    <div class="flex gap-2">
+      <button type="submit" class="px-5 py-2 rounded bg-blue-600 text-white hover:bg-blue-700">Save</button>
+      <a href="/drive/doc/{{ doc.id }}" class="px-5 py-2 rounded border bg-white hover:bg-gray-100">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

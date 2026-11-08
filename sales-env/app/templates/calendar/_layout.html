@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}{% block cal_title %}Calendario{% endblock %} | Calendario{% endblock %}
+{% block content %}
+<div class="flex items-center gap-3 px-4 h-14 border-b border-gray-200 bg-white">
+  <a href="/calendar" class="flex items-center gap-2 mr-4">
+    <span class="w-8 h-8 rounded bg-[#1a73e8] text-white flex flex-col items-center justify-center leading-none"><span class="text-[8px] uppercase">Nov</span><span class="text-sm font-bold">9</span></span>
+    <span class="text-xl text-gray-700">Calendario</span>
+  </a>
+  {% block toolbar %}{% endblock %}
+</div>
+<div class="flex flex-1 min-h-0">
+  <aside class="w-52 shrink-0 border-r border-gray-200 p-3 bg-white">
+    <a href="/calendar/new" class="inline-flex items-center gap-2 px-5 py-3 rounded-2xl shadow bg-white hover:bg-[#e8f0fe] border border-gray-200 text-sm font-medium text-gray-800"><span class="text-2xl leading-none text-[#1a73e8]">+</span> Create</a>
+    <div class="mt-6 text-xs text-gray-500 uppercase tracking-wide">My calendars</div>
+    <div class="mt-2 text-sm flex items-center gap-2"><span class="w-3 h-3 rounded-sm bg-[#039be5]"></span>Customer meetings</div>
+    <div class="mt-1 text-sm flex items-center gap-2"><span class="w-3 h-3 rounded-sm bg-[#33b679]"></span>Internal</div>
+  </aside>
+  <div class="flex-1 min-w-0 bg-white">{% block cal %}{% endblock %}</div>
+</div>
+{% endblock %}

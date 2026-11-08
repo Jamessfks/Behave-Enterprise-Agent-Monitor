@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}{% block dtitle %}Jdrive{% endblock %} - Jdrive{% endblock %}
+{% block content %}
+<div class="flex items-center gap-4 px-4 py-2 border-b border-gray-200">
+  <a href="/drive" class="flex items-center gap-2 text-xl text-gray-700 w-56">
+    <span class="inline-block w-7 h-7 rounded bg-yellow-400 text-white font-bold text-center leading-7">J</span>Jdrive</a>
+  <form method="get" action="/drive" class="flex-1 max-w-2xl flex gap-2">
+    <input type="text" name="q" value="{{ q|default('') }}" placeholder="Search in Jdrive" aria-label="Search in Jdrive"
+           class="flex-1 bg-gray-100 rounded-full px-4 py-2 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-300">
+    <button type="submit" class="px-4 py-2 text-sm rounded-full bg-gray-100 hover:bg-gray-200">Search</button>
+  </form>
+</div>
+<div class="flex flex-1 min-h-0">
+  <aside class="w-60 shrink-0 border-r border-gray-100 px-3 py-3 text-sm">
+    <details class="mb-3" {% if open_new|default(false) %}open{% endif %}>
+      <summary class="list-none cursor-pointer inline-flex items-center gap-2 px-5 py-3 rounded-2xl shadow bg-white border border-gray-200 hover:bg-blue-50 font-medium">+ New</summary>
+      <form data-api="/api/drive/create" class="mt-2 p-3 border rounded-lg bg-gray-50 space-y-2">
+        <input type="hidden" name="folder_id" value="{{ current_folder or 'fd_my_drive' }}">
+        <label class="block text-xs text-gray-600">New document in <strong>{{ folder_path(current_folder or 'fd_my_drive') }}</strong></label>
+        <input type="text" name="name" required placeholder="Document name" aria-label="New document name" class="w-full border rounded px-2 py-1">
+        <button type="submit" class="w-full bg-blue-600 text-white rounded px-3 py-1.5">Create document</button>
+      </form>
+    </details>
+    <nav aria-label="Folders">
+      {% for n in tree %}
+      <a href="/drive?folder={{ n.f.id }}" style="padding-left: {{ 12 + n.depth * 16 }}px"
+         class="block py-1.5 pr-2 rounded-r-full truncate {{ 'bg-blue-100 text-blue-900 font-medium' if n.f.id == current_folder else 'text-gray-700 hover:bg-gray-100' }}">
+        <span class="text-yellow-500">&#9632;</span> {{ n.f.name }}</a>
+      {% endfor %}
+    </nav>
+  </aside>
+  <section class="flex-1 min-w-0 px-6 py-4 overflow-auto">
+    {% block main %}{% endblock %}
+  </section>
+</div>
+{% endblock %}

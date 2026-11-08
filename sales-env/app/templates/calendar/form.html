@@ -1,0 +1,33 @@
+{% extends "calendar/_layout.html" %}
+{% block cal_title %}{{ 'Edit event' if ev else 'New event' }}{% endblock %}
+{% block toolbar %}
+  <a href="{{ '/calendar/event/' ~ ev.id if ev else '/calendar?week=' ~ form.date }}" class="px-3 py-1.5 rounded text-sm hover:bg-gray-100">&lsaquo; Cancel</a>
+  <h1 class="text-xl text-gray-800 ml-2">{{ 'Edit event' if ev else 'New event' }}</h1>
+{% endblock %}
+{% block cal %}
+<form data-api="{{ api }}" class="max-w-2xl p-8 space-y-4 text-sm">
+  <label class="block"><span class="text-gray-600">Title</span>
+    <input name="title" value="{{ form.title }}" required placeholder="Add title" class="mt-1 w-full border-b-2 border-gray-300 focus:border-[#1a73e8] outline-none text-xl py-1"></label>
+  <div class="flex gap-4">
+    <label class="block"><span class="text-gray-600">Date</span>
+      <input type="date" name="date" value="{{ form.date }}" required class="mt-1 block border rounded px-2 py-1.5"></label>
+    <label class="block"><span class="text-gray-600">Start</span>
+      <input type="time" name="start" value="{{ form.start }}" required class="mt-1 block border rounded px-2 py-1.5"></label>
+    <label class="block"><span class="text-gray-600">End</span>
+      <input type="time" name="end" value="{{ form.end }}" required class="mt-1 block border rounded px-2 py-1.5"></label>
+  </div>
+  <label class="block"><span class="text-gray-600">Attendees (comma-separated emails)</span>
+    <input name="attendees" value="{{ form.attendees }}" placeholder="name@company.com, other@company.com" class="mt-1 w-full border rounded px-2 py-1.5"></label>
+  <label class="block"><span class="text-gray-600">Deal (optional)</span>
+    <select name="deal" class="mt-1 block w-full border rounded px-2 py-1.5">
+      <option value="">— None —</option>
+      {% for d in deals %}<option value="{{ d.id }}" {{ 'selected' if d.id == form.deal }}>{{ d.name }}</option>{% endfor %}
+    </select></label>
+  <label class="block"><span class="text-gray-600">Description</span>
+    <textarea name="description" rows="5" class="mt-1 w-full border rounded px-2 py-1.5">{{ form.description }}</textarea></label>
+  <div class="flex items-center gap-3">
+    <button type="submit" class="px-6 py-2 rounded bg-[#1a73e8] hover:bg-[#1765cc] text-white font-medium">Save</button>
+    <span class="text-xs text-gray-500">Saving sends invitations / updates to all guests.</span>
+  </div>
+</form>
+{% endblock %}

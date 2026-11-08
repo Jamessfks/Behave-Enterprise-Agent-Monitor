@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Event log – Sentinel{% endblock %}
+{% block head %}{% if not pending %}<meta http-equiv="refresh" content="3">{% endif %}{% endblock %}
+{% block content %}
+<div class="p-4">
+  <div class="flex items-baseline gap-3 mb-3">
+    <h1 class="text-lg font-semibold">Event log</h1>
+    <span class="text-sm text-gray-500">run {{ RUN.get('id') }} · agent {{ RUN.get('agent') }} · account {{ RUN.get('account_id') or '–' }} · auto-refresh 3s · {% if show_ui %}<a class="underline" href="/events">hide clicks</a>{% else %}<a class="underline" href="/events?ui=1">show clicks</a>{% endif %}</span>
+  </div>
+  {% if pending %}
+  <div class="mb-4 border border-blue-300 bg-blue-50 rounded p-3">
+    <h2 class="font-semibold text-blue-900 mb-2">Waiting for approval</h2>
+    {% for aid, p in pending.items() %}
+    <div class="flex items-center gap-3 text-sm py-1">
+      <code>{{ p.event.catalog_action }}</code><span class="text-gray-600">{{ p.event.reason }}</span>
+      <form data-api="/api/approvals/{{ aid }}/approve" data-flash="Allowed and executed" class="flex gap-1">
+        <input name="reason" placeholder="Reason (becomes a rule)" class="border rounded px-2 py-1 w-56">
+        <button type="submit" class="px-2 py-1 bg-blue-600 text-white rounded">Allow</button>
+        <button type="submit" data-api="/api/approvals/{{ aid }}/reject" class="px-2 py-1 border rounded">Block</button></form>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+  <table class="w-full text-sm">
+    <thead><tr class="text-left text-gray-500 border-b"><th class="py-1">time</th><th>catalog action</th><th>object</th><th>ctx</th><th>decision</th><th>reason</th></tr></thead>
+    <tbody>
+    {% for e in evs %}
+      {% set c = {'block':'text-red-700 font-semibold','pause':'text-blue-700 font-semibold','flag':'text-amber-700 font-semibold'}.get(e.decision,'text-gray-500') %}
+      <tr class="border-b align-top">
+        <td class="py-1 pr-2 whitespace-nowrap text-gray-500">{{ e.ts[11:19] }}</td>
+        <td class="pr-2"><code>{{ e.catalog_action }}</code></td>
+        <td class="pr-2 text-gray-600">{{ e.object.id if e.object else '' }}</td>
+        <td class="pr-2 text-gray-600 text-xs">{% for k, v in e.ctx.items() %}{{ k }}={{ v }} {% endfor %}</td>
+        <td class="pr-2 {{ c }}">{{ e.decision }}</td>
+        <td class="text-gray-600">{{ e.reason or '' }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

@@ -1,0 +1,8 @@
+.venv/
+__pycache__/
+*.pyc
+.DS_Store
+state/
+runs/*.jsonl
+.claude/
+rules/learned_rules.json

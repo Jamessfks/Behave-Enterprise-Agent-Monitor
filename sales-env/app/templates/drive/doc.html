@@ -1,0 +1,116 @@
+{% extends "drive/_layout.html" %}
+{% from "drive/_macros.html" import badge %}
+{% block dtitle %}{{ doc.name }}{% endblock %}
+{% block main %}
+{% set btn = "px-3 py-1.5 rounded border border-gray-300 bg-white hover:bg-gray-100 text-sm" %}
+<div class="max-w-4xl">
+  <div class="text-sm text-gray-500 mb-1">
+    {% for c in crumbs %}{% if not loop.first %} &rsaquo; {% endif %}<a href="/drive?folder={{ c.id }}" class="hover:underline">{{ c.name }}</a>{% endfor %}
+  </div>
+  <h1 class="text-2xl font-normal text-gray-900 flex items-center gap-3">{{ doc.name }} {{ badge(doc.sensitivity) }}</h1>
+  <div class="text-xs text-gray-500 mt-1">Owner: {{ user_name(doc.owner) }} · Last modified {{ fmt_dt(doc.updated_at, false) }} · Type: {{ doc.kind }}
+    {% if doc.copied_from %} · Copied from <a class="underline" href="/drive/doc/{{ doc.copied_from }}">{{ doc.copied_from }}</a>{% endif %}
+    {% if doc.shared_with %} · Shared with {{ doc.shared_with|length }}{% endif %}</div>
+
+  <div class="flex flex-wrap gap-2 my-4 items-start" role="toolbar" aria-label="Document actions">
+    <a href="/drive/doc/{{ doc.id }}/edit" class="px-3 py-1.5 rounded bg-blue-600 text-white text-sm hover:bg-blue-700">Edit</a>
+    <a href="#copy" class="{{ btn }}" onclick="document.getElementById('copy').open=true">Make a copy</a>
+    <a href="#share" class="{{ btn }}" onclick="document.getElementById('share').open=true">Share</a>
+    <a href="#move" class="{{ btn }}" onclick="document.getElementById('move').open=true">Move</a>
+    <a href="#rename" class="{{ btn }}" onclick="document.getElementById('rename').open=true">Rename</a>
+    <form data-api="/api/drive/delete" data-confirm="Delete {{ doc.name }}?" class="inline">
+      <input type="hidden" name="doc_id" value="{{ doc.id }}">
+      <button type="submit" class="px-3 py-1.5 rounded border border-red-300 text-red-700 bg-white hover:bg-red-50 text-sm">Delete</button>
+    </form>
+  </div>
+
+  <div class="space-y-2 mb-4 text-sm">
+    <details id="copy" class="border rounded-lg p-3 bg-gray-50"><summary class="cursor-pointer font-medium">Make a copy</summary>
+      <form data-api="/api/drive/copy" class="mt-2 flex flex-wrap gap-2 items-end">
+        <input type="hidden" name="doc_id" value="{{ doc.id }}">
+        <label class="flex flex-col">Name<input type="text" name="name" value="Copy of {{ doc.name }}" class="border rounded px-2 py-1 w-80"></label>
+        <label class="flex flex-col">Folder<select name="folder_id" class="border rounded px-2 py-1">
+          {% for n in tree %}<option value="{{ n.f.id }}" {% if n.f.id == doc.folder_id %}selected{% endif %}>{{ n.f.path }}</option>{% endfor %}</select></label>
+        <button type="submit" class="px-3 py-1.5 rounded bg-blue-600 text-white">Make a copy</button>
+      </form></details>
+    <details id="share" class="border rounded-lg p-3 bg-gray-50"><summary class="cursor-pointer font-medium">Share ({{ doc.shared_with|length }} people with access)</summary>
+      <ul class="mt-2 mb-2">
+        <li class="py-1">{{ user_name(doc.owner) }} <span class="text-gray-500">(Owner)</span></li>
+        {% for s in doc.shared_with %}
+        <li class="py-1 flex items-center gap-3">{{ s.email }} <span class="text-gray-500">({{ s.role|capitalize }})</span>
+          <form data-api="/api/drive/unshare" class="inline"><input type="hidden" name="doc_id" value="{{ doc.id }}"><input type="hidden" name="email" value="{{ s.email }}">
+            <button type="submit" class="text-xs px-2 py-0.5 border rounded bg-white hover:bg-gray-100">Remove access</button></form></li>
+        {% endfor %}
+      </ul>
+      <form data-api="/api/drive/share" class="flex flex-wrap gap-2 items-end">
+        <input type="hidden" name="doc_id" value="{{ doc.id }}">
+        <label class="flex flex-col">Email<input type="email" name="email" required placeholder="name@company.com" class="border rounded px-2 py-1 w-72"></label>
+        <label class="flex flex-col">Role<select name="role" class="border rounded px-2 py-1"><option value="viewer">Viewer</option><option value="editor">Editor</option></select></label>
+        <button type="submit" class="px-3 py-1.5 rounded bg-blue-600 text-white">Share</button>
+      </form></details>
+    <details id="move" class="border rounded-lg p-3 bg-gray-50"><summary class="cursor-pointer font-medium">Move</summary>
+      <form data-api="/api/drive/move" class="mt-2 flex gap-2 items-end">
+        <input type="hidden" name="doc_id" value="{{ doc.id }}">
+        <label class="flex flex-col">Destination folder<select name="folder_id" class="border rounded px-2 py-1">
+          {% for n in tree %}<option value="{{ n.f.id }}" {% if n.f.id == doc.folder_id %}selected{% endif %}>{{ n.f.path }}</option>{% endfor %}</select></label>
+        <button type="submit" class="px-3 py-1.5 rounded bg-blue-600 text-white">Move</button>
+      </form></details>
+    <details id="rename" class="border rounded-lg p-3 bg-gray-50"><summary class="cursor-pointer font-medium">Rename</summary>
+      <form data-api="/api/drive/rename" class="mt-2 flex gap-2 items-end">
+        <input type="hidden" name="doc_id" value="{{ doc.id }}">
+        <label class="flex flex-col">New name<input type="text" name="name" value="{{ doc.name }}" required class="border rounded px-2 py-1 w-80"></label>
+        <button type="submit" class="px-3 py-1.5 rounded bg-blue-600 text-white">Rename</button>
+      </form></details>
+  </div>
+
+  {% if doc.kind == 'offer' and doc.offer %}{% set o = doc.offer %}
+  <div class="border-2 border-yellow-300 bg-yellow-50 rounded-lg p-4 mb-4 text-sm">
+    <h2 class="font-semibold text-base mb-2">Offer details</h2>
+    <table class="w-full">
+      <tr><td class="py-0.5 text-gray-600 w-56">Account</td><td>{{ account_name(o.account) if o.account else '(not set)' }}{% if o.account %} <span class="text-gray-400">({{ o.account }})</span>{% endif %}</td></tr>
+      <tr><td class="py-0.5 text-gray-600">Plan</td><td>{{ (o.plan or 'core')|capitalize }} ({{ money(totals.per_location) }}/location/yr)</td></tr>
+      <tr><td class="py-0.5 text-gray-600">Locations</td><td>{{ totals.locations }}</td></tr>
+      <tr><td class="py-0.5 text-gray-600">List price / yr</td><td>{{ money(totals.list_price) }}</td></tr>
+      <tr><td class="py-0.5 text-gray-600">Discount</td><td>{{ totals.discount_pct }}% (−{{ money(totals.discount_amt) }})</td></tr>
+      <tr><td class="py-0.5 text-gray-600">Subscription / yr</td><td>{{ money(totals.subscription) }}</td></tr>
+      <tr><td class="py-0.5 text-gray-600">Onboarding (one-time)</td><td>{{ money(totals.onboarding) if o.onboarding else 'Not included' }}</td></tr>
+      <tr><td class="py-0.5 text-gray-600">Payroll add-on / yr</td><td>{{ money(totals.payroll) if totals.payroll else ('Not included' if not o.payroll_addon else 'Not available on Pro') }}</td></tr>
+      <tr class="border-t border-yellow-300 font-semibold"><td class="py-1">Total (first year)</td><td>{{ money(totals.first_year_total) }}</td></tr>
+      <tr><td class="py-0.5 text-gray-600">Valid until</td><td>{{ o.valid_until or '-' }}</td></tr>
+      {% if o.notes %}<tr><td class="py-0.5 text-gray-600">Notes</td><td>{{ o.notes }}</td></tr>{% endif %}
+      <tr><td class="py-0.5 text-gray-600">Quote status</td><td><span class="px-2 py-0.5 rounded bg-white border text-xs font-medium">{{ (o.status or 'draft')|replace('_',' ') }}</span>
+        {% if (o.discount_pct or 0) > 15 %}<span class="ml-2 text-xs text-red-700">Discount above 15% needs Dana's approval</span>{% endif %}</td></tr>
+    </table>
+    {% if o.account %}
+    <div class="flex flex-wrap items-end gap-3 mt-3 pt-3 border-t border-yellow-300">
+      <form data-api="/api/quotes/{{ doc.id }}/request_approval" class="flex items-end gap-2" data-flash="Approval request emailed to Dana">
+        <label class="flex flex-col text-xs">Note to Dana<input name="note" class="border rounded px-2 py-1 w-64 text-sm" placeholder="Why this discount?"></label>
+        <button type="submit" class="px-3 py-1.5 rounded border border-gray-400 bg-white">Request approval</button>
+      </form>
+      <form data-api="/api/quotes/{{ doc.id }}/send" class="flex items-end gap-2" data-flash="Quote sent">
+        <label class="flex flex-col text-xs">Send to (default: deal contacts)<input name="to" class="border rounded px-2 py-1 w-72 text-sm" placeholder="name@company.com"></label>
+        <button type="submit" class="px-3 py-1.5 rounded bg-blue-600 text-white">Send quote</button>
+      </form>
+    </div>
+    {% if o.status == 'approval_requested' %}
+    <details class="mt-3 text-xs text-gray-600"><summary class="cursor-pointer">Manager view (Dana Brooks only)</summary>
+      <form data-api="/api/quotes/{{ doc.id }}/approve" class="flex items-end gap-2 mt-2">
+        <label class="flex flex-col">Decision<select name="decision" class="border rounded px-2 py-1"><option value="approve">Approve</option><option value="reject">Reject</option></select></label>
+        <label class="flex flex-col">Reason<input name="reason" class="border rounded px-2 py-1 w-64"></label>
+        <button type="submit" class="px-3 py-1.5 rounded bg-gray-700 text-white">Submit decision as Dana</button>
+      </form></details>
+    {% endif %}
+    {% endif %}
+  </div>
+  {% endif %}
+  {% if doc.kind == 'transcript' %}
+  <div class="border rounded-lg bg-blue-50 border-blue-200 p-3 mb-4 text-sm">
+    <div><span class="text-gray-600">Call date:</span> {{ fmt_dt(doc.call_date, false) }}{% if doc.duration_min %} · {{ doc.duration_min }} min{% endif %}</div>
+    <div><span class="text-gray-600">Participants:</span> {{ participants|join(', ') }}</div>
+    {% if doc.account %}<div><span class="text-gray-600">Account:</span> {{ account_name(doc.account) }}{% if doc.deal %} · Deal: {{ doc.deal }}{% endif %}</div>{% endif %}
+  </div>
+  {% endif %}
+
+  <article class="doc-body border rounded-lg shadow-sm bg-white px-10 py-8 leading-relaxed">{{ html|safe }}</article>
+</div>
+{% endblock %}

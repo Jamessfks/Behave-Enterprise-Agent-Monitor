@@ -1,0 +1,33 @@
+{% extends "calendar/_layout.html" %}
+{% block cal_title %}{{ e.title }}{% endblock %}
+{% block toolbar %}
+  <a href="/calendar?week={{ week }}" class="px-3 py-1.5 rounded text-sm hover:bg-gray-100">&lsaquo; Back to week</a>
+{% endblock %}
+{% block cal %}
+<div class="max-w-2xl p-8">
+  <div class="flex items-start gap-4">
+    <span class="mt-2 w-4 h-4 rounded {{ 'bg-[#039be5]' if e.account else 'bg-[#33b679]' }}"></span>
+    <div class="flex-1">
+      <h1 class="text-2xl text-gray-900">{{ e.title }}</h1>
+      <div class="text-sm text-gray-700 mt-1">{{ when }}</div>
+    </div>
+  </div>
+  <div class="flex gap-2 mt-5 ml-8">
+    <a href="/calendar/event/{{ e.id }}/edit" class="px-4 py-2 rounded bg-[#1a73e8] hover:bg-[#1765cc] text-white text-sm font-medium">Edit</a>
+    <form data-api="/api/calendar/event/{{ e.id }}/delete" data-confirm="Delete this event? Cancellation notices will be sent to all guests.">
+      <button type="submit" class="px-4 py-2 rounded border border-gray-300 hover:bg-red-50 text-red-700 text-sm font-medium">Delete</button>
+    </form>
+  </div>
+  <dl class="mt-6 ml-8 space-y-4 text-sm">
+    <div><dt class="text-gray-500">Location</dt><dd>{{ e.location or '—' }}</dd></div>
+    <div><dt class="text-gray-500">Guests ({{ e.attendees|length }})</dt>
+      <dd><ul class="mt-1 space-y-1">{% for a in e.attendees %}
+        <li class="flex items-center gap-2"><span class="w-7 h-7 rounded-full bg-gray-200 flex items-center justify-center text-[11px] font-semibold">{{ a.name[:1] }}</span>
+          <span>{{ a.name }}</span> <span class="text-gray-500">&lt;{{ a.email }}&gt;</span>{% if a.email == e.organizer %} <span class="text-xs text-gray-500">· Organizer</span>{% endif %}</li>
+      {% endfor %}</ul></dd></div>
+    {% if deal %}<div><dt class="text-gray-500">Deal</dt><dd><a class="text-[#1a73e8] hover:underline" href="/crm/deal/{{ deal.id }}">{{ deal.name }}</a></dd></div>
+    {% elif e.deal %}<div><dt class="text-gray-500">Deal</dt><dd>{{ e.deal }}</dd></div>{% endif %}
+    <div><dt class="text-gray-500">Description</dt><dd class="whitespace-pre-wrap">{{ e.description or '—' }}</dd></div>
+  </dl>
+</div>
+{% endblock %}
