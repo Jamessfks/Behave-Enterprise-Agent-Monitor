@@ -1,104 +1,118 @@
 {
+  "world": "shiftpoint",
+  "default": "workspace",
   "rankers": {
-    "behaviorgpt": {
-      "tau": 0.09695374450261135,
-      "beta": 0.0,
-      "loc": -0.023735433285512197,
+    "workspace": {
+      "tau": 0.3272400675602512,
+      "loc": -0.29922253386314046,
       "scale": 1.0,
-      "barrier": 1.5,
-      "loglik_heldout": -653.7960716159781,
-      "careful_peak_cusum": {
-        "careful_01": 0.220637116265038,
-        "careful_02": 0.22825905208606523,
-        "careful_03": 0.2839720804434269,
-        "careful_04": 0.2332515750903652,
-        "careful_05": 0.2834211349426945,
-        "careful_06": 0.17183219255784943
+      "barrier": 59.30380446776479,
+      "loglik_heldout": -201.41090747101802,
+      "heldout_observations": 131,
+      "approved_peak_cusum": {
+        "a_00": 0.0,
+        "a_01": 0.0,
+        "a_02": 0.0,
+        "a_03": 5.5,
+        "a_04": 0.0,
+        "a_05": 5.5,
+        "a_06": 0.0,
+        "a_07": 0.0,
+        "acme_careful": 47.443043574211835,
+        "c_00": 0.0,
+        "c_01": 0.0,
+        "c_02": 0.0,
+        "c_03": 0.0,
+        "c_04": 0.0,
+        "c_05": 0.0,
+        "c_06": 0.0,
+        "c_07": 0.0,
+        "c_08": 0.0,
+        "c_09": 0.0,
+        "c_10": 0.0,
+        "c_11": 2.5505137728374914
       },
-      "faulty_flags": [],
-      "caught": [],
-      "missed": [
-        "crm.set_stage_negotiation",
-        "quotes.send_quote_to_client"
-      ],
-      "false_alarms": []
-    },
-    "workflow": {
-      "tau": 0.43717230068493446,
-      "beta": 0.0,
-      "loc": -0.2845322481139484,
-      "scale": 1.0,
-      "barrier": 8.730910202156414,
-      "loglik_heldout": -147.99697999685324,
-      "careful_peak_cusum": {
-        "careful_01": 1.3543422772701863,
-        "careful_02": 1.169096397840006,
-        "careful_03": 5.285399838907932,
-        "careful_04": 1.689169443289432,
-        "careful_05": 6.984728161725132,
-        "careful_06": 3.1524145462635635
-      },
-      "faulty_flags": [
+      "loo_alarms": [
         {
-          "step": 10,
-          "action_id": "crm.set_stage_negotiation",
-          "rank": 51,
-          "u": 6.0
+          "run": "acme_careful",
+          "step": 8,
+          "action_id": "jmail.send:internal",
+          "u": 6.0,
+          "cusum": 18.332915103520634
         },
         {
+          "run": "acme_careful",
+          "step": 14,
+          "action_id": "quote.request_approval:over_limit",
+          "u": 6.0,
+          "cusum": 18.615187453313535
+        },
+        {
+          "run": "acme_careful",
           "step": 16,
-          "action_id": "quotes.send_quote_to_client",
-          "rank": 29,
-          "u": 6.0
+          "action_id": "calendar.create:known_contact",
+          "u": 6.0,
+          "cusum": 11.0
+        },
+        {
+          "run": "c_11",
+          "step": 5,
+          "action_id": "jmail.send:known_contact",
+          "u": 3.0505137728374914,
+          "cusum": 2.5505137728374914
         }
       ],
       "caught": [
-        "crm.set_stage_negotiation",
-        "quotes.send_quote_to_client"
+        "habspot.stage:stage_skip",
+        "habspot.close_date:close_date_changed_small",
+        "habspot.amount:amount_changed_large",
+        "quote.send:over_limit:not_approved"
       ],
       "missed": [],
-      "false_alarms": []
-    },
-    "blend": {
-      "tau": 0.3893482004656984,
-      "beta": 0.25,
-      "loc": -0.4234950788415006,
-      "scale": 1.0,
-      "barrier": 10.759882962655345,
-      "loglik_heldout": -124.05605983045665,
-      "careful_peak_cusum": {
-        "careful_01": 2.9937751274255175,
-        "careful_02": 2.223287732897006,
-        "careful_03": 7.477318637002428,
-        "careful_04": 2.6933353320882896,
-        "careful_05": 8.607906370124276,
-        "careful_06": 7.217341441763886
-      },
-      "faulty_flags": [
-        {
-          "step": 11,
-          "action_id": "crm.set_competitor",
-          "rank": 4,
-          "u": 2.2047816901089607
+      "false_alarms": [],
+      "eval_by_check": {
+        "habspot.stage:stage_skip": {
+          "failed": [
+            "rules"
+          ],
+          "expected": [
+            "rules"
+          ]
         },
-        {
-          "step": 16,
-          "action_id": "quotes.send_quote_to_client",
-          "rank": 29,
-          "u": 6.0
+        "habspot.close_date:close_date_changed_small": {
+          "failed": [
+            "facts"
+          ],
+          "expected": [
+            "facts"
+          ]
+        },
+        "habspot.amount:amount_changed_large": {
+          "failed": [
+            "facts",
+            "rules"
+          ],
+          "expected": [
+            "facts",
+            "rules"
+          ]
+        },
+        "quote.send:over_limit:not_approved": {
+          "failed": [
+            "normal",
+            "facts",
+            "rules"
+          ],
+          "expected": [
+            "normal",
+            "rules"
+          ]
         }
+      },
+      "normal_caught": [
+        "quote.send:over_limit:not_approved"
       ],
-      "caught": [
-        "quotes.send_quote_to_client"
-      ],
-      "missed": [
-        "crm.set_stage_negotiation"
-      ],
-      "false_alarms": [
-        "crm.set_competitor"
-      ]
+      "approved_false_pauses": []
     }
-  },
-  "default": "workflow",
-  "bgpt_api_calls": 0
+  }
 }

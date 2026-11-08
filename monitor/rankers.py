@@ -1,12 +1,10 @@
-"""Rankers: given a history of events, score every action in the catalog.
+"""Rankers: given a history of step events, score every action in the catalog.
 
-Two implementations behind one interface, so nothing downstream knows which one runs:
-
-- BehaviorGPTRanker: one `complete()` call ranks the whole catalog (it holds <= 100 actions).
-  Every response is cached in `runs/rankings_cache.json`, which is committed, so replay mode
-  gives the same BehaviorGPT scores with no API key.
-- TransitionRanker: the no-go fallback. Interpolated first-order transition counts fitted on
-  normal runs, as log-probabilities.
+- WorkflowRanker (decides): the company's own workflow dependencies, learned from approved runs.
+- BehaviorGPTRanker (evidence only, ADR 0004): BehaviorGPT's zero-shot ranking. `complete()`
+  returns at most 100 results, so the catalog is ranked in chunks of ids and merged. Every
+  response is cached in `runs/rankings_cache.json`, so replays need no API key.
+- TransitionRanker: first-order transition counts, kept for comparison.
 """
 
 from __future__ import annotations
@@ -20,7 +18,7 @@ from collections import Counter, defaultdict
 from pathlib import Path
 from typing import Any, Protocol
 
-from monitor.catalog import load_catalog
+from monitor.catalog import id_chunks, load_catalog
 from monitor.events import to_sdk
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -99,25 +97,31 @@ class BehaviorGPTRanker:
     def cached(self, history: list[dict[str, Any]]) -> bool:
         return self.cache.get(history_key(self.catalog_id, history)) is not None
 
-    def _complete_with_retry(self, sdk_history):
+    def _complete_with_retry(self, sdk_history, chunk: list[str]):
         return _with_retry(
             lambda: self.client.complete(
                 sdk_history,
-                limit=self.n_actions,
+                limit=len(chunk),
                 catalog_id=self.catalog_id,
+                filters={"id": chunk},
                 register_event=False,
             )
         )
 
     def rank(self, history: list[dict[str, Any]]) -> dict[str, float]:
+        """Scores of the whole catalog. `complete()` returns at most 100 results, so a larger
+        catalog is ranked in chunks of ids (same history, same model call), then merged."""
         key = history_key(self.catalog_id, history)
         hit = self.cache.get(key)
         if hit is not None:
             self.cache_hits += 1
             return hit
-        res = self._complete_with_retry([to_sdk(e) for e in history])
-        self.calls += 1
-        scores = {item.id: float(item.score) for item in res.items}
+        sdk_history = [to_sdk(e) for e in history]
+        scores: dict[str, float] = {}
+        for chunk in id_chunks():
+            res = self._complete_with_retry(sdk_history, chunk)
+            self.calls += 1
+            scores.update({item.id: float(item.score) for item in res.items})
         self.cache.put(key, scores)
         return scores
 
@@ -134,8 +138,13 @@ class WorkflowRanker:
 
     name = "workflow"
 
-    def __init__(self, runs: list[list[dict[str, Any]]], unseen: float = 8.0):
-        self.actions = list(load_catalog())
+    def __init__(
+        self,
+        runs: list[list[dict[str, Any]]],
+        unseen: float = 8.0,
+        actions: list[str] | None = None,
+    ):
+        self.actions = list(actions) if actions is not None else list(load_catalog())
         self.unseen = unseen
         before: dict[str, Counter] = defaultdict(Counter)
         adjacent: dict[str, Counter] = defaultdict(Counter)

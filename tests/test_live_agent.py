@@ -56,7 +56,16 @@ def test_live_agent_changes_the_workspace_and_waits_for_a_person(client):
         [
             [tool(1, "open_document", doc_id="doc_transcript_t1_acme_foods")],
             [tool(2, "set_deal_stage", deal_id="dl_acme_foods", stage="demo")],
-            [tool(3, "create_quote", deal_id="dl_acme_foods", plan="core", locations=5, discount_pct=10)],
+            [
+                tool(
+                    3,
+                    "create_quote",
+                    deal_id="dl_acme_foods",
+                    plan="core",
+                    locations=5,
+                    discount_pct=10,
+                )
+            ],
             [tool(4, "send_quote", doc_id="__QUOTE__", to="mark.keller@acmefoods.com")],
             [tool(5, "finish", summary="Quoted 5 depots at 10%.")],
         ]
@@ -71,13 +80,19 @@ def test_live_agent_changes_the_workspace_and_waits_for_a_person(client):
     asyncio.run(step())  # stage -> demo
     assert events.EVENTS[-1]["catalog_action"].startswith("habspot.stage")
     out = asyncio.run(step())  # create quote
-    quote_id = next(e["args"]["doc_id"] for e in reversed(events.EVENTS) if e["action"] == "habspot.quote_create")
+    quote_id = next(
+        e["args"]["doc_id"]
+        for e in reversed(events.EVENTS)
+        if e["action"] == "habspot.quote_create"
+    )
     fake.turns[0][0]["input"]["doc_id"] = quote_id
     out = asyncio.run(step())  # send quote -> external send pauses
     assert out["step"]["approval_id"]
     waiting = asyncio.run(step())
     assert waiting.get("waiting") and waiting["step"] is None
-    r = client.post(f"/api/approvals/{out['step']['approval_id']}/reject", json={"reason": "not yet"})
+    r = client.post(
+        f"/api/approvals/{out['step']['approval_id']}/reject", json={"reason": "not yet"}
+    )
     assert r.status_code == 200
     done = asyncio.run(step())  # tool result says blocked, then finish
     assert done["done"] is True and "10%" in done["summary"]

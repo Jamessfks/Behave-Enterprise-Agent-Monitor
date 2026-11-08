@@ -94,7 +94,10 @@ def bootstrap() -> dict[str, Any]:
             "title": sc["title"],
             "request": sc["request"],
             "account": sc["account"],
-            "steps": {"careful": len(runner.steps_for(sc, False)), "mistakes": len(runner.steps_for(sc, True))},
+            "steps": {
+                "careful": len(runner.steps_for(sc, False)),
+                "mistakes": len(runner.steps_for(sc, True)),
+            },
         },
         "apps": {"mail": "/mail", "drive": "/drive", "crm": "/crm/deals", "calendar": "/calendar"},
         "catalog": {
@@ -106,7 +109,9 @@ def bootstrap() -> dict[str, Any]:
             for k, v in (cal.get("rankers") or {}).items()
         },
         "default_ranker": cal.get("default", "workflow"),
-        "go_no_go": {k: gng.get(k) for k in ("careful_median_rank", "careful_top5_share", "catalog_size")},
+        "go_no_go": {
+            k: gng.get(k) for k in ("careful_median_rank", "careful_top5_share", "catalog_size")
+        },
         "live_available": live.available(),
         "behaviorgpt_live": bool(os.environ.get("UNBOXAI_API_KEY")),
         "state": STATE.name,

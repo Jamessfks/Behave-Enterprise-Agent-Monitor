@@ -24,11 +24,11 @@ os.environ["MONITOR_MODE"] = "off"
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from fastapi.testclient import TestClient  # noqa: E402
+from fastapi.testclient import TestClient
 
-from scenarios import http_runner  # noqa: E402
-from workspace import events  # noqa: E402
-from workspace.main import create_app  # noqa: E402
+from scenarios import http_runner
+from workspace import events
+from workspace.main import create_app
 
 APPROVED = ROOT / "runs" / "approved"
 EVAL = ROOT / "runs" / "eval"

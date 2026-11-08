@@ -414,9 +414,11 @@ def learn(decision: str, ev: dict, reason: str, by: str) -> dict | None:
     becomes a new rule'). The monitor applies it to later steps with the same catalog action."""
     if not reason:
         return None
-    failed = (ev.get("monitor") or {}).get("failed") or []
+    mon = ev.get("monitor") or {}
+    failed = mon.get("failed") or []
     rule = {
         "id": f"lr_{len(LEARNED) + 1:03d}",
+        "entity": mon.get("entity"),
         "decision": decision,
         "catalog_action": ev.get("catalog_action"),
         "ctx": ev.get("ctx", {}),

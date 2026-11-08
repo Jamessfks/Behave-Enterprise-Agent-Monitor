@@ -53,7 +53,7 @@ class BlendRanker:
 
 @dataclass
 class NormalVerdict:
-    status: str  # scored | context | funnel | unknown
+    status: str  # scored | context | funnel | unknown | untrained
     ok: bool = True
     p: float | None = None
     rank: int | None = None
@@ -82,7 +82,11 @@ class NormalCheck:
             return NormalVerdict("funnel", cusum=cusum, risk=cusum / self.barrier)
         scores = self.ranker.rank(history)
         if event["action_id"] not in scores:
-            return NormalVerdict("unknown", cusum=cusum, risk=cusum / self.barrier)
+            unseen = getattr(self.ranker, "unseen", None)
+            if unseen is None:
+                return NormalVerdict("unknown", cusum=cusum, risk=cusum / self.barrier)
+            # Never seen in an approved run and not in the catalog: as unusual as an unseen action.
+            scores = {**scores, event["action_id"]: -float(unseen)}
         pred = predict(scores, event["action_id"], self.tau, EPS)
         u = (pred.surprisal - pred.entropy - self.loc) / self.scale
         u = min(max(u, CLIP[0]), CLIP[1])
