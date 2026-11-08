@@ -19,7 +19,9 @@ import time
 import httpx
 
 BASE = "http://localhost:8000"
-C = httpx.Client(base_url=BASE, timeout=10)
+# Requests marked as the agent are logged and gated; without it they count as a person browsing.
+AGENT = {"X-Actor": "agent"}
+C = httpx.Client(base_url=BASE, timeout=10, headers=AGENT)
 
 ME = "alex@shiftpoint.io"
 SIGN = "\n\nBest,\nAlex\n\nAlex Chen\nAccount Executive | Shiftpoint\n+1 (720) 555-0142 | shiftpoint.io"
@@ -627,7 +629,7 @@ def main():
     BASE = a.base
     DELAY = a.delay
     UI = not a.no_ui
-    C = httpx.Client(base_url=BASE, timeout=10)
+    C = httpx.Client(base_url=BASE, timeout=10, headers=AGENT)
     if a.seed is not None:
         random.seed(a.seed)
     if a.mode == "baseline":
