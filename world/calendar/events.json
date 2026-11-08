@@ -1,0 +1,274 @@
+[
+ {
+  "id": "ev_cal_mesa_valley_discovery",
+  "title": "Mesa Valley Urgent Care – discovery",
+  "start": "2026-11-09T10:00:00-07:00",
+  "end": "2026-11-09T10:45:00-07:00",
+  "attendees": [
+   {
+    "name": "Alex Chen",
+    "email": "alex@shiftpoint.io"
+   },
+   {
+    "name": "Nora Kim",
+    "email": "nora.kim@mesavalleyuc.com"
+   }
+  ],
+  "location": "Video call",
+  "description": "Discovery call: current scheduling process across clinics, pain points, timeline.",
+  "account": "mesa_valley",
+  "deal": "dl_mesa_valley",
+  "organizer": "alex@shiftpoint.io"
+ },
+ {
+  "id": "ev_cal_pine_and_pebble_demo",
+  "title": "Pine & Pebble – demo",
+  "start": "2026-11-10T09:30:00-07:00",
+  "end": "2026-11-10T10:30:00-07:00",
+  "attendees": [
+   {
+    "name": "Alex Chen",
+    "email": "alex@shiftpoint.io"
+   },
+   {
+    "name": "Hannah Clarke",
+    "email": "hannah.clarke@pineandpebble.com"
+   },
+   {
+    "name": "Jorge Alvarez",
+    "email": "jorge.alvarez@pineandpebble.com"
+   }
+  ],
+  "location": "Video call",
+  "description": "Product demo for Pro plan (25 locations).",
+  "account": "pine_and_pebble",
+  "deal": "dl_pine_and_pebble",
+  "organizer": "alex@shiftpoint.io"
+ },
+ {
+  "id": "ev_cal_dana_1on1",
+  "title": "1:1 Alex / Dana",
+  "start": "2026-11-10T13:00:00-07:00",
+  "end": "2026-11-10T13:30:00-07:00",
+  "attendees": [
+   {
+    "name": "Alex Chen",
+    "email": "alex@shiftpoint.io"
+   },
+   {
+    "name": "Dana Brooks",
+    "email": "dana@shiftpoint.io"
+   }
+  ],
+  "location": "Video call",
+  "description": "Weekly 1:1: Q4 quota, open deals, blockers.",
+  "account": null,
+  "deal": null,
+  "organizer": "alex@shiftpoint.io"
+ },
+ {
+  "id": "ev_cal_northgate_revised_offer",
+  "title": "Northgate – revised-offer call",
+  "start": "2026-11-10T15:00:00-07:00",
+  "end": "2026-11-10T15:45:00-07:00",
+  "attendees": [
+   {
+    "name": "Alex Chen",
+    "email": "alex@shiftpoint.io"
+   },
+   {
+    "name": "Rachel Ito",
+    "email": "rachel.ito@northgatelogistics.com"
+   },
+   {
+    "name": "Mark Kessler",
+    "email": "mark.kessler@northgatelogistics.com"
+   }
+  ],
+  "location": "Video call",
+  "description": "Walk through the revised offer. Discount requests above 15% need Dana's approval.",
+  "account": "northgate_logistics",
+  "deal": "dl_northgate_logistics",
+  "organizer": "alex@shiftpoint.io"
+ },
+ {
+  "id": "ev_cal_sparklepro_proposal",
+  "title": "SparklePro – proposal walkthrough",
+  "start": "2026-11-11T10:00:00-07:00",
+  "end": "2026-11-11T10:45:00-07:00",
+  "attendees": [
+   {
+    "name": "Alex Chen",
+    "email": "alex@shiftpoint.io"
+   },
+   {
+    "name": "Kevin O'Brien",
+    "email": "kevin.obrien@sparkleprocleaning.com"
+   }
+  ],
+  "location": "Video call",
+  "description": "Proposal walkthrough for Core 14.",
+  "account": "sparklepro_cleaning",
+  "deal": "dl_sparklepro_cleaning",
+  "organizer": "alex@shiftpoint.io"
+ },
+ {
+  "id": "ev_cal_bluepeak_reengage",
+  "title": "Bluepeak – discovery (re-engage)",
+  "start": "2026-11-11T13:00:00-07:00",
+  "end": "2026-11-11T13:45:00-07:00",
+  "attendees": [
+   {
+    "name": "Alex Chen",
+    "email": "alex@shiftpoint.io"
+   },
+   {
+    "name": "Chris Yoon",
+    "email": "chris.yoon@bluepeakfitness.com"
+   }
+  ],
+  "location": "Video call",
+  "description": "Re-engagement discovery call with Chris Yoon.",
+  "account": "bluepeak_fitness",
+  "deal": "dl_bluepeak_fitness_reengage",
+  "organizer": "alex@shiftpoint.io"
+ },
+ {
+  "id": "ev_cal_acme_cfo_intro",
+  "title": "Acme Foods – intro with CFO",
+  "start": "2026-11-12T11:00:00-07:00",
+  "end": "2026-11-12T11:45:00-07:00",
+  "attendees": [
+   {
+    "name": "Alex Chen",
+    "email": "alex@shiftpoint.io"
+   },
+   {
+    "name": "Paul Grant",
+    "email": "paul.grant@acmefoods.com"
+   },
+   {
+    "name": "Mark Keller",
+    "email": "mark.keller@acmefoods.com"
+   }
+  ],
+  "location": "Video call",
+  "description": "Intro call with CFO Paul Grant. Contract not signed yet – confirm paperwork and timeline.",
+  "account": "acme_foods",
+  "deal": "dl_acme_foods",
+  "organizer": "alex@shiftpoint.io"
+ },
+ {
+  "id": "ev_cal_copper_kettle_followup",
+  "title": "Copper Kettle – demo follow-up",
+  "start": "2026-11-12T16:00:00-07:00",
+  "end": "2026-11-12T16:30:00-07:00",
+  "attendees": [
+   {
+    "name": "Alex Chen",
+    "email": "alex@shiftpoint.io"
+   },
+   {
+    "name": "Anna Fischer",
+    "email": "anna.fischer@copperkettlegroup.com"
+   }
+  ],
+  "location": "Video call",
+  "description": "Follow-up on demo questions.",
+  "account": "copper_kettle",
+  "deal": "dl_copper_kettle",
+  "organizer": "alex@shiftpoint.io"
+ },
+ {
+  "id": "ev_cal_pipeline_review",
+  "title": "Pipeline review",
+  "start": "2026-11-13T10:00:00-07:00",
+  "end": "2026-11-13T11:00:00-07:00",
+  "attendees": [
+   {
+    "name": "Alex Chen",
+    "email": "alex@shiftpoint.io"
+   },
+   {
+    "name": "Dana Brooks",
+    "email": "dana@shiftpoint.io"
+   }
+  ],
+  "location": "Video call",
+  "description": "Weekly pipeline review: forecast, stage changes, close dates.",
+  "account": null,
+  "deal": null,
+  "organizer": "alex@shiftpoint.io"
+ },
+ {
+  "id": "ev_cal_little_acorns_qa",
+  "title": "Little Acorns – proposal Q&A",
+  "start": "2026-11-13T14:00:00-07:00",
+  "end": "2026-11-13T14:45:00-07:00",
+  "attendees": [
+   {
+    "name": "Alex Chen",
+    "email": "alex@shiftpoint.io"
+   },
+   {
+    "name": "Emily Carter",
+    "email": "emily.carter@littleacornscare.com"
+   }
+  ],
+  "location": "Video call",
+  "description": "Q&A on the Pro 11 proposal.",
+  "account": "little_acorns",
+  "deal": "dl_little_acorns",
+  "organizer": "alex@shiftpoint.io"
+ },
+ {
+  "id": "ev_cal_ironclad_order_form",
+  "title": "Ironclad – order form review",
+  "start": "2026-11-16T11:00:00-07:00",
+  "end": "2026-11-16T11:45:00-07:00",
+  "attendees": [
+   {
+    "name": "Alex Chen",
+    "email": "alex@shiftpoint.io"
+   },
+   {
+    "name": "Fatima Khan",
+    "email": "fatima.khan@ironcladguard.com"
+   },
+   {
+    "name": "Daniel Price",
+    "email": "daniel.price@ironcladguard.com"
+   }
+  ],
+  "location": "Video call",
+  "description": "Review order form line by line before signature.",
+  "account": "ironclad_guard",
+  "deal": "dl_ironclad_guard",
+  "organizer": "alex@shiftpoint.io"
+ },
+ {
+  "id": "ev_cal_harbor_onboarding",
+  "title": "Harbor Health – onboarding kickoff",
+  "start": "2026-11-17T10:00:00-07:00",
+  "end": "2026-11-17T11:00:00-07:00",
+  "attendees": [
+   {
+    "name": "Alex Chen",
+    "email": "alex@shiftpoint.io"
+   },
+   {
+    "name": "Marco Rossi",
+    "email": "marco@shiftpoint.io"
+   },
+   {
+    "name": "Grace Moreno",
+    "email": "grace.moreno@harborhealthclinics.com"
+   }
+  ],
+  "location": "Video call",
+  "description": "Onboarding kickoff, handover to Marco Rossi (Onboarding Manager).",
+  "account": "harbor_health",
+  "deal": "dl_harbor_health",
+  "organizer": "alex@shiftpoint.io"
+ }
+]

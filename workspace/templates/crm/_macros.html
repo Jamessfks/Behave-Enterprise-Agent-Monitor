@@ -1,0 +1,66 @@
+{% macro stage_badge(s) -%}
+{%- set colors = {'closed_won':'bg-green-100 text-green-800','closed_lost':'bg-gray-200 text-gray-700'} -%}
+<span class="inline-block px-2 py-0.5 rounded text-xs font-medium {{ colors.get(s, 'bg-orange-100 text-orange-800') }}">{{ STAGE_LABELS.get(s, s) }}</span>
+{%- endmacro %}
+{% macro status_badge(s) -%}
+{%- if s == 'do_not_contact' -%}<span class="inline-block px-2 py-0.5 rounded text-xs font-bold bg-red-600 text-white">Do not contact</span>
+{%- elif s == 'unsubscribed' -%}<span class="inline-block px-2 py-0.5 rounded text-xs font-medium bg-gray-300 text-gray-800">Unsubscribed</span>
+{%- elif s == 'interested' -%}<span class="inline-block px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">Interested</span>
+{%- else -%}<span class="inline-block px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">{{ STATUS_LABELS.get(s, s) }}</span>{%- endif -%}
+{%- endmacro %}
+{% macro note_form(field, value) %}
+<form data-api="/api/crm/note" data-flash="Note logged." class="bg-white border rounded p-3 mb-3">
+  <input type="hidden" name="{{ field }}" value="{{ value }}">
+  <label class="block text-sm font-semibold mb-1" for="note-body">Log note</label>
+  <textarea id="note-body" name="body" rows="3" required class="w-full border rounded p-2 text-sm" placeholder="Start typing to leave a note..."></textarea>
+  <button type="submit" class="mt-2 px-3 py-1.5 rounded bg-[#ff7a59] text-[#1e2650] text-sm font-medium">Log note</button>
+</form>
+{% endmacro %}
+{% macro task_form(field, value) %}
+<form data-api="/api/crm/task" data-flash="Task created." class="bg-white border rounded p-3 mb-3">
+  <input type="hidden" name="{{ field }}" value="{{ value }}">
+  <div class="text-sm font-semibold mb-1">Create task</div>
+  <div class="flex gap-2 items-end">
+    <label class="flex-1 text-xs text-gray-600">Task title<input name="title" required class="mt-1 w-full border rounded p-1.5 text-sm text-gray-900"></label>
+    <label class="text-xs text-gray-600">Due date<input type="date" name="due" class="mt-1 block border rounded p-1.5 text-sm text-gray-900"></label>
+    <button type="submit" class="px-3 py-1.5 rounded border border-[#ff7a59] text-[#ff7a59] text-sm font-medium bg-white">Create task</button>
+  </div>
+</form>
+{% endmacro %}
+{% macro timeline(items) %}
+<h3 class="text-sm font-semibold text-gray-700 mb-2">Activity ({{ items|length }})</h3>
+{% for a in items %}
+<div class="bg-white border rounded p-3 mb-2" id="activity-{{ a.id }}">
+  <div class="flex items-center gap-2 text-xs text-gray-500 mb-1">
+    <span class="uppercase font-semibold text-gray-700">{{ a.type }}</span>
+    <span>by {{ user_name(a.author) }}</span>
+    <span>{{ fmt_dt(a.ts, False) }}</span>
+    {% if a.edited_at %}<span class="italic">(edited)</span>{% endif %}
+  </div>
+  {% if a.title and a.title != 'Note' %}<div class="font-medium text-sm">{{ a.title }}</div>{% endif %}
+  {% if a.body %}<div class="text-sm whitespace-pre-wrap">{{ a.body }}</div>{% endif %}
+  {% if a.type == 'task' %}
+    <div class="text-xs mt-1 flex items-center gap-2">
+      <span>Due: {{ a.due or '—' }}</span>
+      {% if a.done %}<span class="px-2 py-0.5 rounded bg-green-100 text-green-800">Completed</span>
+      {% else %}<span class="px-2 py-0.5 rounded bg-yellow-100 text-yellow-800">Open</span>
+      <form data-api="/api/crm/task/{{ a.id }}/complete" class="inline"><button type="submit" class="px-2 py-0.5 border rounded text-xs bg-white">Mark complete</button></form>{% endif %}
+    </div>
+  {% endif %}
+  {% if a.type == 'note' %}
+  <details class="mt-1">
+    <summary class="text-xs text-[#007a93] cursor-pointer">Edit note</summary>
+    <form data-api="/api/crm/note/{{ a.id }}/edit" class="mt-1">
+      <textarea name="body" rows="3" class="w-full border rounded p-2 text-sm" aria-label="Edit note text">{{ a.body }}</textarea>
+      <button type="submit" class="mt-1 px-3 py-1 rounded bg-[#ff7a59] text-[#1e2650] text-xs font-medium">Save note</button>
+    </form>
+  </details>
+  {% endif %}
+</div>
+{% else %}
+<div class="text-sm text-gray-500">No activity yet.</div>
+{% endfor %}
+{% endmacro %}
+{% macro prop(label, value) %}
+<div class="mb-2"><div class="text-xs text-gray-500">{{ label }}</div><div class="text-sm">{{ value if value not in (None, '') else '—' }}</div></div>
+{% endmacro %}

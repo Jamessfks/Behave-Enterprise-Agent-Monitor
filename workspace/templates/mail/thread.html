@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}{{ t.subject }} – Jmail{% endblock %}
+{% block content %}
+<div class="flex flex-1 min-h-0">
+  {% include "mail/_sidebar.html" %}
+  <section class="flex-1 min-w-0 flex flex-col overflow-y-auto">
+    {% include "mail/_search.html" %}
+    {% set back = '/mail?label=' ~ (label|urlencode) %}
+    <div class="flex flex-wrap items-center gap-2 px-4 py-2 border-b border-gray-100 text-sm">
+      <a href="{{ back }}" class="px-3 py-1.5 rounded border border-gray-300 hover:bg-gray-100">← Back</a>
+      <form data-api="/api/mail/archive" class="inline"><input type="hidden" name="thread_id" value="{{ t.id }}"><input type="hidden" name="back" value="{{ back }}">
+        <button type="submit" class="px-3 py-1.5 rounded border border-gray-300 hover:bg-gray-100">Archive</button></form>
+      <form data-api="/api/mail/delete" class="inline"><input type="hidden" name="thread_id" value="{{ t.id }}"><input type="hidden" name="back" value="{{ back }}">
+        <button type="submit" class="px-3 py-1.5 rounded border border-gray-300 hover:bg-gray-100">Delete</button></form>
+      <form data-api="/api/mail/mark_unread" class="inline"><input type="hidden" name="thread_id" value="{{ t.id }}"><input type="hidden" name="back" value="{{ back }}">
+        <button type="submit" class="px-3 py-1.5 rounded border border-gray-300 hover:bg-gray-100">Mark as unread</button></form>
+      <form data-api="/api/mail/label" class="inline-flex items-center gap-1"><input type="hidden" name="thread_id" value="{{ t.id }}"><input type="hidden" name="op" value="add">
+        <label for="add-label" class="text-gray-600">Add label</label>
+        <select id="add-label" name="label" class="border border-gray-300 rounded px-2 py-1.5">
+          {% for lab in user_labels if lab not in t.labels %}<option value="{{ lab }}">{{ lab }}</option>{% endfor %}
+          {% if not t.starred %}<option value="STARRED">Starred</option>{% endif %}
+        </select>
+        <button type="submit" class="px-3 py-1.5 rounded border border-gray-300 hover:bg-gray-100">Add label</button></form>
+    </div>
+    <div class="px-8 py-5">
+      <h1 class="text-2xl text-gray-900 mb-2">{{ t.subject }}</h1>
+      <div class="flex flex-wrap gap-2 mb-4 text-xs">
+        {% for l in t.labels %}
+        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-gray-200 text-gray-800">{{ l }}
+          <form data-api="/api/mail/label" class="inline"><input type="hidden" name="thread_id" value="{{ t.id }}"><input type="hidden" name="label" value="{{ l }}"><input type="hidden" name="op" value="remove">
+            <button type="submit" class="text-gray-500 hover:text-gray-900" aria-label="Remove label {{ l }}">Remove</button></form></span>
+        {% endfor %}
+        {% if t.starred %}<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-yellow-100 text-yellow-800">★ Starred
+          <form data-api="/api/mail/label" class="inline"><input type="hidden" name="thread_id" value="{{ t.id }}"><input type="hidden" name="label" value="STARRED"><input type="hidden" name="op" value="remove">
+            <button type="submit" class="text-yellow-700 hover:text-yellow-900">Remove</button></form></span>{% endif %}
+      </div>
+      {% for m in msgs %}
+      <article class="border-b border-gray-200 py-4" id="{{ m.id }}">
+        <div class="flex items-start gap-3">
+          <div class="w-10 h-10 shrink-0 rounded-full bg-gray-400 text-white flex items-center justify-center font-semibold">{{ (m['from'].name or m['from'].email)[:1]|upper }}</div>
+          <div class="flex-1 min-w-0">
+            <div class="flex justify-between gap-4">
+              <div class="text-sm"><span class="font-semibold text-gray-900">{{ m['from'].name }}</span> <span class="text-gray-600">&lt;{{ m['from'].email }}&gt;</span></div>
+              <div class="text-xs text-gray-600 shrink-0">{{ fmt_dt(m.ts, short=False) }}</div>
+            </div>
+            <div class="text-xs text-gray-600">to {{ m.to_s or '(no recipients)' }}</div>
+            {% if m.cc_s %}<div class="text-xs text-gray-600">cc {{ m.cc_s }}</div>{% endif %}
+            <div class="mt-3 text-sm text-gray-900 whitespace-pre-wrap break-words">{{ m.body }}</div>
+            {% if m.atts %}
+            <div class="mt-3 flex flex-wrap gap-2" aria-label="Attachments">
+              {% for a in m.atts %}
+              <a href="/drive/doc/{{ a.id }}" class="inline-flex items-center gap-2 border border-gray-300 rounded-lg px-3 py-2 text-sm hover:bg-gray-50">
+                <span class="w-6 h-6 rounded bg-blue-600 text-white text-[10px] flex items-center justify-center">DOC</span>
+                <span>{{ a.name }}</span></a>
+              {% endfor %}
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </article>
+      {% endfor %}
+      <div class="flex gap-3 pt-5">
+        <a href="/mail/compose?mode=reply&thread={{ t.id }}" role="button" class="px-5 py-2 rounded-full border border-gray-400 text-sm font-medium hover:bg-gray-100">Reply</a>
+        <a href="/mail/compose?mode=reply_all&thread={{ t.id }}" role="button" class="px-5 py-2 rounded-full border border-gray-400 text-sm font-medium hover:bg-gray-100">Reply all</a>
+        <a href="/mail/compose?mode=forward&thread={{ t.id }}" role="button" class="px-5 py-2 rounded-full border border-gray-400 text-sm font-medium hover:bg-gray-100">Forward</a>
+        {% if 'DRAFT' in t.labels %}<a href="/mail/compose?mode=draft&thread={{ t.id }}" role="button" class="px-5 py-2 rounded-full bg-red-600 text-white text-sm font-medium">Edit draft</a>{% endif %}
+      </div>
+    </div>
+  </section>
+</div>
+{% endblock %}

@@ -11,3 +11,7 @@ node_modules/
 .vercel
 .env*
 .playwright-mcp/
+# workspace runtime state (local MemoryStore persistence)
+state/
+runs/run_*.jsonl
+rules/learned_rules.json

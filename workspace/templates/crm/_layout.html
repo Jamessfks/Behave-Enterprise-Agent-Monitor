@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}{% block crm_title %}Habspot{% endblock %} | Habspot{% endblock %}
+{% block content %}
+<div class="bg-[#2d3e50] text-white flex items-center gap-1 px-4 h-12">
+  <a href="/crm/deals" class="flex items-center gap-2 font-semibold mr-6"><span class="w-6 h-6 rounded-full bg-[#ff7a59] flex items-center justify-center text-xs font-bold">H</span>Habspot</a>
+  {% for key, label, href in [('contacts','Contacts','/crm/contacts'),('companies','Companies','/crm/companies'),('deals','Deals','/crm/deals')] %}
+  <a href="{{ href }}" class="px-3 h-12 flex items-center text-sm {{ 'border-b-4 border-[#ff7a59] font-semibold' if section==key else 'text-gray-200 hover:bg-[#3e5368]' }}">{{ label }}</a>
+  {% endfor %}
+  <form action="/crm/search" method="get" class="ml-auto flex items-center gap-2">
+    <input name="q" value="{{ q|default('') }}" placeholder="Search contacts, companies, deals" aria-label="Search Habspot" class="w-72 rounded px-3 py-1.5 text-sm text-gray-900">
+    <button type="submit" class="px-3 py-1.5 text-sm rounded bg-[#ff7a59] hover:bg-[#ff8f73] font-medium">Search</button>
+  </form>
+</div>
+<div class="flex-1 bg-[#f5f8fa] min-h-0">{% block crm %}{% endblock %}</div>
+{% endblock %}

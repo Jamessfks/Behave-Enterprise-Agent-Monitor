@@ -8,7 +8,7 @@
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -33,53 +33,88 @@
       </svg>
       <div>
         <h1>Agent Monitor</h1>
-        <p class="sub">Every step checked before it counts</p>
+        <p class="sub" id="persona">Every step checked before it counts</p>
       </div>
     </div>
     <nav class="controls" aria-label="Run controls">
-      <div class="seg" role="radiogroup" aria-label="Which agent">
-        <button role="radio" aria-checked="true" tabindex="0" data-run="careful_01">Careful agent</button>
-        <button role="radio" aria-checked="false" tabindex="-1" data-run="faulty">Faulty agent</button>
-        <button role="radio" aria-checked="false" tabindex="-1" data-run="live">Live</button>
+      <div class="seg" role="radiogroup" aria-label="What the agent does">
+        <button role="radio" aria-checked="true" tabindex="0" data-mode="demo">Demo task</button>
+        <button role="radio" aria-checked="false" tabindex="-1" data-mode="live">Live</button>
       </div>
-      <button id="play" class="primary">Play</button>
-      <button id="setup" class="ghost" aria-haspopup="dialog">Company &amp; catalog</button>
+      <button id="mistakes" class="switch" role="switch" aria-checked="true">
+        <span class="track" aria-hidden="true"><span class="thumb"></span></span>
+        <span>Plant mistakes</span>
+      </button>
+      <button id="run" class="primary">Run the agent</button>
+      <button id="reset" class="ghost">Reset world</button>
+      <span id="learned-chip" class="learned-chip" role="status" hidden></span>
+      <button id="setup" class="ghost" aria-haspopup="dialog">Company &amp; rules</button>
     </nav>
   </header>
 
-  <main class="stage">
-    <section class="canvas" aria-label="Workflow">
-      <div id="live-box" class="live-box" hidden>
-        <label for="instruction">Give the agent any request, the way a colleague or your boss would</label>
-        <textarea id="instruction" rows="3"></textarea>
-        <p id="live-note" class="note"></p>
+  <main class="split" id="split">
+    <section class="app-pane" id="app-pane" aria-label="Workspace app">
+      <div class="app-bar">
+        <div class="app-tabs" role="toolbar" aria-label="Open an app">
+          <button data-app="mail">Jmail</button>
+          <button data-app="drive">Jdrive</button>
+          <button data-app="crm">Habspot</button>
+          <button data-app="calendar">Calendario</button>
+        </div>
+        <button class="ghost app-close" id="app-close">Back to the workflow</button>
       </div>
-      <ol id="chain" class="chain" aria-live="polite"></ol>
-      <div id="summary" class="summary" hidden></div>
+      <div class="address">
+        <span class="path" id="app-path" aria-live="polite"></span>
+        <a id="app-open" href="#" target="_blank" rel="noopener">Open in a new tab</a>
+      </div>
+      <iframe id="app-frame" title="Workspace app the agent is using"></iframe>
     </section>
 
-    <aside class="monitor" aria-label="Monitor">
-      <div class="monitor-head">
-        <h2>Monitor</h2>
-        <label class="ranker">Step model
-          <select id="ranker"></select>
-        </label>
+    <div class="divider" id="divider" role="separator" aria-orientation="vertical" aria-label="Resize the app and the workflow" tabindex="0" aria-valuemin="25" aria-valuemax="75" aria-valuenow="46"></div>
+
+    <section class="work-pane" aria-labelledby="scenario-title">
+      <div class="tools" role="toolbar" aria-label="Canvas view">
+        <button class="tool" id="zoom-out" aria-label="Zoom out">−</button>
+        <span class="zoom-level" id="zoom-level" aria-live="polite">100%</span>
+        <button class="tool" id="zoom-in" aria-label="Zoom in">+</button>
+        <button class="tool text" id="fit">Fit</button>
+        <button class="tool text" id="follow" aria-pressed="true">Follow<span class="wide"> the agent</span></button>
+        <button class="tool text show-app-btn" id="show-app" aria-expanded="false" aria-controls="app-pane">Show the app</button>
       </div>
-      <p id="ranker-note" class="note"></p>
-      <figure class="risk">
-        <svg id="risk-chart" viewBox="0 0 300 64" preserveAspectRatio="none" role="img" aria-label="Risk over the run"></svg>
-        <figcaption><span id="risk-now">Risk 0%</span> of the pause barrier</figcaption>
-      </figure>
-      <button class="ghost ledger-toggle" id="ledger-toggle" aria-expanded="false" aria-controls="ledger">Show every step</button>
-      <ol id="ledger" class="ledger"></ol>
-      <p class="foot" id="latency"></p>
-    </aside>
+      <div class="viewport" id="viewport" tabindex="0" role="region" aria-label="Workflow canvas. Drag or use the arrow keys to move around; plus and minus zoom.">
+        <div class="world" id="world">
+          <div class="flow-head">
+            <h2 id="scenario-title" class="display">After the sales call</h2>
+            <p class="dek" id="scenario-dek"></p>
+          </div>
+          <ol id="chain" class="chain" aria-live="polite"></ol>
+          <div id="summary" class="summary" hidden></div>
+        </div>
+      </div>
+
+      <aside class="monitor" id="monitor" aria-label="Monitor">
+        <div class="monitor-head">
+          <h2>Monitor</h2>
+          <svg id="risk-chart" class="risk" viewBox="0 0 300 64" preserveAspectRatio="none" role="img" aria-label="Risk of an unusual step over the run, against the pause line"></svg>
+          <span class="risk-now" id="risk-now">Risk 0%</span>
+          <button class="ghost small" id="monitor-toggle" aria-expanded="false" aria-controls="monitor-body">All steps</button>
+        </div>
+        <div class="monitor-body" id="monitor-body">
+          <div class="monitor-left">
+            <p class="note">The line is the risk of an unusual step; the dashed line is where the step model pauses.</p>
+            <p id="ranker-note" class="note"></p>
+            <p class="foot" id="latency"></p>
+          </div>
+          <ol id="ledger" class="ledger" aria-label="Every step"></ol>
+        </div>
+      </aside>
+    </section>
   </main>
 
   <div id="drawer" class="drawer" role="dialog" aria-modal="true" aria-labelledby="drawer-title" hidden>
     <div class="drawer-panel">
       <div class="drawer-head">
-        <h2 id="drawer-title"></h2>
+        <h2 id="drawer-title" class="display"></h2>
         <button class="ghost close" data-close aria-label="Close">Close</button>
       </div>
       <div id="drawer-body" class="drawer-body"></div>

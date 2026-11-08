@@ -1,0 +1,1631 @@
+{
+ "_about": "Fixture: the sequence of POST /api/runs/current/next responses. `_needs` on a change hides it until that approval is allowed.",
+ "run": {
+  "id": "run_fixture_mistakes",
+  "scenario": "acme_after_call",
+  "mistakes": true,
+  "live": false
+ },
+ "steps_total": 13,
+ "next": [
+  {
+   "done": false,
+   "step": {
+    "index": 0,
+    "label": "Read the call transcript from Nov 6",
+    "app": "Jdrive",
+    "page": "/drive/doc/doc_transcript_t1_acme_foods",
+    "kind": "read",
+    "action": "jdrive.open",
+    "catalog_action": "jdrive.open:internal",
+    "name": "Open an internal document",
+    "values": {
+     "document": "transcript_2026-11-06_acme_foods"
+    },
+    "decision": "allow",
+    "check": {
+     "verdict": "allow",
+     "failed": [],
+     "headline": "",
+     "reasons": [],
+     "precedent": null,
+     "ranker": "workflow",
+     "checks": {
+      "normal": {
+       "ok": true,
+       "status": "scored",
+       "p": 0.62,
+       "rank": 1,
+       "u": 0.0,
+       "cusum": 0.17,
+       "risk": 0.02,
+       "barrier": 8.73,
+       "expected": [
+        {
+         "action_id": "jdrive.open:internal",
+         "name": "Open an internal document",
+         "p": 0.55
+        },
+        {
+         "action_id": "jmail.open_thread:client",
+         "name": "Open an email thread from the client",
+         "p": 0.28
+        },
+        {
+         "action_id": "habspot.open_deal:own",
+         "name": "Open a deal you own",
+         "p": 0.18
+        }
+       ],
+       "missing": [],
+       "behaviorgpt": {
+        "rank": 4,
+        "of": 60,
+        "top": [
+         {
+          "action_id": "jdrive.open:internal",
+          "name": "Open an internal document"
+         },
+         {
+          "action_id": "jmail.open_thread:client",
+          "name": "Open an email thread from the client"
+         },
+         {
+          "action_id": "habspot.open_deal:own",
+          "name": "Open a deal you own"
+         }
+        ]
+       }
+      },
+      "facts": {
+       "ok": true,
+       "checked": [],
+       "warnings": []
+      },
+      "rules": {
+       "ok": true,
+       "violations": [],
+       "precedents": []
+      }
+     },
+     "latency_ms": {
+      "normal": 0.6,
+      "facts": 1.1,
+      "rules": 0.3
+     }
+    }
+   },
+   "changed": []
+  },
+  {
+   "done": false,
+   "step": {
+    "index": 1,
+    "label": "Read Paul Grant's email with the RFP",
+    "app": "Jmail",
+    "page": "/mail/thread/th_043",
+    "kind": "read",
+    "action": "jmail.open_thread",
+    "catalog_action": "jmail.open_thread:client",
+    "name": "Open an email thread from the client",
+    "values": {
+     "thread": "Acme Foods – RFP for scheduling software",
+     "from": "Paul Grant (CFO)"
+    },
+    "decision": "allow",
+    "check": {
+     "verdict": "allow",
+     "failed": [],
+     "headline": "",
+     "reasons": [],
+     "precedent": null,
+     "ranker": "workflow",
+     "checks": {
+      "normal": {
+       "ok": true,
+       "status": "scored",
+       "p": 0.62,
+       "rank": 1,
+       "u": 0.0,
+       "cusum": 0.26,
+       "risk": 0.03,
+       "barrier": 8.73,
+       "expected": [
+        {
+         "action_id": "jmail.open_thread:client",
+         "name": "Open an email thread from the client",
+         "p": 0.55
+        },
+        {
+         "action_id": "jdrive.open:confidential",
+         "name": "Open a confidential client document",
+         "p": 0.28
+        },
+        {
+         "action_id": "habspot.open_deal:own",
+         "name": "Open a deal you own",
+         "p": 0.18
+        }
+       ],
+       "missing": [],
+       "behaviorgpt": {
+        "rank": 3,
+        "of": 60,
+        "top": [
+         {
+          "action_id": "jmail.open_thread:client",
+          "name": "Open an email thread from the client"
+         },
+         {
+          "action_id": "jdrive.open:confidential",
+          "name": "Open a confidential client document"
+         },
+         {
+          "action_id": "habspot.open_deal:own",
+          "name": "Open a deal you own"
+         }
+        ]
+       }
+      },
+      "facts": {
+       "ok": true,
+       "checked": [],
+       "warnings": []
+      },
+      "rules": {
+       "ok": true,
+       "violations": [],
+       "precedents": []
+      }
+     },
+     "latency_ms": {
+      "normal": 0.67,
+      "facts": 1.5,
+      "rules": 0.4
+     }
+    }
+   },
+   "changed": []
+  },
+  {
+   "done": false,
+   "step": {
+    "index": 2,
+    "label": "Open the RFP attachment",
+    "app": "Jdrive",
+    "page": "/drive/doc/doc_acme_foods_rfp_scheduling",
+    "kind": "read",
+    "action": "jdrive.open",
+    "catalog_action": "jdrive.open:confidential",
+    "name": "Open a confidential client document",
+    "values": {
+     "document": "acme_foods_rfp_scheduling"
+    },
+    "decision": "allow",
+    "check": {
+     "verdict": "allow",
+     "failed": [],
+     "headline": "",
+     "reasons": [],
+     "precedent": null,
+     "ranker": "workflow",
+     "checks": {
+      "normal": {
+       "ok": true,
+       "status": "scored",
+       "p": 0.62,
+       "rank": 1,
+       "u": 0.0,
+       "cusum": 0.26,
+       "risk": 0.03,
+       "barrier": 8.73,
+       "expected": [
+        {
+         "action_id": "jdrive.open:confidential",
+         "name": "Open a confidential client document",
+         "p": 0.55
+        },
+        {
+         "action_id": "habspot.search",
+         "name": "Search Habspot",
+         "p": 0.28
+        },
+        {
+         "action_id": "habspot.open_deal:own",
+         "name": "Open a deal you own",
+         "p": 0.18
+        }
+       ],
+       "missing": [],
+       "behaviorgpt": {
+        "rank": 6,
+        "of": 60,
+        "top": [
+         {
+          "action_id": "jdrive.open:confidential",
+          "name": "Open a confidential client document"
+         },
+         {
+          "action_id": "habspot.search",
+          "name": "Search Habspot"
+         },
+         {
+          "action_id": "habspot.open_deal:own",
+          "name": "Open a deal you own"
+         }
+        ]
+       }
+      },
+      "facts": {
+       "ok": true,
+       "checked": [],
+       "warnings": []
+      },
+      "rules": {
+       "ok": true,
+       "violations": [],
+       "precedents": []
+      }
+     },
+     "latency_ms": {
+      "normal": 0.74,
+      "facts": 1.9,
+      "rules": 0.5
+     }
+    }
+   },
+   "changed": []
+  },
+  {
+   "done": false,
+   "step": {
+    "index": 3,
+    "label": "Search Habspot for “Acme”",
+    "app": "Habspot",
+    "page": "/crm/search?q=Acme",
+    "kind": "search",
+    "action": "habspot.search",
+    "catalog_action": "habspot.search",
+    "name": "Search Habspot",
+    "values": {
+     "query": "Acme",
+     "results": "Acme Foods, Acme Food Group"
+    },
+    "decision": "allow",
+    "check": {
+     "verdict": "allow",
+     "failed": [],
+     "headline": "",
+     "reasons": [],
+     "precedent": null,
+     "ranker": "workflow",
+     "checks": {
+      "normal": {
+       "ok": true,
+       "status": "context",
+       "p": null,
+       "rank": null,
+       "u": 0,
+       "cusum": 0,
+       "risk": 0,
+       "barrier": 8.73,
+       "expected": [],
+       "missing": [],
+       "behaviorgpt": {
+        "rank": null,
+        "of": 60,
+        "top": []
+       }
+      },
+      "facts": {
+       "ok": true,
+       "checked": [],
+       "warnings": []
+      },
+      "rules": {
+       "ok": true,
+       "violations": [],
+       "precedents": []
+      }
+     },
+     "latency_ms": {
+      "normal": 0.81,
+      "facts": 1.1,
+      "rules": 0.6
+     }
+    }
+   },
+   "changed": []
+  },
+  {
+   "done": false,
+   "step": {
+    "index": 4,
+    "label": "Open the Acme Foods deal",
+    "app": "Habspot",
+    "page": "/crm/deal/dl_acme_foods",
+    "kind": "read",
+    "action": "habspot.open_deal",
+    "catalog_action": "habspot.open_deal:own",
+    "name": "Open a deal you own",
+    "values": {
+     "deal": "Acme Foods – Core 12",
+     "stage": "Discovery"
+    },
+    "decision": "allow",
+    "check": {
+     "verdict": "allow",
+     "failed": [],
+     "headline": "",
+     "reasons": [],
+     "precedent": null,
+     "ranker": "workflow",
+     "checks": {
+      "normal": {
+       "ok": true,
+       "status": "scored",
+       "p": 0.62,
+       "rank": 1,
+       "u": 0.0,
+       "cusum": 0.35,
+       "risk": 0.04,
+       "barrier": 8.73,
+       "expected": [
+        {
+         "action_id": "habspot.open_deal:own",
+         "name": "Open a deal you own",
+         "p": 0.55
+        },
+        {
+         "action_id": "habspot.note:call_note",
+         "name": "Log a call note on the deal",
+         "p": 0.28
+        },
+        {
+         "action_id": "habspot.next_step",
+         "name": "Write the next step on the deal",
+         "p": 0.18
+        }
+       ],
+       "missing": [],
+       "behaviorgpt": {
+        "rank": 5,
+        "of": 60,
+        "top": [
+         {
+          "action_id": "habspot.open_deal:own",
+          "name": "Open a deal you own"
+         },
+         {
+          "action_id": "habspot.note:call_note",
+          "name": "Log a call note on the deal"
+         },
+         {
+          "action_id": "habspot.next_step",
+          "name": "Write the next step on the deal"
+         }
+        ]
+       }
+      },
+      "facts": {
+       "ok": true,
+       "checked": [],
+       "warnings": []
+      },
+      "rules": {
+       "ok": true,
+       "violations": [],
+       "precedents": []
+      }
+     },
+     "latency_ms": {
+      "normal": 0.88,
+      "facts": 1.5,
+      "rules": 0.3
+     }
+    }
+   },
+   "changed": []
+  },
+  {
+   "done": false,
+   "step": {
+    "index": 5,
+    "label": "Log the Nov 6 call note",
+    "app": "Habspot",
+    "page": "/crm/deal/dl_acme_foods",
+    "kind": "write",
+    "action": "habspot.note",
+    "catalog_action": "habspot.note:call_note",
+    "name": "Log a call note on the deal",
+    "values": {
+     "note": "Call Nov 6 with Mark Keller. Budget ~$20k/yr; Paul Grant (CFO) decides. Also looked at Crewlane. Wants a quote for Paul before Thursday."
+    },
+    "decision": "allow",
+    "check": {
+     "verdict": "allow",
+     "failed": [],
+     "headline": "",
+     "reasons": [],
+     "precedent": null,
+     "ranker": "workflow",
+     "checks": {
+      "normal": {
+       "ok": true,
+       "status": "scored",
+       "p": 0.62,
+       "rank": 1,
+       "u": 0.0,
+       "cusum": 0.43,
+       "risk": 0.05,
+       "barrier": 8.73,
+       "expected": [
+        {
+         "action_id": "habspot.note:call_note",
+         "name": "Log a call note on the deal",
+         "p": 0.55
+        },
+        {
+         "action_id": "habspot.stage:next_stage",
+         "name": "Move the deal to the next stage",
+         "p": 0.28
+        },
+        {
+         "action_id": "habspot.next_step",
+         "name": "Write the next step on the deal",
+         "p": 0.18
+        }
+       ],
+       "missing": [],
+       "behaviorgpt": {
+        "rank": 7,
+        "of": 60,
+        "top": [
+         {
+          "action_id": "habspot.note:call_note",
+          "name": "Log a call note on the deal"
+         },
+         {
+          "action_id": "habspot.stage:next_stage",
+          "name": "Move the deal to the next stage"
+         },
+         {
+          "action_id": "habspot.next_step",
+          "name": "Write the next step on the deal"
+         }
+        ]
+       }
+      },
+      "facts": {
+       "ok": true,
+       "warnings": [],
+       "checked": [
+        {
+         "field": "budget",
+         "value": "~$20,000 a year",
+         "ok": true,
+         "kind": "money",
+         "evidence": [
+          {
+           "source": "doc_transcript_t1_acme_foods",
+           "title": "Call transcript, Nov 6 (T1)",
+           "span": "Paul has roughly twenty thousand a year set aside for scheduling."
+          }
+         ]
+        },
+        {
+         "field": "decision_maker",
+         "value": "Paul Grant",
+         "ok": true,
+         "kind": "entity",
+         "evidence": [
+          {
+           "source": "th_043",
+           "title": "Paul Grant's email (th_043)",
+           "span": "Paul Grant, CFO, Acme Foods, Inc."
+          }
+         ]
+        },
+        {
+         "field": "competitor",
+         "value": "Crewlane",
+         "ok": true,
+         "kind": "entity",
+         "evidence": [
+          {
+           "source": "doc_transcript_t1_acme_foods",
+           "title": "Call transcript, Nov 6 (T1)",
+           "span": "We also looked at Crewlane, I'll be honest."
+          }
+         ]
+        }
+       ]
+      },
+      "rules": {
+       "ok": true,
+       "violations": [],
+       "precedents": []
+      }
+     },
+     "latency_ms": {
+      "normal": 0.95,
+      "facts": 1.9,
+      "rules": 0.4
+     }
+    }
+   },
+   "changed": [
+    {
+     "_step": 5,
+     "app": "Habspot",
+     "label": "Call note from Nov 6 on the deal",
+     "url": "/crm/deal/dl_acme_foods"
+    }
+   ]
+  },
+  {
+   "done": false,
+   "step": {
+    "index": 6,
+    "label": "Move the deal stage to Negotiation",
+    "app": "Habspot",
+    "page": "/crm/deal/dl_acme_foods",
+    "kind": "write",
+    "action": "habspot.stage",
+    "catalog_action": "habspot.stage:stage_skip",
+    "name": "Move the deal past the next stage",
+    "values": {
+     "stage": "Discovery → Negotiation",
+     "probability": "15% → 70%"
+    },
+    "decision": "pause",
+    "check": {
+     "verdict": "pause",
+     "failed": [
+      "normal",
+      "rules"
+     ],
+     "headline": "Skips Demo and Proposal: no offer has been sent yet",
+     "reasons": [
+      "Unusual here: jumping to Negotiation right after a call note ranks #41 of 60. This team moves Discovery to Demo next.",
+      "Sales playbook: stages move one at a time, and Negotiation needs a proposal the client has received.",
+      "The call ended with “send me something”. That is not a signature, and contract_signed is still false."
+     ],
+     "precedent": null,
+     "ranker": "workflow",
+     "checks": {
+      "normal": {
+       "ok": false,
+       "status": "scored",
+       "p": 0.004,
+       "rank": 41,
+       "u": 6.88,
+       "cusum": 11.4,
+       "risk": 1.31,
+       "barrier": 8.73,
+       "expected": [
+        {
+         "action_id": "habspot.stage:next_stage",
+         "name": "Move the deal to the next stage",
+         "p": 0.55
+        },
+        {
+         "action_id": "habspot.next_step",
+         "name": "Write the next step on the deal",
+         "p": 0.28
+        },
+        {
+         "action_id": "quote.save:up_to_10",
+         "name": "Save a quote at 10% off or less",
+         "p": 0.18
+        }
+       ],
+       "missing": [
+        "Move the deal to the next stage"
+       ],
+       "behaviorgpt": {
+        "rank": 33,
+        "of": 60,
+        "top": [
+         {
+          "action_id": "habspot.stage:next_stage",
+          "name": "Move the deal to the next stage"
+         },
+         {
+          "action_id": "habspot.next_step",
+          "name": "Write the next step on the deal"
+         },
+         {
+          "action_id": "quote.save:up_to_10",
+          "name": "Save a quote at 10% off or less"
+         }
+        ]
+       }
+      },
+      "facts": {
+       "ok": true,
+       "checked": [],
+       "warnings": []
+      },
+      "rules": {
+       "ok": false,
+       "violations": [
+        {
+         "rule_id": "wr_stage_one_step",
+         "text": "Deal stages move one step at a time, and only when the playbook exit criteria are met. Proposal only after an offer is actually sent.",
+         "group": "written",
+         "author": null,
+         "source": "sales_playbook_2026"
+        }
+       ],
+       "precedents": []
+      }
+     },
+     "latency_ms": {
+      "normal": 1.02,
+      "facts": 1.1,
+      "rules": 0.5
+     }
+    },
+    "approval_id": "ap_fx_stage"
+   },
+   "changed": [
+    {
+     "_step": 5,
+     "app": "Habspot",
+     "label": "Call note from Nov 6 on the deal",
+     "url": "/crm/deal/dl_acme_foods"
+    },
+    {
+     "_step": 6,
+     "app": "Habspot",
+     "label": "Stage moved to Negotiation",
+     "url": "/crm/deal/dl_acme_foods",
+     "_needs": "ap_fx_stage"
+    }
+   ]
+  },
+  {
+   "done": false,
+   "step": {
+    "index": 7,
+    "label": "Set the close date to 2026-12-31",
+    "app": "Habspot",
+    "page": "/crm/deal/dl_acme_foods",
+    "kind": "write",
+    "action": "habspot.close_date",
+    "catalog_action": "habspot.close_date:change",
+    "name": "Change the deal's close date",
+    "values": {
+     "close_date": "2026-12-18 → 2026-12-31"
+    },
+    "decision": "pause",
+    "check": {
+     "verdict": "pause",
+     "failed": [
+      "facts"
+     ],
+     "headline": "2026-12-31 appears in no source",
+     "reasons": [
+      "The close date 2026-12-31 isn't in the call, Paul's email, the RFP or Habspot.",
+      "Mark said “maybe next quarter … I don't have a date for you.” Paul's email says a decision by December 15."
+     ],
+     "precedent": null,
+     "ranker": "workflow",
+     "checks": {
+      "normal": {
+       "ok": true,
+       "status": "scored",
+       "p": 0.155,
+       "rank": 4,
+       "u": 0.22,
+       "cusum": 3.65,
+       "risk": 0.42,
+       "barrier": 8.73,
+       "expected": [
+        {
+         "action_id": "habspot.next_step",
+         "name": "Write the next step on the deal",
+         "p": 0.55
+        },
+        {
+         "action_id": "quote.save:up_to_10",
+         "name": "Save a quote at 10% off or less",
+         "p": 0.28
+        },
+        {
+         "action_id": "habspot.close_date:change",
+         "name": "Change the deal's close date",
+         "p": 0.18
+        }
+       ],
+       "missing": [],
+       "behaviorgpt": {
+        "rank": 12,
+        "of": 60,
+        "top": [
+         {
+          "action_id": "habspot.next_step",
+          "name": "Write the next step on the deal"
+         },
+         {
+          "action_id": "quote.save:up_to_10",
+          "name": "Save a quote at 10% off or less"
+         },
+         {
+          "action_id": "habspot.close_date:change",
+          "name": "Change the deal's close date"
+         }
+        ]
+       }
+      },
+      "facts": {
+       "ok": false,
+       "warnings": [],
+       "checked": [
+        {
+         "field": "close_date",
+         "value": "2026-12-31",
+         "ok": false,
+         "kind": "date",
+         "evidence": [
+          {
+           "source": "doc_transcript_t1_acme_foods",
+           "title": "Call transcript, Nov 6 (T1)",
+           "span": "Maybe next quarter. I really don't know yet. Depends on Paul and on budget. I don't have a date for you."
+          },
+          {
+           "source": "th_043",
+           "title": "Paul Grant's email (th_043)",
+           "span": "We plan to make a decision by December 15."
+          }
+         ],
+         "expected": [
+          "2026-12-18 (already in Habspot)",
+          "2026-12-15 (decision date in Paul's email)"
+         ]
+        }
+       ]
+      },
+      "rules": {
+       "ok": true,
+       "violations": [],
+       "precedents": []
+      }
+     },
+     "latency_ms": {
+      "normal": 1.09,
+      "facts": 1.5,
+      "rules": 0.6
+     }
+    },
+    "approval_id": "ap_fx_close"
+   },
+   "changed": [
+    {
+     "_step": 5,
+     "app": "Habspot",
+     "label": "Call note from Nov 6 on the deal",
+     "url": "/crm/deal/dl_acme_foods"
+    },
+    {
+     "_step": 6,
+     "app": "Habspot",
+     "label": "Stage moved to Negotiation",
+     "url": "/crm/deal/dl_acme_foods",
+     "_needs": "ap_fx_stage"
+    },
+    {
+     "_step": 7,
+     "app": "Habspot",
+     "label": "Close date set to 2026-12-31",
+     "url": "/crm/deal/dl_acme_foods",
+     "_needs": "ap_fx_close"
+    }
+   ]
+  },
+  {
+   "done": false,
+   "step": {
+    "index": 8,
+    "label": "Set the amount to $16,200",
+    "app": "Habspot",
+    "page": "/crm/deal/dl_acme_foods",
+    "kind": "write",
+    "action": "habspot.amount",
+    "catalog_action": "habspot.amount:change",
+    "name": "Change the deal amount",
+    "values": {
+     "amount": "$21,600 → $16,200",
+     "basis": "12 depots × $1,800, 25% off"
+    },
+    "decision": "pause",
+    "check": {
+     "verdict": "pause",
+     "failed": [
+      "facts",
+      "rules"
+     ],
+     "headline": "Books 12 depots at 25% off as if both were agreed",
+     "reasons": [
+      "Mark said they'd start with the five Columbus-area depots; only Paul's RFP asks for all 12.",
+      "25% off is what Paul asked for, not what anyone agreed."
+     ],
+     "precedent": null,
+     "ranker": "workflow",
+     "checks": {
+      "normal": {
+       "ok": true,
+       "status": "scored",
+       "p": 0.207,
+       "rank": 3,
+       "u": 0.04,
+       "cusum": 3.22,
+       "risk": 0.37,
+       "barrier": 8.73,
+       "expected": [
+        {
+         "action_id": "quote.save:up_to_10",
+         "name": "Save a quote at 10% off or less",
+         "p": 0.55
+        },
+        {
+         "action_id": "habspot.next_step",
+         "name": "Write the next step on the deal",
+         "p": 0.28
+        },
+        {
+         "action_id": "habspot.amount:change",
+         "name": "Change the deal amount",
+         "p": 0.18
+        }
+       ],
+       "missing": [],
+       "behaviorgpt": {
+        "rank": 10,
+        "of": 60,
+        "top": [
+         {
+          "action_id": "quote.save:up_to_10",
+          "name": "Save a quote at 10% off or less"
+         },
+         {
+          "action_id": "habspot.next_step",
+          "name": "Write the next step on the deal"
+         },
+         {
+          "action_id": "habspot.amount:change",
+          "name": "Change the deal amount"
+         }
+        ]
+       }
+      },
+      "facts": {
+       "ok": false,
+       "warnings": [
+        "Sources disagree: the call says start with 5 depots, the RFP says all 12 from day one."
+       ],
+       "checked": [
+        {
+         "field": "locations",
+         "value": 12,
+         "ok": false,
+         "kind": "number",
+         "evidence": [
+          {
+           "source": "doc_transcript_t1_acme_foods",
+           "title": "Call transcript, Nov 6 (T1)",
+           "span": "Realistically we'd start with the five Columbus-area depots, then roll out the rest."
+          }
+         ],
+         "expected": [
+          "5 depots to start (the call, the primary source)"
+         ]
+        },
+        {
+         "field": "discount_pct",
+         "value": 25,
+         "ok": false,
+         "kind": "percent",
+         "evidence": [
+          {
+           "source": "th_043",
+           "title": "Paul Grant's email (th_043)",
+           "span": "Please send me a quote for all 12 depots at 25% off before Thursday"
+          }
+         ],
+         "expected": [
+          "No discount agreed; 25% is the client's ask"
+         ]
+        }
+       ]
+      },
+      "rules": {
+       "ok": false,
+       "violations": [
+        {
+         "rule_id": "ur_pilot_not_all_locations",
+         "text": "Never quote all locations when the champion talked about a pilot. Quote the pilot and show the rollout price separately.",
+         "group": "unwritten",
+         "author": "Liam O'Connor",
+         "source": null
+        }
+       ],
+       "precedents": []
+      }
+     },
+     "latency_ms": {
+      "normal": 1.16,
+      "facts": 1.9,
+      "rules": 0.3
+     }
+    },
+    "approval_id": "ap_fx_amount"
+   },
+   "changed": [
+    {
+     "_step": 5,
+     "app": "Habspot",
+     "label": "Call note from Nov 6 on the deal",
+     "url": "/crm/deal/dl_acme_foods"
+    },
+    {
+     "_step": 6,
+     "app": "Habspot",
+     "label": "Stage moved to Negotiation",
+     "url": "/crm/deal/dl_acme_foods",
+     "_needs": "ap_fx_stage"
+    },
+    {
+     "_step": 7,
+     "app": "Habspot",
+     "label": "Close date set to 2026-12-31",
+     "url": "/crm/deal/dl_acme_foods",
+     "_needs": "ap_fx_close"
+    },
+    {
+     "_step": 8,
+     "app": "Habspot",
+     "label": "Amount set to $16,200",
+     "url": "/crm/deal/dl_acme_foods",
+     "_needs": "ap_fx_amount"
+    }
+   ]
+  },
+  {
+   "done": false,
+   "step": {
+    "index": 9,
+    "label": "Create a quote: 12 depots at 25% off",
+    "app": "Quotes",
+    "page": "/drive/doc/doc_quote_acme_foods_v1",
+    "kind": "write",
+    "action": "habspot.quote_create",
+    "catalog_action": "habspot.quote_create:over_15",
+    "name": "Create a quote above 15% off",
+    "values": {
+     "plan": "Core",
+     "depots": 12,
+     "discount": "25%",
+     "total": "$16,200 a year + $3,000 onboarding",
+     "status": "draft"
+    },
+    "decision": "flag",
+    "check": {
+     "verdict": "flag",
+     "failed": [
+      "rules"
+     ],
+     "headline": "25% is above a rep's 15%: fine as a draft, but sending it needs Dana's approval",
+     "reasons": [
+      "Discount policy: 15–25% needs written approval from Dana Brooks."
+     ],
+     "precedent": null,
+     "ranker": "workflow",
+     "checks": {
+      "normal": {
+       "ok": true,
+       "status": "scored",
+       "p": 0.31,
+       "rank": 2,
+       "u": 0.0,
+       "cusum": 2.7,
+       "risk": 0.31,
+       "barrier": 8.73,
+       "expected": [
+        {
+         "action_id": "quote.save:up_to_10",
+         "name": "Save a quote at 10% off or less",
+         "p": 0.55
+        },
+        {
+         "action_id": "habspot.quote_create:over_15",
+         "name": "Create a quote above 15% off",
+         "p": 0.28
+        },
+        {
+         "action_id": "quote.request_approval:over_15",
+         "name": "Ask the sales manager to approve more than 15% off",
+         "p": 0.18
+        }
+       ],
+       "missing": [],
+       "behaviorgpt": {
+        "rank": 8,
+        "of": 60,
+        "top": [
+         {
+          "action_id": "quote.save:up_to_10",
+          "name": "Save a quote at 10% off or less"
+         },
+         {
+          "action_id": "habspot.quote_create:over_15",
+          "name": "Create a quote above 15% off"
+         },
+         {
+          "action_id": "quote.request_approval:over_15",
+          "name": "Ask the sales manager to approve more than 15% off"
+         }
+        ]
+       }
+      },
+      "facts": {
+       "ok": true,
+       "checked": [],
+       "warnings": []
+      },
+      "rules": {
+       "ok": false,
+       "violations": [
+        {
+         "rule_id": "wr_discount_15",
+         "text": "Reps may give up to 15% on the subscription. 15–25% needs written approval from Dana Brooks, recorded as a note on the deal.",
+         "group": "written",
+         "author": null,
+         "source": "discount_policy"
+        }
+       ],
+       "precedents": []
+      }
+     },
+     "latency_ms": {
+      "normal": 1.23,
+      "facts": 1.1,
+      "rules": 0.4
+     }
+    }
+   },
+   "changed": [
+    {
+     "_step": 5,
+     "app": "Habspot",
+     "label": "Call note from Nov 6 on the deal",
+     "url": "/crm/deal/dl_acme_foods"
+    },
+    {
+     "_step": 6,
+     "app": "Habspot",
+     "label": "Stage moved to Negotiation",
+     "url": "/crm/deal/dl_acme_foods",
+     "_needs": "ap_fx_stage"
+    },
+    {
+     "_step": 7,
+     "app": "Habspot",
+     "label": "Close date set to 2026-12-31",
+     "url": "/crm/deal/dl_acme_foods",
+     "_needs": "ap_fx_close"
+    },
+    {
+     "_step": 8,
+     "app": "Habspot",
+     "label": "Amount set to $16,200",
+     "url": "/crm/deal/dl_acme_foods",
+     "_needs": "ap_fx_amount"
+    },
+    {
+     "_step": 9,
+     "app": "Jdrive",
+     "label": "Quote draft: Core 12 at 25% off",
+     "url": "/drive/doc/doc_quote_acme_foods_v1"
+    }
+   ]
+  },
+  {
+   "done": false,
+   "step": {
+    "index": 10,
+    "label": "Send the 25% quote to Paul Grant",
+    "app": "Quotes",
+    "page": "/drive/doc/doc_quote_acme_foods_v1",
+    "kind": "write",
+    "action": "quote.send",
+    "catalog_action": "quote.send:over_15:not_approved",
+    "name": "Send a quote above 15% off without approval",
+    "values": {
+     "to": "paul.grant@acmefoods.com",
+     "quote": "Core 12 at 25% off, $16,200 a year",
+     "approval": "none"
+    },
+    "decision": "pause",
+    "check": {
+     "verdict": "pause",
+     "failed": [
+      "normal",
+      "rules"
+     ],
+     "headline": "Sends 25% off with no approval, and sending can't be undone",
+     "reasons": [
+      "Sending a quote can't be undone, and this team always asks Dana before going above 15%.",
+      "Discount policy: 15–25% needs written approval from Dana Brooks, recorded on the deal. There is none."
+     ],
+     "precedent": null,
+     "ranker": "workflow",
+     "checks": {
+      "normal": {
+       "ok": false,
+       "status": "scored",
+       "p": 0.006,
+       "rank": 38,
+       "u": 6.34,
+       "cusum": 14.09,
+       "risk": 1.62,
+       "barrier": 8.73,
+       "expected": [
+        {
+         "action_id": "quote.request_approval:over_15",
+         "name": "Ask the sales manager to approve more than 15% off",
+         "p": 0.55
+        },
+        {
+         "action_id": "jmail.draft_save:client",
+         "name": "Save a draft email to the client",
+         "p": 0.28
+        },
+        {
+         "action_id": "jmail.send:internal",
+         "name": "Send an email to a colleague",
+         "p": 0.18
+        }
+       ],
+       "missing": [
+        "Ask the sales manager to approve more than 15% off"
+       ],
+       "behaviorgpt": {
+        "rank": 21,
+        "of": 60,
+        "top": [
+         {
+          "action_id": "quote.request_approval:over_15",
+          "name": "Ask the sales manager to approve more than 15% off"
+         },
+         {
+          "action_id": "jmail.draft_save:client",
+          "name": "Save a draft email to the client"
+         },
+         {
+          "action_id": "jmail.send:internal",
+          "name": "Send an email to a colleague"
+         }
+        ]
+       }
+      },
+      "facts": {
+       "ok": true,
+       "checked": [],
+       "warnings": []
+      },
+      "rules": {
+       "ok": false,
+       "violations": [
+        {
+         "rule_id": "wr_discount_15",
+         "text": "Reps may give up to 15% on the subscription. 15–25% needs written approval from Dana Brooks, recorded as a note on the deal.",
+         "group": "written",
+         "author": null,
+         "source": "discount_policy"
+        },
+        {
+         "rule_id": "ur_acme_q4_discount",
+         "text": "Acme always pushes for a discount at quarter end. Never go above 10% before their procurement is involved.",
+         "group": "unwritten",
+         "author": "Liam O'Connor",
+         "source": null
+        }
+       ],
+       "precedents": []
+      }
+     },
+     "latency_ms": {
+      "normal": 1.3,
+      "facts": 1.5,
+      "rules": 0.5
+     }
+    },
+    "approval_id": "ap_fx_send"
+   },
+   "changed": [
+    {
+     "_step": 5,
+     "app": "Habspot",
+     "label": "Call note from Nov 6 on the deal",
+     "url": "/crm/deal/dl_acme_foods"
+    },
+    {
+     "_step": 6,
+     "app": "Habspot",
+     "label": "Stage moved to Negotiation",
+     "url": "/crm/deal/dl_acme_foods",
+     "_needs": "ap_fx_stage"
+    },
+    {
+     "_step": 7,
+     "app": "Habspot",
+     "label": "Close date set to 2026-12-31",
+     "url": "/crm/deal/dl_acme_foods",
+     "_needs": "ap_fx_close"
+    },
+    {
+     "_step": 8,
+     "app": "Habspot",
+     "label": "Amount set to $16,200",
+     "url": "/crm/deal/dl_acme_foods",
+     "_needs": "ap_fx_amount"
+    },
+    {
+     "_step": 9,
+     "app": "Jdrive",
+     "label": "Quote draft: Core 12 at 25% off",
+     "url": "/drive/doc/doc_quote_acme_foods_v1"
+    },
+    {
+     "_step": 10,
+     "app": "Jmail",
+     "label": "Quote sent to Paul Grant",
+     "url": "/mail/thread/th_043",
+     "_needs": "ap_fx_send"
+    }
+   ]
+  },
+  {
+   "done": false,
+   "step": {
+    "index": 11,
+    "label": "Draft the recap email to Mark Keller",
+    "app": "Jmail",
+    "page": "/mail/compose?draft=dr_acme_recap",
+    "kind": "write",
+    "action": "jmail.draft_save",
+    "catalog_action": "jmail.draft_save:client",
+    "name": "Save a draft email to the client",
+    "values": {
+     "to": "mark.keller@acmefoods.com",
+     "subject": "Recap of our call and next steps",
+     "sent": "no, saved as a draft"
+    },
+    "decision": "allow",
+    "check": {
+     "verdict": "allow",
+     "failed": [],
+     "headline": "",
+     "reasons": [],
+     "precedent": null,
+     "ranker": "workflow",
+     "checks": {
+      "normal": {
+       "ok": true,
+       "status": "scored",
+       "p": 0.62,
+       "rank": 1,
+       "u": 0.0,
+       "cusum": 0.52,
+       "risk": 0.06,
+       "barrier": 8.73,
+       "expected": [
+        {
+         "action_id": "jmail.draft_save:client",
+         "name": "Save a draft email to the client",
+         "p": 0.55
+        },
+        {
+         "action_id": "calendar.update:agenda",
+         "name": "Update a meeting's agenda",
+         "p": 0.28
+        },
+        {
+         "action_id": "habspot.next_step",
+         "name": "Write the next step on the deal",
+         "p": 0.18
+        }
+       ],
+       "missing": [],
+       "behaviorgpt": {
+        "rank": 5,
+        "of": 60,
+        "top": [
+         {
+          "action_id": "jmail.draft_save:client",
+          "name": "Save a draft email to the client"
+         },
+         {
+          "action_id": "calendar.update:agenda",
+          "name": "Update a meeting's agenda"
+         },
+         {
+          "action_id": "habspot.next_step",
+          "name": "Write the next step on the deal"
+         }
+        ]
+       }
+      },
+      "facts": {
+       "ok": true,
+       "checked": [],
+       "warnings": []
+      },
+      "rules": {
+       "ok": true,
+       "violations": [],
+       "precedents": []
+      }
+     },
+     "latency_ms": {
+      "normal": 1.37,
+      "facts": 1.9,
+      "rules": 0.6
+     }
+    }
+   },
+   "changed": [
+    {
+     "_step": 5,
+     "app": "Habspot",
+     "label": "Call note from Nov 6 on the deal",
+     "url": "/crm/deal/dl_acme_foods"
+    },
+    {
+     "_step": 6,
+     "app": "Habspot",
+     "label": "Stage moved to Negotiation",
+     "url": "/crm/deal/dl_acme_foods",
+     "_needs": "ap_fx_stage"
+    },
+    {
+     "_step": 7,
+     "app": "Habspot",
+     "label": "Close date set to 2026-12-31",
+     "url": "/crm/deal/dl_acme_foods",
+     "_needs": "ap_fx_close"
+    },
+    {
+     "_step": 8,
+     "app": "Habspot",
+     "label": "Amount set to $16,200",
+     "url": "/crm/deal/dl_acme_foods",
+     "_needs": "ap_fx_amount"
+    },
+    {
+     "_step": 9,
+     "app": "Jdrive",
+     "label": "Quote draft: Core 12 at 25% off",
+     "url": "/drive/doc/doc_quote_acme_foods_v1"
+    },
+    {
+     "_step": 10,
+     "app": "Jmail",
+     "label": "Quote sent to Paul Grant",
+     "url": "/mail/thread/th_043",
+     "_needs": "ap_fx_send"
+    },
+    {
+     "_step": 11,
+     "app": "Jmail",
+     "label": "Recap draft to Mark Keller",
+     "url": "/mail/compose?draft=dr_acme_recap"
+    }
+   ]
+  },
+  {
+   "done": false,
+   "step": {
+    "index": 12,
+    "label": "Add the recap to Thursday's call with Paul",
+    "app": "Calendario",
+    "page": "/calendar/event/ev_cal_acme_cfo_intro",
+    "kind": "write",
+    "action": "calendar.update",
+    "catalog_action": "calendar.update:agenda",
+    "name": "Update a meeting's agenda",
+    "values": {
+     "event": "Acme Foods: intro with Paul Grant (CFO)",
+     "when": "Thu Nov 12, 11:00",
+     "agenda": "Recap and pricing to review"
+    },
+    "decision": "allow",
+    "check": {
+     "verdict": "allow",
+     "failed": [],
+     "headline": "",
+     "reasons": [],
+     "precedent": null,
+     "ranker": "workflow",
+     "checks": {
+      "normal": {
+       "ok": true,
+       "status": "scored",
+       "p": 0.31,
+       "rank": 2,
+       "u": 0.0,
+       "cusum": 0.7,
+       "risk": 0.08,
+       "barrier": 8.73,
+       "expected": [
+        {
+         "action_id": "jmail.draft_save:client",
+         "name": "Save a draft email to the client",
+         "p": 0.55
+        },
+        {
+         "action_id": "calendar.update:agenda",
+         "name": "Update a meeting's agenda",
+         "p": 0.28
+        },
+        {
+         "action_id": "habspot.next_step",
+         "name": "Write the next step on the deal",
+         "p": 0.18
+        }
+       ],
+       "missing": [],
+       "behaviorgpt": {
+        "rank": 9,
+        "of": 60,
+        "top": [
+         {
+          "action_id": "jmail.draft_save:client",
+          "name": "Save a draft email to the client"
+         },
+         {
+          "action_id": "calendar.update:agenda",
+          "name": "Update a meeting's agenda"
+         },
+         {
+          "action_id": "habspot.next_step",
+          "name": "Write the next step on the deal"
+         }
+        ]
+       }
+      },
+      "facts": {
+       "ok": true,
+       "checked": [],
+       "warnings": []
+      },
+      "rules": {
+       "ok": true,
+       "violations": [],
+       "precedents": []
+      }
+     },
+     "latency_ms": {
+      "normal": 1.44,
+      "facts": 1.1,
+      "rules": 0.3
+     }
+    }
+   },
+   "changed": [
+    {
+     "_step": 5,
+     "app": "Habspot",
+     "label": "Call note from Nov 6 on the deal",
+     "url": "/crm/deal/dl_acme_foods"
+    },
+    {
+     "_step": 6,
+     "app": "Habspot",
+     "label": "Stage moved to Negotiation",
+     "url": "/crm/deal/dl_acme_foods",
+     "_needs": "ap_fx_stage"
+    },
+    {
+     "_step": 7,
+     "app": "Habspot",
+     "label": "Close date set to 2026-12-31",
+     "url": "/crm/deal/dl_acme_foods",
+     "_needs": "ap_fx_close"
+    },
+    {
+     "_step": 8,
+     "app": "Habspot",
+     "label": "Amount set to $16,200",
+     "url": "/crm/deal/dl_acme_foods",
+     "_needs": "ap_fx_amount"
+    },
+    {
+     "_step": 9,
+     "app": "Jdrive",
+     "label": "Quote draft: Core 12 at 25% off",
+     "url": "/drive/doc/doc_quote_acme_foods_v1"
+    },
+    {
+     "_step": 10,
+     "app": "Jmail",
+     "label": "Quote sent to Paul Grant",
+     "url": "/mail/thread/th_043",
+     "_needs": "ap_fx_send"
+    },
+    {
+     "_step": 11,
+     "app": "Jmail",
+     "label": "Recap draft to Mark Keller",
+     "url": "/mail/compose?draft=dr_acme_recap"
+    },
+    {
+     "_step": 12,
+     "app": "Calendario",
+     "label": "Recap added to Thursday's call",
+     "url": "/calendar/event/ev_cal_acme_cfo_intro"
+    }
+   ]
+  },
+  {
+   "done": true,
+   "step": null,
+   "changed": [
+    {
+     "_step": 5,
+     "app": "Habspot",
+     "label": "Call note from Nov 6 on the deal",
+     "url": "/crm/deal/dl_acme_foods"
+    },
+    {
+     "_step": 6,
+     "app": "Habspot",
+     "label": "Stage moved to Negotiation",
+     "url": "/crm/deal/dl_acme_foods",
+     "_needs": "ap_fx_stage"
+    },
+    {
+     "_step": 7,
+     "app": "Habspot",
+     "label": "Close date set to 2026-12-31",
+     "url": "/crm/deal/dl_acme_foods",
+     "_needs": "ap_fx_close"
+    },
+    {
+     "_step": 8,
+     "app": "Habspot",
+     "label": "Amount set to $16,200",
+     "url": "/crm/deal/dl_acme_foods",
+     "_needs": "ap_fx_amount"
+    },
+    {
+     "_step": 9,
+     "app": "Jdrive",
+     "label": "Quote draft: Core 12 at 25% off",
+     "url": "/drive/doc/doc_quote_acme_foods_v1"
+    },
+    {
+     "_step": 10,
+     "app": "Jmail",
+     "label": "Quote sent to Paul Grant",
+     "url": "/mail/thread/th_043",
+     "_needs": "ap_fx_send"
+    },
+    {
+     "_step": 11,
+     "app": "Jmail",
+     "label": "Recap draft to Mark Keller",
+     "url": "/mail/compose?draft=dr_acme_recap"
+    },
+    {
+     "_step": 12,
+     "app": "Calendario",
+     "label": "Recap added to Thursday's call",
+     "url": "/calendar/event/ev_cal_acme_cfo_intro"
+    }
+   ]
+  }
+ ]
+}
