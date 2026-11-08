@@ -76,10 +76,22 @@ class RedisStore:
     name = "redis"
 
     def __init__(self, url: str, token: str):
+        self.url, self.token = url, token
+        self.version = -1  # what this instance last loaded or saved
+        self._clients: dict[int, Any] = {}
+
+    @property
+    def redis(self):
+        """One client per event loop: the async HTTP client inside is bound to the loop it was
+        created on, and a server or test may run requests on different loops."""
+        import asyncio
+
         from upstash_redis.asyncio import Redis
 
-        self.redis = Redis(url, token, allow_telemetry=False)
-        self.version = -1  # what this instance last loaded or saved
+        key = id(asyncio.get_running_loop())
+        if key not in self._clients:
+            self._clients[key] = Redis(self.url, self.token, allow_telemetry=False)
+        return self._clients[key]
 
     async def _acquire(self) -> str:
         import asyncio
