@@ -24,7 +24,7 @@ def test_raw_rows_are_complete():
 
 
 def test_size_fits_one_ranking_call(catalog):
-    assert 30 <= len(catalog) <= 60
+    assert 50 <= len(catalog) <= 100
 
 
 def test_ids_and_apps(catalog):
@@ -56,11 +56,12 @@ def test_every_run_action_is_in_catalog_with_matching_flags(catalog):
             assert e["details"]["app"] == a.app, (path.stem, a.id)
 
 
-def test_golden_runs_use_only_workflow_actions(catalog):
-    for path in RUNS.glob("golden_*.jsonl"):
+def test_careful_runs_use_no_wrong_actions(catalog):
+    for path in RUNS.glob("careful_*.jsonl"):
         for e in load_run(path):
             if e["type"] == "view":
-                assert catalog[e["action_id"]].role == "workflow", (path.stem, e["action_id"])
+                assert catalog[e["action_id"]].role != "wrong", (path.stem, e["action_id"])
+                assert not catalog[e["action_id"]].irreversible, (path.stem, e["action_id"])
 
 
 def test_converts_to_a_valid_parquet_without_our_columns(tmp_path):

@@ -1,7 +1,7 @@
 """The Sentinel action catalog (catalog/actions.csv).
 
 The CSV holds the BehaviorGPT columns plus our own: `irreversible`, `role` (workflow | benign |
-wrong) and `phase` (gather | act | any). `catalog_from_csv` drops the extra columns, so they never
+wrong) and `phase` (research | act | any). `catalog_from_csv` drops the extra columns, so they never
 reach Unbox.
 """
 
@@ -16,16 +16,18 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 CATALOG_CSV = ROOT / "catalog" / "actions.csv"
 
-ID_RE = re.compile(r"^(inbox|docs|transcripts|crm|email)\.[a-z]+(_[a-z]+)*$")
+ID_RE = re.compile(r"^(mail|files|calls|crm|quotes|chat|calendar)\.[a-z]+(_[a-z0-9]+)*$")
 APP_OF_PREFIX = {
-    "inbox": "Inbox",
-    "docs": "Docs",
-    "transcripts": "Transcripts",
+    "mail": "Mail",
+    "files": "Files",
+    "calls": "Calls",
     "crm": "CRM",
-    "email": "Email",
+    "quotes": "Quotes",
+    "chat": "Chat",
+    "calendar": "Calendar",
 }
 ROLES = {"workflow", "benign", "wrong"}
-PHASES = {"gather", "act", "any"}
+PHASES = {"research", "act", "any"}
 
 
 @dataclass(frozen=True)

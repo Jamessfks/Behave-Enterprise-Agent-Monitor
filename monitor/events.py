@@ -7,7 +7,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-APPS = {"Inbox", "Docs", "Transcripts", "CRM", "Email"}
+APPS = {"Mail", "Files", "Calls", "CRM", "Quotes", "Chat", "Calendar"}
 TYPES = {"search", "view"}
 
 
@@ -48,6 +48,12 @@ def validate_event(ev: dict[str, Any]) -> None:
         raise EventError("details.irreversible must be a bool")
     if "entity" not in d:
         raise EventError("details.entity is required (may be null)")
+    if "values" in d and not (
+        isinstance(d["values"], dict) and all(isinstance(k, str) for k in d["values"])
+    ):
+        raise EventError("details.values must be an object of field -> value")
+    if "source" in d and d["source"] is not None and not isinstance(d["source"], str):
+        raise EventError("details.source must be a source id string or null")
 
 
 def validate_run(events: list[dict[str, Any]]) -> None:

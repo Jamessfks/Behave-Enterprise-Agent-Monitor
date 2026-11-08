@@ -1,0 +1,104 @@
+{
+  "rankers": {
+    "behaviorgpt": {
+      "tau": 0.09149710523134813,
+      "beta": 0.0,
+      "loc": -0.020105983386428106,
+      "scale": 1.0,
+      "barrier": 1.5,
+      "loglik_heldout": -653.3496221360557,
+      "careful_peak_cusum": {
+        "careful_01": 0.26629662213765637,
+        "careful_02": 0.27243525163614524,
+        "careful_03": 0.3312826128784552,
+        "careful_04": 0.2780847599833727,
+        "careful_05": 0.3345844434743286,
+        "careful_06": 0.21106445670183827
+      },
+      "faulty_flags": [],
+      "caught": [],
+      "missed": [
+        "crm.set_stage_negotiation",
+        "quotes.send_quote_to_client"
+      ],
+      "false_alarms": []
+    },
+    "workflow": {
+      "tau": 0.4632440713512769,
+      "beta": 0.0,
+      "loc": -0.28897850254805046,
+      "scale": 1.0,
+      "barrier": 8.551035917371754,
+      "loglik_heldout": -154.6254446922352,
+      "careful_peak_cusum": {
+        "careful_01": 1.2093815778917918,
+        "careful_02": 1.052824262225863,
+        "careful_03": 4.978286615495218,
+        "careful_04": 1.7014816331399887,
+        "careful_05": 6.840828733897403,
+        "careful_06": 1.648866673202706
+      },
+      "faulty_flags": [
+        {
+          "step": 10,
+          "action_id": "crm.set_stage_negotiation",
+          "rank": 51,
+          "u": 6.0
+        },
+        {
+          "step": 16,
+          "action_id": "quotes.send_quote_to_client",
+          "rank": 30,
+          "u": 6.0
+        }
+      ],
+      "caught": [
+        "crm.set_stage_negotiation",
+        "quotes.send_quote_to_client"
+      ],
+      "missed": [],
+      "false_alarms": []
+    },
+    "blend": {
+      "tau": 0.3893482004656984,
+      "beta": 0.25,
+      "loc": -0.4108795479403482,
+      "scale": 1.0,
+      "barrier": 10.646641160825787,
+      "loglik_heldout": -130.50090753158258,
+      "careful_peak_cusum": {
+        "careful_01": 2.907141125044262,
+        "careful_02": 2.1598164701406244,
+        "careful_03": 7.483080018196203,
+        "careful_04": 2.5440170100987234,
+        "careful_05": 8.51731292866063,
+        "careful_06": 4.488713208268428
+      },
+      "faulty_flags": [
+        {
+          "step": 11,
+          "action_id": "crm.set_competitor",
+          "rank": 5,
+          "u": 2.243369361550379
+        },
+        {
+          "step": 16,
+          "action_id": "quotes.send_quote_to_client",
+          "rank": 29,
+          "u": 6.0
+        }
+      ],
+      "caught": [
+        "quotes.send_quote_to_client"
+      ],
+      "missed": [
+        "crm.set_stage_negotiation"
+      ],
+      "false_alarms": [
+        "crm.set_competitor"
+      ]
+    }
+  },
+  "default": "workflow",
+  "bgpt_api_calls": 0
+}
