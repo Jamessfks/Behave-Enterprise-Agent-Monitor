@@ -15,6 +15,7 @@ import json
 import math
 import os
 import threading
+import time
 from collections import Counter, defaultdict
 from pathlib import Path
 from typing import Any, Protocol
@@ -84,9 +85,9 @@ class BehaviorGPTRanker:
     @property
     def client(self):
         if self._client is None:
-            from behaviorgpt import UnboxAIClient
+            from monitor.unbox import get_client
 
-            self._client = UnboxAIClient(market="us")
+            self._client = get_client()
         return self._client
 
     @property
@@ -98,18 +99,23 @@ class BehaviorGPTRanker:
     def cached(self, history: list[dict[str, Any]]) -> bool:
         return self.cache.get(history_key(self.catalog_id, history)) is not None
 
+    def _complete_with_retry(self, sdk_history):
+        return _with_retry(
+            lambda: self.client.complete(
+                sdk_history,
+                limit=self.n_actions,
+                catalog_id=self.catalog_id,
+                register_event=False,
+            )
+        )
+
     def rank(self, history: list[dict[str, Any]]) -> dict[str, float]:
         key = history_key(self.catalog_id, history)
         hit = self.cache.get(key)
         if hit is not None:
             self.cache_hits += 1
             return hit
-        res = self.client.complete(
-            [to_sdk(e) for e in history],
-            limit=self.n_actions,
-            catalog_id=self.catalog_id,
-            register_event=False,
-        )
+        res = self._complete_with_retry([to_sdk(e) for e in history])
         self.calls += 1
         scores = {item.id: float(item.score) for item in res.items}
         self.cache.put(key, scores)
@@ -186,6 +192,29 @@ class WorkflowRanker:
                 cost += self.unseen / 2
             out[a] = -cost
         return out
+
+
+RETRY_DELAYS = (0.5, 1.5)  # seconds; then give up and let the caller handle the error
+
+
+def _retryable(err: Exception) -> bool:
+    from behaviorgpt import RateLimitError, UnboxAIError
+
+    if isinstance(err, RateLimitError):
+        return True
+    return isinstance(err, UnboxAIError) and (err.status_code or 0) >= 500
+
+
+def _with_retry(call, sleep=time.sleep):
+    """Retry rate limits (429) and server errors (5xx), as Unbox's own anomaly app does."""
+    for delay in (*RETRY_DELAYS, None):
+        try:
+            return call()
+        except Exception as e:
+            if delay is None or not _retryable(e):
+                raise
+            sleep(delay)
+    return None  # unreachable
 
 
 class TransitionRanker:

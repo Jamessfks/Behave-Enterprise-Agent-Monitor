@@ -26,7 +26,15 @@ from env.scenario import SOURCES, TRIGGER
 from monitor.catalog import load_catalog
 from monitor.core import calibration, check_step, checks, default_ranker, learned_rule
 from monitor.events import EventError, load_run, validate_event
-from monitor.unbox import NAME_RE, PORTAL_CATALOGS, SLOTS, plan_push, read_csv, validate_rows
+from monitor.unbox import (
+    NAME_RE,
+    PORTAL_CATALOGS,
+    SLOTS,
+    get_client,
+    plan_push,
+    read_csv,
+    validate_rows,
+)
 
 app = FastAPI(title="Agent Monitor")
 
@@ -137,9 +145,7 @@ def catalogs() -> dict[str, Any]:
     }
     if not os.environ.get("UNBOXAI_API_KEY"):
         return {**out, "available": False, "owned": []}
-    from behaviorgpt import UnboxAIClient
-
-    mine = [x for x in UnboxAIClient(market="us").list_catalogs() if x.owned]
+    mine = [x for x in get_client().list_catalogs() if x.owned]
     return {
         **out,
         "available": True,
@@ -173,9 +179,9 @@ async def catalog_upload(
         return summary
     if not os.environ.get("UNBOXAI_API_KEY"):
         raise HTTPException(400, "Embedding needs UNBOXAI_API_KEY on the server.")
-    from behaviorgpt import UnboxAIClient, catalog_from_csv
+    from behaviorgpt import catalog_from_csv
 
-    client = UnboxAIClient(market="us")
+    client = get_client()
     mode, existing = plan_push(name, [x for x in client.list_catalogs() if x.owned])
     if mode == "full":
         raise HTTPException(
@@ -202,9 +208,7 @@ async def catalog_upload(
 
 @app.get("/api/catalog/status")
 def catalog_status(job_id: str) -> dict[str, Any]:
-    from behaviorgpt import UnboxAIClient
-
-    st = UnboxAIClient(market="us").job_status(job_id)
+    st = get_client().job_status(job_id)
     return {
         "status": getattr(st, "status", None),
         "catalog_id": getattr(st, "catalog_id", None),
@@ -215,11 +219,11 @@ def catalog_status(job_id: str) -> dict[str, Any]:
 @app.post("/api/catalog/preview")
 def catalog_preview(body: PreviewIn) -> dict[str, Any]:
     """BehaviorGPT's top predicted next actions after `after`, on any embedded catalog."""
-    from behaviorgpt import UnboxAIClient, View
+    from behaviorgpt import View
 
     if not os.environ.get("UNBOXAI_API_KEY"):
         raise HTTPException(400, "Preview needs UNBOXAI_API_KEY on the server.")
-    res = UnboxAIClient(market="us").complete(
+    res = get_client().complete(
         [View(a) for a in body.after], limit=8, catalog_id=body.catalog_id, register_event=False
     )
     return {"next": [{"id": i.id, "name": i.data.get("name"), "score": i.score} for i in res.items]}

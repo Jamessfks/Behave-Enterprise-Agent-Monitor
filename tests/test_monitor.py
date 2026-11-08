@@ -168,3 +168,39 @@ def test_default_verdicts_do_not_depend_on_behaviorgpt(monkeypatch):
     without = play(run)
     assert [(i, r["failed"]) for i, r in without] == with_bgpt
     assert all(r["checks"]["normal"]["behaviorgpt"]["rank"] is None for _, r in without)
+
+
+def test_retries_rate_limits_and_server_errors_but_not_bad_requests():
+    from behaviorgpt import BadRequestError, RateLimitError, UnboxAIError
+
+    from monitor.rankers import _with_retry
+
+    slept, calls = [], []
+
+    def flaky():
+        calls.append(1)
+        if len(calls) == 1:
+            raise RateLimitError("slow down", status_code=429)
+        if len(calls) == 2:
+            raise UnboxAIError("upstream", status_code=503)
+        return "ok"
+
+    assert _with_retry(flaky, sleep=slept.append) == "ok"
+    assert len(calls) == 3 and slept == [0.5, 1.5]
+
+    def bad():
+        raise BadRequestError("bad field", status_code=400)
+
+    with pytest.raises(BadRequestError):
+        _with_retry(bad, sleep=slept.append)
+
+
+def test_shared_client_sets_the_timezone(monkeypatch):
+    from monitor import unbox
+
+    monkeypatch.setenv("UNBOXAI_API_KEY", "ubx_test_not_a_real_key")
+    monkeypatch.setattr(unbox, "_CLIENT", None)
+    c = unbox.get_client()
+    assert c is unbox.get_client()  # one shared client
+    assert c.timezone == "America/New_York"
+    monkeypatch.setattr(unbox, "_CLIENT", None)

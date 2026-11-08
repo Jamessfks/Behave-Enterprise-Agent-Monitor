@@ -29,19 +29,25 @@ from dotenv import load_dotenv
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from monitor.unbox import NAME_RE, PORTAL_CATALOGS, SLOTS, plan_push, read_csv, validate_rows
+from monitor.unbox import (
+    NAME_RE,
+    PORTAL_CATALOGS,
+    SLOTS,
+    get_client,
+    plan_push,
+    read_csv,
+    validate_rows,
+)
 
 RECORD = ROOT / "catalog" / "unbox.json"
 PORTAL = PORTAL_CATALOGS
 
 
 def client():
-    from behaviorgpt import UnboxAIClient
-
     load_dotenv(ROOT / ".env")
     if not os.environ.get("UNBOXAI_API_KEY"):
         sys.exit("UNBOXAI_API_KEY is not set: add it to .env (never commit it).")
-    return UnboxAIClient(market="us")
+    return get_client()
 
 
 def owned(c) -> list:
