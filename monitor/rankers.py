@@ -53,10 +53,13 @@ class RankingCache:
     def put(self, key: str, scores: dict[str, float]) -> None:
         with self._lock:
             self._data[key] = scores
-            self.path.parent.mkdir(parents=True, exist_ok=True)
-            tmp = self.path.with_suffix(".tmp")
-            tmp.write_text(json.dumps(self._data, sort_keys=True, separators=(",", ":")))
-            tmp.replace(self.path)
+            try:
+                self.path.parent.mkdir(parents=True, exist_ok=True)
+                tmp = self.path.with_suffix(".tmp")
+                tmp.write_text(json.dumps(self._data, sort_keys=True, separators=(",", ":")))
+                tmp.replace(self.path)
+            except OSError:  # read-only file system (e.g. Vercel): keep it in memory
+                pass
 
     def __len__(self) -> int:
         return len(self._data)

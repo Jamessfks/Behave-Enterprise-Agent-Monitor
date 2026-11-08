@@ -10,6 +10,7 @@ dependencies = [
     "python-dotenv>=1.0",
     "numpy>=1.26",
     "anthropic>=0.70",
+    "python-multipart>=0.0.33",
 ]
 
 [dependency-groups]
