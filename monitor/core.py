@@ -70,7 +70,7 @@ def _short(aid: str | None) -> str:
 def fmt_p(p: float | None) -> str:
     if p is None:
         return "n/a"
-    return "<0.1%" if p < 0.001 else f"{p:.1%}"
+    return "under 0.1%" if p < 0.001 else f"{p:.1%}"
 
 
 def check_step(
@@ -104,7 +104,7 @@ def check_step(
             exp = nv.expected[0][0] if nv.expected else None
             headline = (
                 f"Expected “{_short(exp)}”; actual “{_short(event['action_id'])}” "
-                f"(p = {fmt_p(nv.p)})."
+                f"({fmt_p(nv.p)} likely)."
             )
             reasons.append(headline)
             if missing:

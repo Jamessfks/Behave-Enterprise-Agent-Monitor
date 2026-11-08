@@ -132,6 +132,7 @@ class WorkflowRanker:
         self.actions = list(load_catalog())
         self.unseen = unseen
         before: dict[str, Counter] = defaultdict(Counter)
+        adjacent: dict[str, Counter] = defaultdict(Counter)
         count: Counter = Counter()
         for run in runs:
             done: list[str] = []
@@ -141,10 +142,15 @@ class WorkflowRanker:
                 count[e["action_id"]] += 1
                 for b in set(done):
                     before[e["action_id"]][b] += 1
+                if done:
+                    adjacent[e["action_id"]][done[-1]] += 1
                 done.append(e["action_id"])
         self.frac = {
             a: {b: n / count[a] for b, n in before[a].items() if n / count[a] >= 0.5} for a in count
         }
+        # Hard dependencies: b comes right before a in >= 90% of runs (ask -> read the reply).
+        # A skipped hard dependency is never excused: a reply can't be read before asking.
+        self.hard = {a: {b for b, n in adjacent[a].items() if n / count[a] >= 0.9} for a in count}
 
     def missing(self, history: list[dict[str, Any]], action: str) -> list[tuple[str, float]]:
         """Usual predecessors of `action` that haven't happened yet, most usual first."""
@@ -172,7 +178,10 @@ class WorkflowRanker:
             if a not in self.frac:
                 cost = self.unseen
             else:
-                cost = sum(f for b, f in self.frac[a].items() if b not in skip)
+                hard = self.hard.get(a, set())
+                cost = sum(
+                    f for b, f in self.frac[a].items() if b not in (done if b in hard else skip)
+                )
             if a in done:
                 cost += self.unseen / 2
             out[a] = -cost

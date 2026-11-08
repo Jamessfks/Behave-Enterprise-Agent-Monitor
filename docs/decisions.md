@@ -1,73 +1,96 @@
 # Decisions
 
-**Status: Phase 0, 2026-11-08.** Each entry says what was chosen and why. Revisit an entry only
-with a reason, and update it here when you do.
+Each entry says what was chosen and why. Newest first.
 
-## Stack: one Python app
+## 2026-11-09: MVP build (docs/prompts/build-mvp.md)
 
-- **Backend:** Python 3.12 + FastAPI, managed with `uv` (`pyproject.toml`). The BehaviorGPT SDK is
-  Python, and Unbox's anomaly app, which we adapt, is FastAPI. One process serves all three parts.
-- **Fake environment (Inbox, Docs, Transcripts, CRM, Email):** server-rendered pages plus plain
-  HTML/JS under `env/`, with no build step. Each user action posts an event to `/api/events`.
-  Data is seeded from JSON in `env/seed/`. State is in memory and resets per run.
-- **Monitor:** `monitor/`, with an async `AsyncUnboxAIClient` and an on-disk ranking cache
-  (SQLite in `.untracked/`).
-- **Dashboard UI:** plain HTML/CSS/JS under `web/` (same pattern as upstream), with live updates
-  over Server-Sent Events and a small chart lib from a CDN. No React build. Saves time and nothing
-  to break at deploy.
-- **Python ≥ 3.11** is required by the SDK. The repo pins 3.12.
+### The step model: BehaviorGPT didn't pass go/no-go on its own
 
-Layout:
+- `results/go_no_go.json`: on the six careful runs, BehaviorGPT ranks the true next action at a
+  **median of #20 of 60** (top-5 only 13% of the time; random is about #30). With a task-describing
+  `Search` prefix it gets slightly better (#17), but it also ranks the faulty run's steps *better*.
+  It rates "send the quote to the client" as the **#2** most likely step after applying a discount,
+  which makes sense for a consumer model (view → buy). So it misses mistake 1.
+- The SDK has no fine-tuning (that answers the PDF's open question 1). So check 1 can use one of
+  three rankers behind one interface (`monitor/rankers.py`, `monitor/normal.py`):
+  - **workflow** (default): dependencies learned from the approved runs. The share of good runs
+    in which b came before a. A skip is charged once, where it happened. "Always directly
+    before" pairs (ask → read the reply) are hard dependencies and never excused.
+  - **behaviorgpt**: zero-shot.
+  - **blend**: workflow log-score + β × standardized BehaviorGPT score (β fitted on held-out runs).
+- Calibration is leave-one-out on the careful runs (`monitor/calibrate.py` →
+  `monitor/calibration.json`). Results on the faulty run:
 
-```
-env/        fake workplace app + seed data
-monitor/    scoring, calibration, go/no-go
-agent/      computer-use loop + task prompt
-web/        dashboard
-catalog/    actions.csv (source of truth)
-runs/       recorded and scripted runs (*.jsonl)
-server.py   FastAPI entry point mounting all of the above
-```
+  | Ranker | Caught (of 2 behavior mistakes) | False alarms |
+  |---|---|---|
+  | workflow | 2 | 0 |
+  | blend | 1 | 1 |
+  | behaviorgpt | 0 | 0 |
 
-## Deployment: one Docker container
+  The default is chosen by that table, not tuned to make the demo fire. The UI shows BehaviorGPT's
+  own rank and top guesses on every step whichever ranker decides, and the step-model selector
+  lets judges switch.
+- Changes from Unbox's method, each written in the code: an exact softmax (small catalog); the
+  scale floored at 1 nat (few, near-deterministic runs make the MAD tiny); irreversible actions get
+  a per-step gate at u ≥ 3 on top of the CUSUM, because CUSUM deliberately doesn't stop on one
+  surprising step.
 
-- One `Dockerfile` running `uvicorn server:app` on `$PORT`. The same image runs locally and online.
-- **Host: Hugging Face Spaces (Docker SDK)**, the way upstream deploys its anomaly demo. It's free,
-  gives a public https URL, keeps one long-lived process (in-memory run state and SSE work), and
-  takes secrets in the Space settings. Fallback: Render or Fly.io (same image).
-- Not Vercel for v1: functions are serverless instances, so in-memory run state and the SSE
-  stream would need an external store. That's doable, but not worth it in a few hours.
-- **Replay mode** works without any API key (pre-scored runs ship in `runs/`), so the public URL
-  demos even if keys or quotas fail.
+### Fact check and rules check
 
-## Computer-use agent: Claude
+- Facts must appear in a source the agent **opened earlier in the run**. The span is returned as
+  evidence. A value contradicting the call transcript (the primary source) is flagged unless the
+  conflict was resolved with the rep. The amount is derived (seats × price × 12 × (1 − discount)).
+- Rules come from the company context: `max_discount_on_send`, `requires_before`
+  (incl. `previous_stage`), `forbid`, `advisory`, and `precedent`. **Allow requires a reason**, and
+  it becomes a precedent rule. A later step with the same action and failed checks is allowed and
+  cites the reason.
 
-- **Model:** `claude-opus-5-5` with tool `{"type": "computer_toolset_20260801"}`. This needs no
-  beta header (see `docs/reference/computer-use.md`).
-- **Where it runs:** Anthropic's reference container
-  ([computer-use-demo](https://github.com/anthropics/claude-quickstarts/tree/main/computer-use-demo)),
-  locally in Docker, with its Firefox opened on the environment URL. The agent never sees real
-  accounts or credentials.
-- **Events come from the environment**, not from the agent's click log. The agent's tool calls are
-  shown in the dashboard as a side panel only.
-- **Pausing:** the environment gates irreversible actions via `/api/runs/{id}/gate`. The agent
-  loop also checks `flagged` between iterations and waits for Approve/Stop.
+### Stateless server, Vercel
 
-## Monitor fallback
+- The user asked for Vercel. Vercel functions don't keep in-memory sessions, so the server is
+  **stateless**: the browser holds each run and posts `{history, event, context, cusum, ranker}`
+  to `/api/check`. Live mode sends the whole agent loop state to `/api/agent/step` and makes at
+  most one Claude call per request.
+- BehaviorGPT rankings are cached in `runs/rankings_cache.json` (committed), so replay shows
+  BehaviorGPT's real ranks with no key. On a read-only file system the cache stays in memory.
+- `web/` is mounted last with `StaticFiles`, so Vercel promotes it to the CDN, and API routes win.
 
-If the go/no-go test fails, swap `BehaviorGPTRanker` for `TransitionRanker` (first-order counts from
-the scripted runs). Same interface, so the UI and agent don't change. See the `monitor-scoring` skill.
+### Live mode: app tools, not pixels
 
-## Secrets
+- The spec says the app records semantic steps, with no screenshots or vision. Live agents
+  (`claude-opus-5-5`) use tools (`list_items`, `open_item`, `crm_update_deal`, `quote`,
+  `chat_send`, `calendar_book`, `email`, …) that map one-to-one to catalog actions
+  (`env/app.py`). Each call is checked **before** it executes. Computer use stays possible later
+  by putting the same app behind a browser.
+- Not verified against the real API yet: there's no `ANTHROPIC_API_KEY` in this environment.
+  `tests/test_server.py` runs the loop with a fake Claude.
 
-`.env` (gitignored; template in `.env.example`): `UNBOXAI_API_KEY`, `UNBOXAI_CATALOG_ID`,
-`ANTHROPIC_API_KEY`. On the host, the same names are set as Space secrets.
+### Company context and catalog upload
 
-## Open / owner needed
+- The setup drawer edits the company name, background and unwritten rules. Unwritten rules
+  added in the UI are `advisory` (shown to people, not code-checked). Turning free text into
+  checkable rules would need an LLM, which is left for later.
+- Catalog upload validates a CSV and, on request, embeds it with BehaviorGPT, then previews
+  BehaviorGPT's next-action guesses. The demo scenario keeps using the Acme catalog
+  (`cat_7c99…`, in `.env` as `UNBOXAI_CATALOG_ID`).
 
-- [ ] **Unbox API key:** a team member signs in at portal.unboxai.com and puts the key in their
-      local `.env`. Not in chat, not in git.
-- [ ] **Anthropic API key** with computer-use access, for the agent.
-- [ ] **Hugging Face account/org** to own the Space.
-- [x] `pip install behaviorgpt` works: v0.10.0 installed with `uv sync` on Python 3.12; imports
-      and the client raise `AuthenticationError` without a key, as expected.
+### Facts about the Unbox account
+
+- The SDK's default catalog name `retail_catalog` doesn't exist for this key. Public catalogs are
+  `retail_catalog_500k`, `amazon_sample`, `hm_fashion`, `art_catalog` and `PixelRec200K`.
+- Measured latency of one ranking call: 0.15–0.4 s.
+
+## 2026-11-08: Phase 0
+
+The original Phase 0 choices (Hugging Face Spaces, Claude computer use, the Northwind workflow)
+were replaced by the entries above. The event schema (search/view, no order type,
+`details.irreversible`) still holds, extended in docs/event-schema.md.
+
+## Open questions
+
+- Does BehaviorGPT do better on a catalog written as action + outcome ("Send the quote *after
+  approval*")? Worth one more go/no-go run.
+- More approved runs (recorded from careful live agents) would make the workflow model and the
+  barrier less fragile. Six scripted runs are a thin base, and the pitch should say so.
+- Mistake 3's other variant (200 seats) is caught by the fact check in tests but isn't in the
+  recorded faulty run, so the faulty run pauses exactly three times as the spec asks.

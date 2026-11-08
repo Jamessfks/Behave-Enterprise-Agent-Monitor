@@ -1,0 +1,9 @@
+.venv
+.untracked
+.pytest_cache
+.ruff_cache
+tests
+docs
+.claude
+*.parquet
+results

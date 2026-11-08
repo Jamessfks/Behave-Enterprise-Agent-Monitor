@@ -1,1 +1,83 @@
-<!doctype html><title>Agent Monitor</title>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Agent Monitor</title>
+  <meta name="description" content="Every step an AI agent takes is checked before it counts: is it normal, is it true, is it allowed.">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <svg width="0" height="0" aria-hidden="true" style="position:absolute">
+    <defs>
+      <filter id="glow" x="-200%" y="-20%" width="500%" height="140%">
+        <feGaussianBlur stdDeviation="2.4" result="b"/>
+        <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+    </defs>
+  </svg>
+
+  <header class="bar">
+    <div class="brand">
+      <svg class="mark" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2v6M12 16v6M5 8h14v8H5z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/></svg>
+      <div>
+        <h1>Agent Monitor</h1>
+        <p class="sub">Every step checked before it counts</p>
+      </div>
+    </div>
+    <nav class="controls" aria-label="Run controls">
+      <div class="seg" role="radiogroup" aria-label="Which agent">
+        <button role="radio" aria-checked="true" data-run="careful_01">Careful agent</button>
+        <button role="radio" aria-checked="false" data-run="faulty">Faulty agent</button>
+        <button role="radio" aria-checked="false" data-run="live">Live</button>
+      </div>
+      <button id="play" class="primary">Play</button>
+      <button id="setup" class="ghost" aria-haspopup="dialog">Company &amp; catalog</button>
+    </nav>
+  </header>
+
+  <main class="stage">
+    <section class="canvas" aria-label="Workflow">
+      <div id="live-box" class="live-box" hidden>
+        <label for="instruction">Give the agent any request, the way a colleague or your boss would</label>
+        <textarea id="instruction" rows="3"></textarea>
+        <p id="live-note" class="note"></p>
+      </div>
+      <ol id="chain" class="chain" aria-live="polite"></ol>
+      <div id="summary" class="summary" hidden></div>
+    </section>
+
+    <aside class="monitor" aria-label="Monitor">
+      <div class="monitor-head">
+        <h2>Monitor</h2>
+        <label class="ranker">Step model
+          <select id="ranker"></select>
+        </label>
+      </div>
+      <p id="ranker-note" class="note"></p>
+      <figure class="risk">
+        <svg id="risk-chart" viewBox="0 0 300 64" preserveAspectRatio="none" role="img" aria-label="Risk over the run"></svg>
+        <figcaption><span id="risk-now">Risk 0%</span> of the pause barrier</figcaption>
+      </figure>
+      <ol id="ledger" class="ledger"></ol>
+      <p class="foot" id="latency"></p>
+    </aside>
+  </main>
+
+  <div id="drawer" class="drawer" role="dialog" aria-modal="true" aria-labelledby="drawer-title" hidden>
+    <div class="drawer-panel">
+      <div class="drawer-head">
+        <h2 id="drawer-title"></h2>
+        <button class="ghost close" data-close aria-label="Close">Close</button>
+      </div>
+      <div id="drawer-body" class="drawer-body"></div>
+    </div>
+  </div>
+
+  <script src="app.js" defer></script>
+</body>
+</html>
