@@ -6,4 +6,3 @@ tests
 docs
 .claude
 *.parquet
-results
