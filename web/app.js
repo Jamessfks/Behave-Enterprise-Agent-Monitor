@@ -29,12 +29,12 @@ const ICON = {
 const glyph = (app) =>
   `<span class="glyph" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round">${ICON[app] || ICON.CRM}</svg></span>`;
 
-const EDGE = `<svg viewBox="0 0 24 34" aria-hidden="true">
-  <line class="base" x1="12" y1="0" x2="12" y2="27"/>
-  <line class="current" x1="12" y1="0" x2="12" y2="27"/>
-  <path class="arc" d="M12 3 l-4 6 l6 4 l-5 6 l3 5"/>
-  <circle class="spark" cx="12" cy="3" r="2.2"/>
-  <path class="head" d="M7.5 26 L12 33 L16.5 26 Z"/></svg>`;
+const EDGE = `<svg viewBox="0 0 40 56" aria-hidden="true">
+  <line class="base" x1="20" y1="0" x2="20" y2="46"/>
+  <line class="current" x1="20" y1="0" x2="20" y2="46"/>
+  <path class="arc" d="M20 4 l-9 8 l13 7 l-11 9 l10 8 l-5 7"/>
+  <circle class="spark" cx="20" cy="3" r="2.6"/>
+  <path class="head" d="M14 45 L20 55 L26 45 Z"/></svg>`;
 
 const RANKER_LABEL = { workflow: "Company workflow", behaviorgpt: "BehaviorGPT only", blend: "Blend" };
 
@@ -69,7 +69,23 @@ async function init() {
   sel.addEventListener("change", () => { S.ranker = sel.value; rankerNote(); });
   rankerNote();
   $("#instruction").value = S.boot.trigger.text;
-  document.querySelectorAll(".seg button").forEach((b) => b.addEventListener("click", () => pickRun(b.dataset.run)));
+  const segs = [...document.querySelectorAll(".seg button")];
+  segs.forEach((b, i) => {
+    b.addEventListener("click", () => pickRun(b.dataset.run));
+    b.addEventListener("keydown", (e) => {
+      const d = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[e.key];
+      if (!d || S.busy) return;
+      e.preventDefault();
+      const next = segs[(i + d + segs.length) % segs.length];
+      pickRun(next.dataset.run);
+      next.focus();
+    });
+  });
+  $("#ledger-toggle").addEventListener("click", (e) => {
+    const open = $("#ledger").classList.toggle("open");
+    e.currentTarget.setAttribute("aria-expanded", String(open));
+    e.currentTarget.textContent = open ? "Hide steps" : "Show every step";
+  });
   $("#play").addEventListener("click", () => (S.run === "live" ? playLive() : playReplay()));
   $("#setup").addEventListener("click", openSetup);
   $("#drawer").addEventListener("click", (e) => { if (e.target.id === "drawer" || e.target.closest("[data-close]")) closeDrawer(); });
@@ -94,7 +110,10 @@ function rankerNote() {
 function pickRun(run) {
   if (S.busy) return;
   S.run = run;
-  document.querySelectorAll(".seg button").forEach((b) => b.setAttribute("aria-checked", String(b.dataset.run === run)));
+  document.querySelectorAll(".seg button").forEach((b) => {
+    b.setAttribute("aria-checked", String(b.dataset.run === run));
+    b.tabIndex = b.dataset.run === run ? 0 : -1;
+  });
   $("#live-box").hidden = run !== "live";
   $("#live-note").textContent = run === "live" && !S.boot.live_available
     ? "Live mode needs an Anthropic API key on the server (ANTHROPIC_API_KEY). The two recorded agents work without one."
@@ -103,7 +122,7 @@ function pickRun(run) {
 }
 
 /* ---------- chain ---------- */
-function reset() {
+function reset(idle = true) {
   S.risks = []; S.flags = []; S.latency = [];
   $("#chain").innerHTML = "";
   $("#ledger").innerHTML = "";
@@ -117,6 +136,20 @@ function reset() {
   li.className = "node trigger";
   li.innerHTML = `${glyph("Trigger")}<div class="title">Request from ${esc(t.from.split(" (")[0])}</div><div class="checks"></div><div class="meta">${esc(text.length > 150 ? text.slice(0, 150) + "…" : text)}</div>`;
   $("#chain").append(li);
+  if (idle) {
+    for (const name of ["Read the sources", "Update the CRM and the quote", "Coordinate and follow up"]) {
+      const e = document.createElement("li");
+      e.className = "edge ghost";
+      e.setAttribute("aria-hidden", "true");
+      e.innerHTML = EDGE;
+      const g = document.createElement("li");
+      g.className = "node ghost-step";
+      g.setAttribute("aria-hidden", "true");
+      g.innerHTML = `${glyph("CRM")}<div class="title">${name}</div><div class="checks"></div>`;
+      $("#chain").append(e, g);
+    }
+    $("#chain").insertAdjacentHTML("beforeend", '<li class="idle-hint">Press Play to watch each step get checked before it runs.</li>');
+  }
   $("#play").disabled = S.run === "live" && !S.boot.live_available;
   $("#play").textContent = "Play";
 }
@@ -149,9 +182,12 @@ function metaLine(ev) {
 
 function chips(res) {
   const c = res.checks, out = [];
-  if (c.normal.status === "scored") out.push(`<span class="chip ${c.normal.ok ? "ok" : "bad"}">normal</span>`);
-  if (c.facts.checked.length) out.push(`<span class="chip ${c.facts.ok ? (c.facts.warnings.length ? "warn" : "ok") : "bad"}">facts</span>`);
-  if (c.rules.violations.length || c.rules.precedents.length || res.irreversible) out.push(`<span class="chip ${c.rules.ok ? "ok" : "bad"}">rules</span>`);
+  if (c.normal.status === "scored") out.push(c.normal.ok ? '<span class="chip ok">normal</span>' : '<span class="chip bad">unusual</span>');
+  if (c.facts.checked.length) {
+    out.push(!c.facts.ok ? '<span class="chip bad">unsupported</span>'
+      : c.facts.warnings.length ? '<span class="chip warn">sources disagree</span>' : '<span class="chip ok">facts</span>');
+  }
+  if (c.rules.violations.length || c.rules.precedents.length || res.irreversible) out.push(c.rules.ok ? '<span class="chip ok">rules</span>' : '<span class="chip bad">breaks rule</span>');
   return out.join("") || '<span class="chip ok">passed</span>';
 }
 
@@ -172,19 +208,22 @@ function settle(node, edge, ev, res) {
 /* ---------- monitor ---------- */
 function ledgerRow(ev, res) {
   const n = res.checks.normal, N = Object.keys(S.boot.catalog).length;
+  const flag = res.verdict === "pause";
   const li = document.createElement("li");
-  li.className = "row" + (res.verdict === "pause" ? " flag" : "");
-  let body = "";
+  li.className = "row" + (flag ? " flag" : "");
+  let bar = "", rank = "", more = "";
   if (n.status === "scored") {
-    const exp = Math.max(0.03, (N - n.rank + 1) / N);
-    const guess = n.expected.slice(0, 2).map((x) => x.name).join("; ");
-    const bg = n.behaviorgpt.rank ? `BehaviorGPT ranked it #${n.behaviorgpt.rank} of ${n.behaviorgpt.of}; its top guess: ${n.behaviorgpt.top[0]?.name ?? "n/a"}.` : "";
-    body = `<div class="bar-exp" role="img" aria-label="Expectedness: rank ${n.rank} of ${N}"><i style="width:${(exp * 100).toFixed(0)}%"></i></div>
-      <div class="guess">Expected next: ${esc(guess)}.</div>${bg ? `<div class="guess">${esc(bg)}</div>` : ""}`;
+    const exp = Math.max(0.04, (N - n.rank + 1) / N);
+    bar = `<div class="bar-exp" role="img" aria-label="How expected: rank ${n.rank} of ${N}"><i style="width:${(exp * 100).toFixed(0)}%"></i></div>`;
+    rank = `#${n.rank}/${N}`;
+    const guess = n.expected.slice(0, 2).map((x) => esc(x.name)).join("; ");
+    const bg = n.behaviorgpt.rank ? `BehaviorGPT ranked it #${n.behaviorgpt.rank} of ${n.behaviorgpt.of}; its top guess: ${esc(n.behaviorgpt.top[0]?.name ?? "n/a")}.` : "BehaviorGPT: not available for this step.";
+    more = `<details${flag ? " open" : ""}><summary>${flag ? "Why it stopped" : "What was expected"}</summary><p>Expected next: ${guess}.</p><p>${bg}</p></details>`;
   } else {
-    body = `<div class="guess">${n.status === "context" ? "Search sets context; not scored." : "Repeat of an earlier step; not scored."}</div>`;
+    bar = '<span></span>';
+    rank = n.status === "context" ? "search" : "repeat";
   }
-  li.innerHTML = `<span class="n">${ev.step + 1}</span><span class="what">${esc(res.verdict === "pause" ? "Paused: " + title(ev) : title(ev))}</span>${body}`;
+  li.innerHTML = `<span class="n">${ev.step + 1}</span><span class="what" title="${esc(title(ev))}">${esc(flag ? "Paused: " + title(ev) : title(ev))}</span>${bar}<span class="rank">${rank}</span>${more}`;
   $("#ledger").prepend(li);
 }
 
@@ -194,7 +233,7 @@ function drawRisk() {
   const y = (r) => H - Math.min(r, top) / top * (H - 6) - 3;
   const x = (i) => (pts.length < 2 ? 0 : (i / (pts.length - 1)) * W);
   const line = pts.map((p, i) => `${i ? "L" : "M"}${x(i).toFixed(1)} ${y(p.risk).toFixed(1)}`).join(" ");
-  svg.innerHTML = `<line class="barrier" x1="0" x2="${W}" y1="${y(1)}" y2="${y(1)}"/>${line ? `<path class="line" d="${line}"/>` : ""}` +
+  svg.innerHTML = `<line class="baseline" x1="0" x2="${W}" y1="${y(0)}" y2="${y(0)}"/><line class="barrier" x1="0" x2="${W}" y1="${y(1)}" y2="${y(1)}"/>${line ? `<path class="line" d="${line}"/>` : ""}` +
     pts.map((p, i) => (p.flag ? `<circle class="flag" cx="${x(i)}" cy="${y(Math.max(p.risk, 1))}" r="3.5"/>` : "")).join("");
 }
 
@@ -222,9 +261,9 @@ function pauseCard(node, ev, res) {
       <ul>${other.map((r) => `<li>${esc(r)}</li>`).join("")}</ul>
       ${marco.map((m) => `<blockquote class="marco">${esc(m)}</blockquote>`).join("")}
       <p class="hint">Caught by: ${esc(by)}.</p>
-      <label for="why-${ev.step}">To allow it, say why. Your reason becomes a rule for next time.</label>
+      <label for="why-${ev.step}" id="why-hint-${ev.step}">To allow it, say why. Your reason becomes a rule for next time.</label>
       <textarea id="why-${ev.step}" rows="2" placeholder="For example: the client confirmed this by phone"></textarea>
-      <div class="actions"><button class="primary" data-allow disabled>Allow</button><button class="danger" data-block>Block</button></div>`;
+      <div class="actions"><button class="primary" data-allow disabled aria-describedby="why-hint-${ev.step}">Allow</button><button class="danger" data-block>Block</button></div>`;
     node.after(card);
     const why = card.querySelector("textarea"), allow = card.querySelector("[data-allow]");
     why.addEventListener("input", () => { allow.disabled = !why.value.trim(); });
@@ -256,7 +295,7 @@ function decided(node, edge, ev, res, d) {
 /* ---------- replay ---------- */
 async function playReplay() {
   if (S.busy) return;
-  reset();
+  reset(false);
   S.busy = true;
   $("#play").disabled = true;
   $("#play").textContent = "Running…";
@@ -317,7 +356,7 @@ function summary() {
 /* ---------- live ---------- */
 async function playLive() {
   if (S.busy || !S.boot.live_available) return;
-  reset();
+  reset(false);
   S.busy = true;
   $("#play").disabled = true;
   $("#play").textContent = "Agent working…";

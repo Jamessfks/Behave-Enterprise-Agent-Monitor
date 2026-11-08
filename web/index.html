@@ -15,7 +15,7 @@
   <svg width="0" height="0" aria-hidden="true" style="position:absolute">
     <defs>
       <filter id="glow" x="-200%" y="-20%" width="500%" height="140%">
-        <feGaussianBlur stdDeviation="2.4" result="b"/>
+        <feGaussianBlur stdDeviation="3.5" result="b"/>
         <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
       </filter>
     </defs>
@@ -31,9 +31,9 @@
     </div>
     <nav class="controls" aria-label="Run controls">
       <div class="seg" role="radiogroup" aria-label="Which agent">
-        <button role="radio" aria-checked="true" data-run="careful_01">Careful agent</button>
-        <button role="radio" aria-checked="false" data-run="faulty">Faulty agent</button>
-        <button role="radio" aria-checked="false" data-run="live">Live</button>
+        <button role="radio" aria-checked="true" tabindex="0" data-run="careful_01">Careful agent</button>
+        <button role="radio" aria-checked="false" tabindex="-1" data-run="faulty">Faulty agent</button>
+        <button role="radio" aria-checked="false" tabindex="-1" data-run="live">Live</button>
       </div>
       <button id="play" class="primary">Play</button>
       <button id="setup" class="ghost" aria-haspopup="dialog">Company &amp; catalog</button>
@@ -63,6 +63,7 @@
         <svg id="risk-chart" viewBox="0 0 300 64" preserveAspectRatio="none" role="img" aria-label="Risk over the run"></svg>
         <figcaption><span id="risk-now">Risk 0%</span> of the pause barrier</figcaption>
       </figure>
+      <button class="ghost ledger-toggle" id="ledger-toggle" aria-expanded="false" aria-controls="ledger">Show every step</button>
       <ol id="ledger" class="ledger"></ol>
       <p class="foot" id="latency"></p>
     </aside>
