@@ -120,6 +120,7 @@ button.danger:hover:not(:disabled) { background: var(--block-bg); }
 .mark-line { stroke: var(--logo-line); }
 .mark-spark { stroke: var(--logo-accent); }
 .mark-dot { fill: var(--logo-accent); }
+.mark-dot2 { fill: var(--logo-line); }
 .controls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
 #run { min-width: 190px; }
 .seg { display: inline-flex; background: var(--sheen); border: 1px solid var(--line); border-radius: var(--r-md); padding: 3px; }

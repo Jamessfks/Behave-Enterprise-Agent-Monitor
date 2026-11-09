@@ -1,12 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <rect width="64" height="64" rx="14" fill="#EDE8F5"/>
-  <g transform="translate(32 32) scale(0.068) translate(-512 -512)">
-    <g fill="none" stroke="#3D52A0" stroke-width="78" stroke-linecap="round">
-      <path d="M512 115V483"/>
-      <path d="M512 757V910"/>
-      <rect x="390" y="499" width="244" height="242" rx="52"/>
-    </g>
-    <path d="M444 321H580" stroke="#7091E6" stroke-width="70" stroke-linecap="round"/>
-    <circle cx="512" cy="621" r="66" fill="#7091E6"/>
-  </g>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#ede8f5"/><g fill="none" stroke="#3d52a0" stroke-width="5" stroke-linejoin="miter"><path d="M21 9H11v46h10"/><path d="M43 9h10v46H43"/></g><circle fill="#3d52a0" cx="40.8" cy="40.8" r="2.60"/><circle fill="#3d52a0" cx="32.0" cy="44.5" r="2.94"/><circle fill="#3d52a0" cx="23.2" cy="40.8" r="3.28"/><circle fill="#3d52a0" cx="19.5" cy="32.0" r="3.62"/><circle fill="#3d52a0" cx="23.2" cy="23.2" r="3.96"/><circle fill="#3d52a0" cx="32.0" cy="19.5" r="4.30"/><circle fill="#3d52a0" cx="40.8" cy="23.2" r="4.64"/><circle fill="#7091e6" cx="44.5" cy="32.0" r="4.98"/></svg>
