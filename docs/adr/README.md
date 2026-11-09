@@ -18,3 +18,4 @@ edit the old one's text.
 | [0010](0010-one-agent-with-a-mistakes-switch.md) | One agent with a "Plant mistakes" switch | Accepted |
 | [0011](0011-canvas-ui.md) | Split-screen canvas: live app plus a pannable workflow | Accepted |
 | [0012](0012-step-changes-and-paced-playback.md) | Each step says what it changed; the next step is known before it runs | Accepted |
+| [0013](0013-live-computer-use-and-warm-behaviorgpt.md) | Live mode drives the apps by computer use; BehaviorGPT, warm-started, judges it (supersedes 0004 for Live) | Accepted |

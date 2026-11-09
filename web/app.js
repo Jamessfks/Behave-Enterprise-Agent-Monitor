@@ -94,7 +94,7 @@ const EDGE = `<svg viewBox="0 0 40 56" aria-hidden="true">
   <circle class="spark" cx="20" cy="3" r="2.6"/>
   <path class="head" d="M14 45 L20 55 L26 45 Z"/></svg>`;
 
-const CAUGHT_BY = { normal: "Step model", facts: "Fact check", rules: "Rules check" };
+const CAUGHT_BY = { normal: "Step model", facts: "Fact check", rules: "Rules check", behaviorgpt: "BehaviorGPT" };
 const RANKER_LABEL = { workflow: "Company workflow", behaviorgpt: "BehaviorGPT only", blend: "Blend" };
 const KIND = { read: "reads", search: "searches", write: "changes something" };
 
@@ -558,9 +558,11 @@ function triggerNode() {
   const b = S.boot, li = document.createElement("li");
   li.className = "node trigger";
   if (S.mode === "live") {
-    const note = b.live_available
-      ? "A Claude agent works in the workspace apps. Every step it takes is checked before it runs."
-      : "Live mode needs an Anthropic API key on the server (ANTHROPIC_API_KEY). The demo task runs without one.";
+    const note = !b.live_available
+      ? "Live mode needs GEMINI_API_KEY (computer use) or ANTHROPIC_API_KEY on the server. The demo task runs without one."
+      : b.live_agent === "computer_use"
+        ? "A Gemini agent uses the apps like a person, in a browser window on this computer: it reads the screen, clicks and types. Every step it takes is checked before it counts, and BehaviorGPT ranks it as evidence."
+        : "A Claude agent works in the workspace apps. Every step it takes is checked before it runs.";
     li.innerHTML = `${glyph("Trigger")}<div class="head">Live request</div><label class="title" for="instruction">Ask the agent anything, the way a colleague would</label>
       <div class="live-input"><textarea id="instruction" rows="4" ${b.live_available ? "" : "disabled"} aria-describedby="live-note">${esc(scenario().request)}</textarea>
       <p id="live-note" class="note">${esc(note)}</p></div>`;
@@ -775,6 +777,8 @@ async function startRun() {
   if (live && !instruction) { $("#instruction")?.focus(); return; }
   const body = live ? { instruction } : { scenario: S.scenarioId, mistakes: S.mistakes };
   resetChain(false);
+  S.liveSummary = "";
+  if (live) { try { if (window.Notification?.permission === "default") Notification.requestPermission(); } catch (e) { /* none */ } }
   if (live) { const t = $("#instruction"); t.value = instruction; t.disabled = true; }
   setBusy(true, live ? "Agent working…" : "Running…");
   fitHome(true);
@@ -801,7 +805,8 @@ async function continueRun() {
 }
 
 async function loop() {
-  for (let guard = 0; guard < 200; guard++) {
+  const limit = S.mode === "live" ? 2000 : 200;  // a computer-use agent takes many small steps
+  for (let guard = 0; guard < limit; guard++) {
     const up = S.upcoming;
     const { edge, node } = pendingStep(up);
     if (up) {
@@ -825,7 +830,13 @@ async function loop() {
     if (S.abandoned) { edge.remove(); node.remove(); return; }
     S.upcoming = res.upcoming || null;
     if (Array.isArray(res.changed)) S.changed = res.changed;
-    if (!res.step) { edge.remove(); node.remove(); break; }
+    if (res.summary) S.liveSummary = res.summary;
+    if (!res.step) {
+      edge.remove(); node.remove();
+      // Live computer use: the agent is still working, ask again. The demo task stops as before.
+      if (S.mode === "live" && !res.done && (res.working || res.waiting)) continue;
+      break;
+    }
     await showStep(res.step, edge, node, true);
     if (S.abandoned) return;
     if (res.done) break;
@@ -867,6 +878,7 @@ async function showStep(st, edge, node, live) {
   const page = st.page || st.changes?.[0]?.url || "";
   const what = `Step ${st.index + 1}: ${stepTitle(st)}`;
   if (st.decision === "pause") {
+    if ((st.check?.failed || []).includes("behaviorgpt")) bgptAlert(st, what);
     caption("paused", `${what}. Nothing in ${st.app} changes unless you allow it.`);
     note(noteHtml(st, "paused"));
     const d = await pauseCard(node, st);
@@ -898,6 +910,27 @@ async function showStep(st, edge, node, live) {
   }
   const phase = st.decision === "flag" ? "flagged" : st.changes?.length ? "changed" : "read";
   await afterBeat(st, page, phase, st.decision === "flag" ? `${what}. It ran, but it's flagged: ${st.check?.headline || "worth a look"}` : what);
+}
+
+/* Live computer use: BehaviorGPT held a change and the agent stopped. Pop up an alert. */
+function bgptAlert(st, what) {
+  document.getElementById("bgpt-alert")?.remove();
+  const box = document.createElement("div");
+  box.id = "bgpt-alert";
+  box.setAttribute("role", "alertdialog");
+  box.setAttribute("aria-labelledby", "bgpt-alert-h");
+  box.style.cssText = "position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;background:rgba(20,0,0,.45)";
+  box.innerHTML = `<div style="max-width:560px;margin:16px;background:#fff;color:#1d1d1d;border:4px solid #c62828;border-radius:14px;padding:22px 24px;box-shadow:0 12px 48px rgba(0,0,0,.4);font:16px/1.45 system-ui,sans-serif">
+    <h2 id="bgpt-alert-h" style="margin:0 0 8px;color:#c62828;font-size:21px">BehaviorGPT stopped the agent</h2>
+    <p style="margin:0 0 6px"><strong>${esc(what)}</strong></p>
+    <p style="margin:0 0 10px">${esc(st.check?.headline || "This change is unusual for how the company works.")}</p>
+    <p style="margin:0 0 16px;color:#555">The change hasn't been made, and the agent is waiting. Allow it with a reason to let the agent continue, or Block it to stop the agent.</p>
+    <button class="primary" id="bgpt-alert-ok">Review the step</button></div>`;
+  document.body.append(box);
+  const ok = box.querySelector("#bgpt-alert-ok");
+  ok.addEventListener("click", () => box.remove());
+  ok.focus();
+  try { if (window.Notification?.permission === "granted") new Notification("BehaviorGPT stopped the agent", { body: st.check?.headline || what }); } catch (e) { /* no notifications */ }
 }
 
 /* Show the page after the step ran, point at what changed (or what the agent read), and dwell. */
@@ -1008,6 +1041,7 @@ function finish() {
   const box = $("#summary");
   let html = `<h3 class="display">${pauses.length ? `${pauses.length} step${pauses.length > 1 ? "s" : ""} paused for a person` : "No step needed a person"}</h3>
     <p class="dek">${S.steps.length} steps, each checked before it ran.${pauses.length ? ` ${pauses.filter((p) => p.decision === "allow").length} allowed with a reason, ${pauses.filter((p) => p.decision === "block").length} blocked.` : ""}</p>`;
+  if (S.mode === "live" && S.liveSummary) html += `<p class="note">The agent's own summary: “${esc(S.liveSummary)}”</p>`;
   if (S.records.length) {
     html += `<div class="table-wrap"><table class="compare caught"><thead><tr><th>Step</th><th>Action</th><th>Caught by</th><th>Decision</th></tr></thead><tbody>${S.records.map((r) =>
       `<tr><td data-label="Step">${r.step}</td><td data-label="Action">${esc(r.name)}</td><td data-label="Caught by">${esc(r.failed.map((f) => CAUGHT_BY[f] || f).join(", ") || "Rules check")}</td><td data-label="Decision" class="dec-${esc(r.decision)}">${esc((DECISION_TEXT[r.decision] || (() => r.decision))(r))}</td></tr>`).join("")}</tbody></table></div>`;

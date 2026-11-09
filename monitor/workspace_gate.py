@@ -8,6 +8,7 @@ checks (monitor/core.py). It never imports `workspace`.
 
 from __future__ import annotations
 
+import os
 import time
 from typing import Any
 
@@ -50,9 +51,13 @@ def check(
             "view": view,
             "learned": learned,
             "data": data,
+            # Live computer-use runs get the warm-started BehaviorGPT (ADR 0013); demo runs don't.
+            "live": run.get("agent") == "computer_use",
         },
         cusum,
     )
+    if gate and run.get("agent") == "computer_use":
+        _behaviorgpt_judge(res)
     failed = res["failed"]
     if res["verdict"] == "pass" or res["verdict"] == "allowed_by_rule":
         decision = "allow"
@@ -90,3 +95,23 @@ def check(
         "name": res["name"],
         "latency_ms": latency,
     }
+
+
+def _behaviorgpt_judge(res: dict[str, Any]) -> None:
+    """Live computer use only (ADR 0013): BehaviorGPT also judges every change the agent tries.
+    Ranked outside its top LIVE_BGPT_CUTOFF (default 8) of the catalog, the change is held for a
+    person and the agent stops until they decide. On the approved runs this cutoff caught 4 of
+    the 5 planted mistakes and held 22 of 86 correct changes. Demo runs never get here."""
+    b = (res["checks"]["normal"] or {}).get("behaviorgpt") or {}
+    rank, cutoff = b.get("rank"), int(os.environ.get("LIVE_BGPT_CUTOFF", "8"))
+    if not rank or rank <= cutoff or res["verdict"] == "allowed_by_rule":
+        return
+    expected = ", ".join(f"“{t['name']}”" for t in (b.get("top") or [])[:3])
+    headline = f"BehaviorGPT: unusual step. It ranked this #{rank} of {b.get('of')}" + (
+        f"; it expected {expected}." if expected else "."
+    )
+    res["failed"] = [*res["failed"], "behaviorgpt"]
+    res["reasons"] = [headline, *res["reasons"]]
+    if res["verdict"] in ("pass", "allowed_by_rule"):
+        res["verdict"] = "pause"
+        res["headline"] = headline

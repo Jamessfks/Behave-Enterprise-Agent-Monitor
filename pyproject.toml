@@ -18,6 +18,8 @@ dependencies = [
 
 [dependency-groups]
 dev = ["pytest>=8", "ruff>=0.6"]
+# Live mode with computer use (README: Live). Local only; drives the installed Edge.
+live = ["google-genai>=2.7.0", "playwright>=1.50"]
 
 [tool.uv]
 package = false

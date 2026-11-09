@@ -18,6 +18,7 @@ from datetime import datetime
 from typing import Any
 
 from . import store
+from .timefmt import ftime
 
 COLLS = ("deals", "contacts", "companies", "activities", "threads", "docs", "calendar")
 APP = {
@@ -241,8 +242,8 @@ def _fmt(key: str, v: Any) -> str | None:
 def _when(v: str) -> str:
     try:
         if len(v) <= 10:
-            return datetime.fromisoformat(v).strftime("%a %b %-d, %Y")
-        return datetime.fromisoformat(v).strftime("%a %b %-d, %Y, %-I:%M %p")
+            return ftime(datetime.fromisoformat(v), "%a %b %-d, %Y")
+        return ftime(datetime.fromisoformat(v), "%a %b %-d, %Y, %-I:%M %p")
     except ValueError:
         return v
 

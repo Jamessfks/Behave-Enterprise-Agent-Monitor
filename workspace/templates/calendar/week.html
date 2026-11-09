@@ -13,7 +13,7 @@
     {% for d in days %}
     <div class="text-center py-2">
       <div class="text-[11px] uppercase {{ 'text-[#1a73e8]' if d.is_today else 'text-gray-500' }}">{{ d.date.strftime('%a') }}</div>
-      <a href="/calendar/new?date={{ d.date.isoformat() }}&time=10:00" title="Create event on {{ d.date.strftime('%b %-d') }}"
+      <a href="/calendar/new?date={{ d.date.isoformat() }}&time=10:00" title="Create event on {{ ftime(d.date, '%b %-d') }}"
          class="inline-flex w-10 h-10 rounded-full items-center justify-center text-xl {{ 'bg-[#1a73e8] text-white' if d.is_today else 'text-gray-800 hover:bg-gray-100' }}">{{ d.date.day }}</a>
     </div>
     {% endfor %}
@@ -25,7 +25,7 @@
     {% for d in days %}
     <div class="relative border-l border-gray-200" data-day="{{ d.date.isoformat() }}">
       {% for h in HOURS %}
-      <a href="/calendar/new?date={{ d.date.isoformat() }}&time={{ '%02d' % h }}:00" class="block border-b border-gray-100 hover:bg-gray-50" style="height: {{ HOUR_PX }}px" aria-label="Create event {{ d.date.strftime('%b %-d') }} {{ h }}:00"></a>
+      <a href="/calendar/new?date={{ d.date.isoformat() }}&time={{ '%02d' % h }}:00" class="block border-b border-gray-100 hover:bg-gray-50" style="height: {{ HOUR_PX }}px" aria-label="Create event {{ ftime(d.date, '%b %-d') }} {{ h }}:00"></a>
       {% endfor %}
       {% for b in d.events %}
       {% set internal = not b.e.account %}

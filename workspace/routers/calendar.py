@@ -10,6 +10,7 @@ from datetime import date, datetime, timedelta
 from fastapi import APIRouter, HTTPException, Request
 
 from .. import events, store
+from ..timefmt import ftime
 from ..web import as_list, body, ok, page
 
 router = APIRouter()
@@ -124,7 +125,7 @@ def _layout(e: dict) -> dict:
         "e": e,
         "top": int(top),
         "height": max(22, int(dur * HOUR_PX) - 2),
-        "time": f"{s.strftime('%-I:%M')} – {en.strftime('%-I:%M %p')}",
+        "time": f"{ftime(s, '%-I:%M')} – {ftime(en, '%-I:%M %p')}",
     }
 
 
@@ -162,7 +163,7 @@ def week_page(request: Request, week: str | None = None):
             prev=(mon - timedelta(days=7)).isoformat(),
             next=(mon + timedelta(days=7)).isoformat(),
             today=_monday(_today()).isoformat(),
-            title_range=f"{mon.strftime('%b %-d')} – {(mon + timedelta(days=6)).strftime('%b %-d, %Y')}",
+            title_range=f"{ftime(mon, '%b %-d')} – {ftime(mon + timedelta(days=6), '%b %-d, %Y')}",
         ),
     )
 
@@ -201,7 +202,7 @@ def event_page(request: Request, ev_id: str):
         "calendar/event.html",
         **_ctx(
             e=e,
-            when=f"{s.strftime('%A, %B %-d, %Y')} · {s.strftime('%-I:%M')} – {en.strftime('%-I:%M %p')}",
+            when=f"{ftime(s, '%A, %B %-d, %Y')} · {ftime(s, '%-I:%M')} – {ftime(en, '%-I:%M %p')}",
             week=_monday(s.date()).isoformat(),
             deal=store.get("deals", e.get("deal")) if store.DATA.get("deals") is not None else None,
         ),

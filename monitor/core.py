@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import json
 import logging
+import os
 import time
 from functools import cache
 from pathlib import Path
@@ -89,6 +90,53 @@ def normal_check(directory: str | None = None) -> tuple[NormalCheck | None, str]
 
 
 @cache
+def bgpt_live() -> BehaviorGPTRanker | None:
+    """Live mode's BehaviorGPT (ADR 0013): warm start from approved runs, its own catalog id
+    (LIVE_UNBOXAI_CATALOG_ID, else UNBOXAI_CATALOG_ID) and its own cache, so the demo task's
+    evidence and the committed cache stay exactly as they are."""
+    try:
+        import monitor.clockfix  # noqa: F401  (history is silently dropped if the clock is fast)
+        from monitor.rankers import RankingCache, default_examples
+
+        return BehaviorGPTRanker(
+            catalog_id=os.environ.get("LIVE_UNBOXAI_CATALOG_ID")
+            or os.environ.get("UNBOXAI_CATALOG_ID", ""),
+            cache=RankingCache(ROOT / ".untracked" / "live_rankings_cache.json"),
+            examples=default_examples(),
+            pick=same_account_examples,
+        )
+    except (OSError, ValueError, KeyError) as e:
+        log.warning("Live BehaviorGPT ranker unavailable: %s", e)
+        return None
+
+
+@cache
+def _approved_by_account() -> list[tuple[str | None, list[dict[str, Any]]]]:
+    d = approved_dir()
+    out = []
+    for p in sorted(d.glob("*.jsonl")) if d.is_dir() else []:
+        raw = load_raw_run(p)
+        steps = adapter.steps(raw)
+        if raw and any(e["type"] == "view" for e in steps):
+            out.append(((raw[0].get("run") or {}).get("account_id"), steps))
+    return out
+
+
+def same_account_examples(history: list[dict[str, Any]], k: int | None = None):
+    """Live's warm start: approved runs about the account this run works on (its most frequent
+    entity so far), then others, k in all (BGPT_WARM_START, default 3). On the approved runs this
+    moved correct changes from median rank 55 to 3 of 139."""
+    from collections import Counter
+
+    k = int(os.environ.get("BGPT_WARM_START", "3")) if k is None else k
+    ents = Counter(e["details"].get("entity") for e in history if e["details"].get("entity"))
+    acct = ents.most_common(1)[0][0] if ents else None
+    runs = _approved_by_account()
+    same = [r for a, r in runs if acct and a == acct]
+    return (same + [r for a, r in runs if not acct or a != acct])[:k]
+
+
+@cache
 def bgpt() -> BehaviorGPTRanker | None:
     try:
         return BehaviorGPTRanker()
@@ -97,10 +145,12 @@ def bgpt() -> BehaviorGPTRanker | None:
         return None
 
 
-def behaviorgpt_evidence(history: list[dict[str, Any]], event: dict[str, Any]) -> dict[str, Any]:
+def behaviorgpt_evidence(
+    history: list[dict[str, Any]], event: dict[str, Any], live: bool = False
+) -> dict[str, Any]:
     """BehaviorGPT's rank of this step and its top guesses: evidence, never a vote."""
     out: dict[str, Any] = {"rank": None, "of": len(catalog_ids()), "top": []}
-    b = bgpt()
+    b = bgpt_live() if live else bgpt()
     if event["type"] != "view" or b is None:
         return out
     try:
@@ -161,7 +211,7 @@ def check_step(
     else:
         nv = normal.evaluate(history, event, cusum)
     tb = time.perf_counter()
-    bg = behaviorgpt_evidence(history, event)
+    bg = behaviorgpt_evidence(history, event, live=bool(ctx.get("live")))
     t1 = time.perf_counter()
     fv = check_facts(event, ctx.get("facts"))
     t2 = time.perf_counter()

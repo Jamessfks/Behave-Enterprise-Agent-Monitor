@@ -28,7 +28,7 @@ from pydantic import BaseModel
 ROOT = Path(__file__).resolve().parent
 load_dotenv(ROOT / ".env")
 
-from agent import live
+from agent import computer_use, live
 from monitor.catalog import load_catalog
 from monitor.unbox import (
     NAME_RE,
@@ -74,6 +74,11 @@ class RunIn(BaseModel):
     scenario: str | None = None
     mistakes: bool = True
     instruction: str | None = None
+
+
+class FinishIn(BaseModel):
+    run_id: str
+    summary: str = ""
 
 
 class PreviewIn(BaseModel):
@@ -123,17 +128,23 @@ def bootstrap() -> dict[str, Any]:
         "go_no_go": {
             k: gng.get(k) for k in ("careful_median_rank", "careful_top5_share", "catalog_size")
         },
-        "live_available": live.available(),
+        "live_available": live.available() or computer_use.available(),
+        "live_agent": "computer_use" if computer_use.available() else "claude",
         "behaviorgpt_live": bool(os.environ.get("UNBOXAI_API_KEY")),
         "state": STATE.name,
     }
 
 
 @app.post("/api/runs")
-async def start_run(body: RunIn) -> dict[str, Any]:
+async def start_run(body: RunIn, request: Request) -> dict[str, Any]:
+    computer_use.stop()  # a new run of any kind ends a computer-use agent still working
     if body.instruction:
+        if computer_use.available():
+            return computer_use.start(body.instruction, str(request.base_url).rstrip("/"))
         if not live.available():
-            raise HTTPException(400, "Live mode needs ANTHROPIC_API_KEY on the server.")
+            raise HTTPException(
+                400, "Live mode needs GEMINI_API_KEY (computer use) or ANTHROPIC_API_KEY."
+            )
         return live.start(body.instruction)
     try:
         return runner.start(body.scenario or DEFAULT_SCENARIO, body.mistakes)
@@ -143,9 +154,24 @@ async def start_run(body: RunIn) -> dict[str, Any]:
 
 @app.post("/api/runs/current/next")
 async def next_step() -> dict[str, Any]:
-    if (events.RUN_STATE.get("live") or {}).get("active"):
+    lv = events.RUN_STATE.get("live") or {}
+    if lv.get("active") and lv.get("mode") == "computer_use":
+        return await computer_use.next_step(WORKSPACE)
+    if lv.get("active"):
         return await live.next_step(WORKSPACE)
     return await runner.next_step(WORKSPACE)
+
+
+@app.get("/api/runs/current/agent")
+def agent_status() -> dict[str, Any]:
+    """The computer-use agent polls this before each turn: halted on a flagged step, or stopped."""
+    return computer_use.status()
+
+
+@app.post("/api/runs/current/finish")
+def finish_run(body: FinishIn) -> dict[str, Any]:
+    """The computer-use agent process reports it is done, with its summary."""
+    return computer_use.finish(body.run_id, body.summary)
 
 
 @app.get("/api/runs/current")

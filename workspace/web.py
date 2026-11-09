@@ -8,6 +8,7 @@ from fastapi import Request
 from fastapi.templating import Jinja2Templates
 
 from . import events, store
+from .timefmt import ftime
 
 templates = Jinja2Templates(directory=str(Path(__file__).parent / "templates"))
 
@@ -21,9 +22,9 @@ def fmt_dt(ts: str | None, short: bool = True) -> str:
         return ts
     if short:
         if d.date().isoformat() == store.NOW[:10]:
-            return d.strftime("%-I:%M %p")
-        return d.strftime("%b %-d")
-    return d.strftime("%a, %b %-d, %Y, %-I:%M %p")
+            return ftime(d, "%-I:%M %p")
+        return ftime(d, "%b %-d")
+    return ftime(d, "%a, %b %-d, %Y, %-I:%M %p")
 
 
 def money(v: Any) -> str:
@@ -44,6 +45,7 @@ def contact_name(c: dict | None) -> str:
 
 templates.env.globals.update(
     fmt_dt=fmt_dt,
+    ftime=ftime,
     money=money,
     user_name=user_name,
     contact_name=contact_name,

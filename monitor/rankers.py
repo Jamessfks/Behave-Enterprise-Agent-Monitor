@@ -64,7 +64,22 @@ class RankingCache:
         return len(self._data)
 
 
+def default_examples(k: int | None = None) -> list[list[dict[str, Any]]]:
+    """The warm start used in Live mode (ADR 0013): the first k approved runs (runs/approved/),
+    BGPT_WARM_START=k (default 3). On approved runs outside the examples, 3 example runs moved
+    the true next step from median rank 86 of 139 to 1."""
+    from monitor.core import approved_runs  # local import: core imports this module
+
+    k = int(os.environ.get("BGPT_WARM_START", "3")) if k is None else k
+    return approved_runs()[:k] if k > 0 else []
+
+
 class BehaviorGPTRanker:
+    """BehaviorGPT ranks the next step. Cold by default (the demo task). With `examples` (Live
+    mode, ADR 0013), approved runs go first as earlier sessions (the SDK takes a list of
+    sessions), so the model sees how this company does the work before it scores the run in
+    progress. A run is never among its own examples."""
+
     name = "behaviorgpt"
 
     def __init__(
@@ -72,13 +87,33 @@ class BehaviorGPTRanker:
         catalog_id: str | None = None,
         client: Any = None,
         cache: RankingCache | None = None,
+        examples: list[list[dict[str, Any]]] | None = None,
+        pick: Any = None,
     ):
         self.catalog_id = catalog_id or os.environ.get("UNBOXAI_CATALOG_ID", "")
         self.cache = cache if cache is not None else RankingCache()
         self._client = client
+        self.examples = examples or []
+        self.pick = pick  # history -> example runs (Live: runs about the same account)
         self.n_actions = len(load_catalog())
         self.calls = 0
         self.cache_hits = 0
+
+    def _for(self, history: list[dict[str, Any]]) -> list[list[dict[str, Any]]]:
+        """Example runs for this history: swap out the run being scored (replays, calibration)."""
+        rid = history[0].get("run_id") if history else None
+        ex = self.pick(history) if self.pick else self.examples
+        if rid and any(r and r[0].get("run_id") == rid for r in ex):
+            pool = default_examples(1000)
+            ex = [r for r in pool if r and r[0].get("run_id") != rid][: len(ex)]
+        return ex
+
+    def _key(self, history: list[dict[str, Any]], ex: list[list[dict[str, Any]]]) -> str:
+        key = history_key(self.catalog_id, history)
+        if not ex:
+            return key  # cold start: the same keys as the committed cache
+        warm = ",".join(str(r[0].get("run_id")) for r in ex if r)
+        return key.replace("|", f"|warm:{warm}|", 1)
 
     @property
     def client(self):
@@ -95,7 +130,7 @@ class BehaviorGPTRanker:
         )
 
     def cached(self, history: list[dict[str, Any]]) -> bool:
-        return self.cache.get(history_key(self.catalog_id, history)) is not None
+        return self.cache.get(self._key(history, self._for(history))) is not None
 
     def _complete_with_retry(self, sdk_history, chunk: list[str]):
         return _with_retry(
@@ -111,12 +146,15 @@ class BehaviorGPTRanker:
     def rank(self, history: list[dict[str, Any]]) -> dict[str, float]:
         """Scores of the whole catalog. `complete()` returns at most 100 results, so a larger
         catalog is ranked in chunks of ids (same history, same model call), then merged."""
-        key = history_key(self.catalog_id, history)
+        ex = self._for(history)
+        key = self._key(history, ex)
         hit = self.cache.get(key)
         if hit is not None:
             self.cache_hits += 1
             return hit
-        sdk_history = [to_sdk(e) for e in history]
+        current = [to_sdk(e) for e in history]
+        sessions = [[to_sdk(e) for e in r] for r in ex if r] + ([current] if current else [])
+        sdk_history = sessions if len(sessions) > 1 else (sessions[0] if sessions else [])
         scores: dict[str, float] = {}
         for chunk in id_chunks():
             res = self._complete_with_retry(sdk_history, chunk)
